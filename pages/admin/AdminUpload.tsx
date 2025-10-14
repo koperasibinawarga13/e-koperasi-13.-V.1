@@ -8,11 +8,12 @@ const AdminUpload: React.FC = () => {
     const [files, setFiles] = useState<File[]>([]);
     const [uploadProgress, setUploadProgress] = useState(0);
     const [isUploading, setIsUploading] = useState(false);
-    const [uploadSuccess, setUploadSuccess] = useState(false);
+    const [uploadStatus, setUploadStatus] = useState('');
 
     const onDrop = useCallback((acceptedFiles: File[]) => {
         setFiles(acceptedFiles);
-        setUploadSuccess(false);
+        setUploadStatus('');
+        setUploadProgress(0);
     }, []);
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -21,22 +22,25 @@ const AdminUpload: React.FC = () => {
             'text/csv': ['.csv'],
             'application/vnd.ms-excel': ['.xls'],
             'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'],
-        }
+        },
+        maxFiles: 1,
     });
-
+    
     const handleUpload = () => {
-        if (files.length === 0) return;
+        if (files.length === 0) {
+            setUploadStatus('Pilih file terlebih dahulu.');
+            return;
+        }
         setIsUploading(true);
-        setUploadSuccess(false);
-        setUploadProgress(0);
-
-        // Simulate upload progress
+        setUploadStatus('Mengunggah file...');
+        
+        // Mock upload progress
         const interval = setInterval(() => {
             setUploadProgress(prev => {
                 if (prev >= 100) {
                     clearInterval(interval);
                     setIsUploading(false);
-                    setUploadSuccess(true);
+                    setUploadStatus(`File '${files[0].name}' berhasil diunggah.`);
                     setFiles([]);
                     return 100;
                 }
@@ -44,70 +48,58 @@ const AdminUpload: React.FC = () => {
             });
         }, 200);
     };
-    
-    const removeFile = (fileName: string) => {
-        setFiles(files.filter(file => file.name !== fileName));
-    };
 
     return (
         <div>
             <Header title="Upload Data" />
-            <div className="bg-white p-8 rounded-xl shadow-md max-w-2xl mx-auto">
-                <h2 className="text-xl font-bold text-dark mb-4">Upload File Data Keuangan</h2>
-                <p className="text-gray-600 mb-6">Silakan unggah file dalam format .csv, .xls, atau .xlsx untuk memperbarui data keuangan koperasi.</p>
+            <div className="bg-white p-6 rounded-xl shadow-md">
+                <h2 className="text-xl font-bold text-dark mb-4">Upload Data Anggota atau Transaksi</h2>
+                <p className="text-gray-600 mb-6">Pilih file CSV, XLS, atau XLSX untuk diimpor ke dalam sistem.</p>
                 
                 <div 
                     {...getRootProps()} 
-                    className={`border-2 border-dashed rounded-lg p-10 text-center cursor-pointer transition-colors ${isDragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400'}`}
+                    className={`border-2 border-dashed rounded-lg p-12 text-center cursor-pointer transition-colors ${isDragActive ? 'border-primary bg-blue-50' : 'border-gray-300'}`}
                 >
                     <input {...getInputProps()} />
-                    <div className="flex flex-col items-center text-gray-500">
-                        <UploadIcon className="w-12 h-12 mb-4" />
+                    <div className="flex flex-col items-center">
+                        <UploadIcon className="w-12 h-12 text-gray-400 mb-4" />
                         {isDragActive ? (
-                            <p>Jatuhkan file di sini ...</p>
+                            <p className="text-lg text-primary font-semibold">Jatuhkan file di sini...</p>
                         ) : (
-                            <p>Seret & jatuhkan file di sini, atau klik untuk memilih file</p>
+                            <p className="text-gray-500">Seret &amp; jatuhkan file di sini, atau klik untuk memilih file</p>
                         )}
-                        <p className="text-xs mt-2">CSV, XLS, XLSX (MAX. 5MB)</p>
+                        <p className="text-xs text-gray-400 mt-2">Hanya file .csv, .xls, .xlsx yang didukung</p>
                     </div>
                 </div>
 
                 {files.length > 0 && (
                     <div className="mt-6">
-                        <h3 className="font-semibold mb-2">File yang akan diupload:</h3>
+                        <h3 className="font-semibold">File terpilih:</h3>
                         <ul>
-                            {files.map(file => (
-                                <li key={file.name} className="flex justify-between items-center bg-gray-100 p-2 rounded mb-2">
-                                    <span className="text-sm">{file.name} - {(file.size / 1024).toFixed(2)} KB</span>
-                                    <button onClick={() => removeFile(file.name)} className="text-red-500 hover:text-red-700 text-sm font-bold">X</button>
-                                </li>
-                            ))}
+                            {files.map(file => <li key={file.name}>{file.name} - {(file.size / 1024).toFixed(2)} KB</li>)}
                         </ul>
                     </div>
                 )}
                 
+                <div className="mt-8">
+                    <button 
+                        onClick={handleUpload} 
+                        disabled={isUploading || files.length === 0}
+                        className="bg-primary text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-800 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+                    >
+                        {isUploading ? 'Mengunggah...' : 'Upload File'}
+                    </button>
+                </div>
+
                 {isUploading && (
                     <div className="mt-6">
                         <ProgressBar progress={uploadProgress} />
-                        <p className="text-center mt-2 text-sm">{uploadProgress}%</p>
                     </div>
                 )}
-
-                {uploadSuccess && (
-                    <div className="mt-6 p-4 bg-green-100 text-green-800 rounded-lg text-center">
-                        File berhasil diupload!
-                    </div>
+                
+                {uploadStatus && (
+                    <p className={`mt-4 text-sm ${uploadStatus.includes('berhasil') ? 'text-green-600' : 'text-red-600'}`}>{uploadStatus}</p>
                 )}
-
-                <div className="mt-8 text-right">
-                    <button 
-                        onClick={handleUpload}
-                        disabled={files.length === 0 || isUploading}
-                        className="bg-secondary text-white px-6 py-2 rounded-lg font-semibold hover:bg-emerald-600 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
-                    >
-                        {isUploading ? 'Mengunggah...' : 'Upload'}
-                    </button>
-                </div>
             </div>
         </div>
     );

@@ -1,42 +1,54 @@
-import { Anggota } from '../types';
+import { collection, getDocs, doc, addDoc, updateDoc, deleteDoc } from "firebase/firestore";
+import { db } from "../firebaseConfig";
+import { Anggota } from "../types";
 
-// Mock data to simulate Firestore
-let mockAnggota: Anggota[] = [
-  { id: '1', nomorAnggota: 'AGT001', nama: 'Budi Santoso', nik: '3201234567890001', alamat: 'Jl. Merdeka No. 1', telepon: '081234567890', tanggalMasuk: '2022-01-15', status: 'Aktif' },
-  { id: '2', nomorAnggota: 'AGT002', nama: 'Siti Aminah', nik: '3201234567890002', alamat: 'Jl. Pahlawan No. 2', telepon: '081234567891', tanggalMasuk: '2022-02-20', status: 'Aktif' },
-  { id: '3', nomorAnggota: 'AGT003', nama: 'Joko Widodo', nik: '3201234567890003', alamat: 'Jl. Kenanga No. 3', telepon: '081234567892', tanggalMasuk: '2023-03-10', status: 'Tidak Aktif' },
+const anggotaCollectionRef = collection(db, "anggota");
+
+// Mock data to start with if firestore is empty
+const mockAnggota: Omit<Anggota, 'id'>[] = [
+    { no_anggota: 'A001', nama: 'Budi Santoso', nik: '3201012345670001', alamat: 'Jl. Merdeka No. 10', no_telepon: '081234567890', tanggal_bergabung: '2022-01-15', status: 'Aktif' },
+    { no_anggota: 'A002', nama: 'Citra Lestari', nik: '3201012345670002', alamat: 'Jl. Pahlawan No. 5', no_telepon: '081234567891', tanggal_bergabung: '2022-03-20', status: 'Aktif' },
+    { no_anggota: 'A003', nama: 'Doni Firmansyah', nik: '3201012345670003', alamat: 'Jl. Kemerdekaan No. 12', no_telepon: '081234567892', tanggal_bergabung: '2023-05-10', status: 'Tidak Aktif' },
 ];
 
-let nextId = 4;
+let isMockDataInitialized = false;
 
-const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
+const initializeMockData = async () => {
+    if (isMockDataInitialized) return;
+    try {
+        const snapshot = await getDocs(anggotaCollectionRef);
+        if (snapshot.empty) {
+            console.log("Firestore is empty, initializing with mock data.");
+            for (const anggota of mockAnggota) {
+                await addDoc(anggotaCollectionRef, anggota);
+            }
+        }
+    } catch (e) {
+        console.error("Error initializing mock data: ", e);
+    } finally {
+        isMockDataInitialized = true;
+    }
+};
 
 export const getAnggota = async (): Promise<Anggota[]> => {
-  await delay(500); // Simulate network delay
-  return [...mockAnggota];
+    await initializeMockData();
+    const data = await getDocs(anggotaCollectionRef);
+    return data.docs.map(doc => ({ ...doc.data(), id: doc.id } as Anggota));
 };
 
-export const addAnggota = async (anggotaData: Omit<Anggota, 'id'>): Promise<Anggota> => {
-  await delay(500);
-  const newAnggota: Anggota = {
-    ...anggotaData,
-    id: (nextId++).toString(),
-  };
-  mockAnggota.push(newAnggota);
-  return newAnggota;
+export const addAnggota = async (anggota: Omit<Anggota, 'id'>): Promise<Anggota> => {
+    const docRef = await addDoc(anggotaCollectionRef, anggota);
+    return { ...anggota, id: docRef.id };
 };
 
-export const updateAnggota = async (id: string, anggotaData: Partial<Anggota>): Promise<Anggota> => {
-    await delay(500);
-    const index = mockAnggota.findIndex(a => a.id === id);
-    if (index === -1) {
-        throw new Error('Anggota not found');
-    }
-    mockAnggota[index] = { ...mockAnggota[index], ...anggotaData };
-    return mockAnggota[index];
+export const updateAnggota = async (anggota: Anggota): Promise<Anggota> => {
+    const anggotaDoc = doc(db, "anggota", anggota.id);
+    const { id, ...data } = anggota;
+    await updateDoc(anggotaDoc, data as any);
+    return anggota;
 };
 
 export const deleteAnggota = async (id: string): Promise<void> => {
-    await delay(500);
-    mockAnggota = mockAnggota.filter(a => a.id !== id);
+    const anggotaDoc = doc(db, "anggota", id);
+    await deleteDoc(anggotaDoc);
 };

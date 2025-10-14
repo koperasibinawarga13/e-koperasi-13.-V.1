@@ -6,25 +6,24 @@ export enum UserRole {
 export interface User {
   id: string;
   name: string;
-  email: string;
   role: UserRole;
-  anggotaId?: string; // Link to Anggota document if role is ANGGOTA
+  email?: string;
 }
 
 export interface Anggota {
-  id: string;
-  nomorAnggota: string;
-  nama: string;
-  nik: string;
-  alamat: string;
-  telepon: string;
-  tanggalMasuk: string; // ISO string date
-  status: 'Aktif' | 'Tidak Aktif';
+    id: string;
+    no_anggota: string;
+    nama: string;
+    nik: string;
+    alamat: string;
+    no_telepon: string;
+    tanggal_bergabung: string;
+    status: 'Aktif' | 'Tidak Aktif';
 }
 
 export interface Transaction {
     id: string;
-    date: string; // ISO string date
+    date: string;
     description: string;
     type: 'Simpanan' | 'Penarikan' | 'Pinjaman' | 'Angsuran';
     amount: number;
