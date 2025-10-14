@@ -1,54 +1,94 @@
-import { collection, getDocs, doc, addDoc, updateDoc, deleteDoc } from "firebase/firestore";
-import { db } from "../firebaseConfig";
-import { Anggota } from "../types";
+// FIX: Implemented full content for anggotaService.ts to handle Firestore operations.
+import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, where, writeBatch, getDoc } from 'firebase/firestore';
+import { db } from '../firebaseConfig';
+import { Anggota } from '../types';
 
-const anggotaCollectionRef = collection(db, "anggota");
+const anggotaCollectionRef = collection(db, 'anggota');
 
-// Mock data to start with if firestore is empty
-const mockAnggota: Omit<Anggota, 'id'>[] = [
-    { no_anggota: 'A001', nama: 'Budi Santoso', nik: '3201012345670001', alamat: 'Jl. Merdeka No. 10', no_telepon: '081234567890', tanggal_bergabung: '2022-01-15', status: 'Aktif' },
-    { no_anggota: 'A002', nama: 'Citra Lestari', nik: '3201012345670002', alamat: 'Jl. Pahlawan No. 5', no_telepon: '081234567891', tanggal_bergabung: '2022-03-20', status: 'Aktif' },
-    { no_anggota: 'A003', nama: 'Doni Firmansyah', nik: '3201012345670003', alamat: 'Jl. Kemerdekaan No. 12', no_telepon: '081234567892', tanggal_bergabung: '2023-05-10', status: 'Tidak Aktif' },
-];
-
-let isMockDataInitialized = false;
-
-const initializeMockData = async () => {
-    if (isMockDataInitialized) return;
+export const getAnggota = async (): Promise<Anggota[]> => {
     try {
-        const snapshot = await getDocs(anggotaCollectionRef);
-        if (snapshot.empty) {
-            console.log("Firestore is empty, initializing with mock data.");
-            for (const anggota of mockAnggota) {
-                await addDoc(anggotaCollectionRef, anggota);
-            }
-        }
-    } catch (e) {
-        console.error("Error initializing mock data: ", e);
-    } finally {
-        isMockDataInitialized = true;
+        const data = await getDocs(anggotaCollectionRef);
+        return data.docs.map((doc) => ({ ...doc.data(), id: doc.id } as Anggota));
+    } catch (error) {
+        console.error("Error fetching anggota: ", error);
+        return [];
     }
 };
 
-export const getAnggota = async (): Promise<Anggota[]> => {
-    await initializeMockData();
-    const data = await getDocs(anggotaCollectionRef);
-    return data.docs.map(doc => ({ ...doc.data(), id: doc.id } as Anggota));
+export const getAnggotaById = async (id: string): Promise<Anggota | null> => {
+    try {
+        const docRef = doc(db, 'anggota', id);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+            return { ...docSnap.data(), id: docSnap.id } as Anggota;
+        }
+        return null;
+    } catch (error) {
+        console.error("Error fetching anggota by ID: ", error);
+        return null;
+    }
 };
 
-export const addAnggota = async (anggota: Omit<Anggota, 'id'>): Promise<Anggota> => {
-    const docRef = await addDoc(anggotaCollectionRef, anggota);
-    return { ...anggota, id: docRef.id };
+
+export const findAnggotaByCredentials = async (no_anggota: string, password: string): Promise<Anggota | null> => {
+    try {
+        const q = query(anggotaCollectionRef, where("no_anggota", "==", no_anggota), where("password", "==", password));
+        const querySnapshot = await getDocs(q);
+        if (!querySnapshot.empty) {
+            const doc = querySnapshot.docs[0];
+            return { ...doc.data(), id: doc.id } as Anggota;
+        }
+        return null;
+    } catch (error) {
+        console.error("Error finding anggota by credentials: ", error);
+        return null;
+    }
 };
 
-export const updateAnggota = async (anggota: Anggota): Promise<Anggota> => {
-    const anggotaDoc = doc(db, "anggota", anggota.id);
-    const { id, ...data } = anggota;
-    await updateDoc(anggotaDoc, data as any);
-    return anggota;
+type NewAnggotaData = Omit<Anggota, 'id'>;
+
+export const addAnggota = async (newAnggota: NewAnggotaData): Promise<Anggota> => {
+    try {
+        const docRef = await addDoc(anggotaCollectionRef, newAnggota);
+        return { ...newAnggota, id: docRef.id };
+    } catch (error) {
+        console.error("Error adding anggota: ", error);
+        throw error;
+    }
+};
+
+export const batchAddAnggota = async (anggotaList: NewAnggotaData[]): Promise<void> => {
+    try {
+        const batch = writeBatch(db);
+        anggotaList.forEach((anggota) => {
+            const docRef = doc(anggotaCollectionRef); // Automatically generate unique ID
+            batch.set(docRef, anggota);
+        });
+        await batch.commit();
+    } catch (error) {
+        console.error("Error adding anggota in batch: ", error);
+        throw error;
+    }
+}
+
+export const updateAnggota = async (updatedAnggota: Anggota): Promise<Anggota> => {
+    try {
+        const anggotaDoc = doc(db, 'anggota', updatedAnggota.id);
+        const { id, ...dataToUpdate } = updatedAnggota;
+        await updateDoc(anggotaDoc, dataToUpdate);
+        return updatedAnggota;
+    } catch (error) {
+        console.error("Error updating anggota: ", error);
+        throw error;
+    }
 };
 
 export const deleteAnggota = async (id: string): Promise<void> => {
-    const anggotaDoc = doc(db, "anggota", id);
-    await deleteDoc(anggotaDoc);
+    try {
+        const anggotaDoc = doc(db, 'anggota', id);
+        await deleteDoc(anggotaDoc);
+    } catch (error) {
+        console.error("Error deleting anggota: ", error);
+        throw error;
+    }
 };

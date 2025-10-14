@@ -1,9 +1,11 @@
-import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
-import { User } from '../types';
+// FIX: Implemented full content for AuthContext.tsx to provide authentication state and actions.
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { User, UserRole, Anggota } from '../types';
+import { findAnggotaByCredentials, getAnggotaById } from '../services/anggotaService';
 
 interface AuthContextType {
   user: User | null;
-  login: (user: User) => void;
+  login: (username: string, password: string) => Promise<void>;
   logout: () => void;
   loading: boolean;
 }
@@ -15,23 +17,49 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check for a logged-in user in localStorage
     try {
       const storedUser = localStorage.getItem('user');
       if (storedUser) {
         setUser(JSON.parse(storedUser));
       }
     } catch (error) {
-        console.error("Failed to parse user from localStorage", error);
-        localStorage.removeItem('user');
+      console.error("Failed to parse user from localStorage", error);
+      localStorage.removeItem('user');
     } finally {
         setLoading(false);
     }
   }, []);
 
-  const login = (userData: User) => {
-    localStorage.setItem('user', JSON.stringify(userData));
-    setUser(userData);
+  const login = async (username: string, password: string) => {
+    // Admin login (hardcoded)
+    if (username === 'admin@koperasi13.com' && password === 'admin123') {
+      const adminUser: User = {
+        id: 'admin01',
+        name: 'Admin Koperasi',
+        email: 'admin@koperasi13.com',
+        role: UserRole.ADMIN,
+      };
+      localStorage.setItem('user', JSON.stringify(adminUser));
+      setUser(adminUser);
+      return;
+    }
+    
+    // Anggota login (Firestore)
+    const anggota = await findAnggotaByCredentials(username, password);
+    if (anggota) {
+        const anggotaUser: User = {
+            id: anggota.id,
+            anggotaId: anggota.id,
+            name: anggota.nama,
+            email: anggota.email,
+            role: UserRole.ANGGOTA
+        };
+        localStorage.setItem('user', JSON.stringify(anggotaUser));
+        setUser(anggotaUser);
+        return;
+    }
+
+    throw new Error('Username atau password salah.');
   };
 
   const logout = () => {
@@ -40,7 +68,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   if (loading) {
-    return <div>Loading...</div>; // Or a spinner component
+      return <div className="flex justify-center items-center h-screen">Loading...</div>; 
   }
 
   return (

@@ -1,48 +1,53 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from '../../components/Header';
 import { useAuth } from '../../context/AuthContext';
 import { UserCircleIcon } from '../../components/icons/Icons';
-
-interface ProfileData {
-  nama: string;
-  noAnggota: string;
-  nik: string;
-  email: string;
-  noTelepon: string;
-  alamat: string;
-  tanggalBergabung: string;
-}
+import { Anggota } from '../../types';
+import { getAnggotaById, updateAnggota } from '../../services/anggotaService';
 
 const AnggotaProfil: React.FC = () => {
   const { user } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
-  
-  // Mock data for profile, would be fetched from an API
-  const [profileData, setProfileData] = useState<ProfileData>({
-    nama: user?.name || 'Budi Santoso',
-    noAnggota: 'A001',
-    nik: '3201012345670001',
-    email: user?.email || 'budi.s@example.com',
-    noTelepon: '081234567890',
-    alamat: 'Jl. Merdeka No. 10, Jakarta Pusat, DKI Jakarta, 10110',
-    tanggalBergabung: '15 Januari 2022',
-  });
+  const [profileData, setProfileData] = useState<Anggota | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   
   const [editableData, setEditableData] = useState({
-      email: profileData.email,
-      noTelepon: profileData.noTelepon,
-      alamat: profileData.alamat,
+      email: '',
+      no_telepon: '',
+      alamat: '',
   });
+
+  useEffect(() => {
+      const fetchProfile = async () => {
+          if (user?.anggotaId) {
+              setIsLoading(true);
+              const data = await getAnggotaById(user.anggotaId);
+              setProfileData(data);
+              if (data) {
+                  setEditableData({
+                      email: data.email,
+                      no_telepon: data.no_telepon,
+                      alamat: data.alamat,
+                  });
+              }
+              setIsLoading(false);
+          }
+      };
+      fetchProfile();
+  }, [user]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       const { name, value } = e.target;
       setEditableData(prev => ({ ...prev, [name]: value }));
   };
   
-  const handleSave = () => {
-      setProfileData(prev => ({ ...prev, ...editableData }));
-      setIsEditing(false);
-      // Here you would also call an API to save the changes
+  const handleSave = async () => {
+      if (profileData) {
+          const updatedData = { ...profileData, ...editableData };
+          const result = await updateAnggota(updatedData);
+          setProfileData(result);
+          setIsEditing(false);
+      }
   };
 
   const ProfileField: React.FC<{ label: string; value: string; }> = ({ label, value }) => (
@@ -63,6 +68,14 @@ const AnggotaProfil: React.FC = () => {
       </div>
   );
 
+  if (isLoading) {
+      return <div>Loading profile...</div>;
+  }
+
+  if (!profileData) {
+      return <div>Gagal memuat profil.</div>;
+  }
+
   return (
     <div>
       <Header title="Profil Anggota" />
@@ -71,24 +84,24 @@ const AnggotaProfil: React.FC = () => {
           <UserCircleIcon className="w-24 h-24 text-gray-300" />
           <div>
             <h2 className="text-2xl font-bold text-dark">{profileData.nama}</h2>
-            <p className="text-gray-500">No. Anggota: {profileData.noAnggota}</p>
+            <p className="text-gray-500">No. Anggota: {profileData.no_anggota}</p>
           </div>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
             <ProfileField label="NIK" value={profileData.nik} />
-            <ProfileField label="Tanggal Bergabung" value={profileData.tanggalBergabung} />
+            <ProfileField label="Tanggal Bergabung" value={new Date(profileData.tanggal_bergabung).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })} />
 
             {isEditing ? (
                 <>
                     <EditableField label="Email" name="email" value={editableData.email} type="email" />
-                    <EditableField label="No. Telepon" name="noTelepon" value={editableData.noTelepon} type="tel" />
+                    <EditableField label="No. Telepon" name="no_telepon" value={editableData.no_telepon} type="tel" />
                     <EditableField label="Alamat" name="alamat" value={editableData.alamat} isTextarea={true} />
                 </>
             ) : (
                 <>
                     <ProfileField label="Email" value={profileData.email} />
-                    <ProfileField label="No. Telepon" value={profileData.noTelepon} />
+                    <ProfileField label="No. Telepon" value={profileData.no_telepon} />
                     <ProfileField label="Alamat" value={profileData.alamat} />
                 </>
             )}
