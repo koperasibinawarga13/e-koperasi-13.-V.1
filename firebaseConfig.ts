@@ -1,21 +1,20 @@
-// FIX: Import firebase to resolve 'Cannot find name 'firebase'' error.
-import firebase from 'firebase/compat/app';
-import 'firebase/compat/firestore';
+import { initializeApp } from "firebase/app";
+import { getFirestore } from "firebase/firestore";
 
-// IMPORTANT: Replace with your actual Firebase project configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_STORAGE_BUCKET",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyDNFHn1AffQHEtMxjYcmOWMV3xyNv_9nHU",
+  authDomain: "e-koperasi13.firebaseapp.com",
+  projectId: "e-koperasi13",
+  storageBucket: "e-koperasi13.appspot.com",
+  messagingSenderId: "15792482213",
+  appId: "1:15792482213:web:d7b1965f9b11a5380a2a4c",
+  measurementId: "G-B96R2RRHPW"
 };
 
-// Initialize Firebase
-// Using compat libraries for easier integration with existing code patterns
-firebase.initializeApp(firebaseConfig);
 
-const db = firebase.firestore();
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
 export { db };
