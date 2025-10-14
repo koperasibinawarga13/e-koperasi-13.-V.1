@@ -1,0 +1,5 @@
+{
+  "name": "E-Banking Koperasi Binawarga",
+  "description": "A modern, secure, and user-friendly e-banking frontend for Koperasi Binawarga, providing separate portals for administrators and members to manage finances, view reports, and update profiles.",
+  "requestFramePermissions": []
+}
