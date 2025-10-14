@@ -1,4 +1,4 @@
-
+// FIX: Create type definitions for User, Anggota, and Transaction.
 export enum UserRole {
   ADMIN = 'admin',
   ANGGOTA = 'anggota',
@@ -11,21 +11,24 @@ export interface User {
   email: string;
 }
 
-export interface Member {
-  id: string;
-  memberId: string;
-  name: string;
-  joinDate: string;
-  status: 'Aktif' | 'Tidak Aktif';
-  totalSimpanan: number;
-  totalPinjaman: number;
-}
+export type TransactionType = 'Simpanan' | 'Angsuran' | 'Penarikan' | 'Pinjaman';
 
 export interface Transaction {
   id: string;
   date: string;
   description: string;
-  type: 'Simpanan' | 'Penarikan' | 'Pinjaman' | 'Angsuran';
+  type: TransactionType;
   amount: number;
   balance: number;
+}
+
+export interface Anggota {
+  id: string;
+  name: string;
+  email: string;
+  joinDate: string;
+  phone: string;
+  address: string;
+  totalSimpanan: number;
+  totalPinjaman: number;
 }

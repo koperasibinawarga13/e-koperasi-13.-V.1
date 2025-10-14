@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 const iconProps = {
@@ -58,5 +57,11 @@ export const CogIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
 export const BuildingOfficeIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
     <svg {...iconProps} {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h6.375M9 12h6.375m-6.375 5.25h6.375M5.25 9h13.5" />
+    </svg>
+);
+
+export const ChevronLeftIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+    <svg {...iconProps} {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
     </svg>
 );

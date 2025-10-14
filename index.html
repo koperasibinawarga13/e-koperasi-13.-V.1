@@ -1,11 +1,10 @@
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>E-Banking Koperasi Binawarga</title>
+    <title>e-Koperasi 13</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
@@ -26,6 +25,13 @@
     <script src="https://unpkg.com/react-router-dom@6/umd/react-router-dom.production.min.js"></script>
     <script src="https://unpkg.com/recharts@2/umd/Recharts.min.js"></script>
 
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    
+    <!-- SheetJS for Excel parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
   <script type="importmap">
 {
   "imports": {
@@ -33,7 +39,9 @@
     "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
     "react/": "https://aistudiocdn.com/react@^19.2.0/",
     "recharts": "https://aistudiocdn.com/recharts@^3.2.1",
-    "react-router-dom": "https://aistudiocdn.com/react-router-dom@^7.9.4"
+    "react-router-dom": "https://aistudiocdn.com/react-router-dom@^7.9.4",
+    "firebase/": "https://aistudiocdn.com/firebase@^12.4.0/",
+    "react-dropzone": "https://aistudiocdn.com/react-dropzone@^14.3.8"
   }
 }
 </script>

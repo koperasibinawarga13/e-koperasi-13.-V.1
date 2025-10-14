@@ -29,7 +29,10 @@ const LoginPage: React.FC = () => {
         <div className="text-center">
             <div className="flex justify-center items-center mb-4">
                 <BuildingOfficeIcon className="w-12 h-12 text-primary" />
-                <h1 className="text-4xl font-bold ml-3 text-dark">Binawarga</h1>
+                <div className="ml-4 text-left">
+                  <h1 className="text-4xl font-bold text-dark">e-Koperasi 13</h1>
+                  <p className="text-sm text-gray-500 -mt-1">Bina Warga</p>
+                </div>
             </div>
           <h2 className="text-2xl font-bold text-gray-800">Selamat Datang!</h2>
           <p className="text-gray-500 mt-2">Silakan login untuk mengakses akun Anda.</p>
