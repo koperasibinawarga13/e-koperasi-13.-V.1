@@ -249,7 +249,7 @@ export const deleteMonthlyReport = async (monthToDelete: string): Promise<void> 
 
                     revertedState.jumlah_total_simpanan = revertedState.akhir_simpanan_pokok + revertedState.akhir_simpanan_wajib + revertedState.akhir_simpanan_sukarela + revertedState.akhir_simpanan_wisata;
                     revertedState.jumlah_total_pinjaman = revertedState.akhir_pinjaman_berjangka + revertedState.akhir_pinjaman_khusus;
-                    revertedState.periode = undefined;
+                    delete (revertedState as Partial<Keuangan>).periode;
 
                     transaction.set(mainDocRef, revertedState);
                 }
