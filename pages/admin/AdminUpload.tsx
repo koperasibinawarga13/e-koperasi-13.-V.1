@@ -219,7 +219,7 @@ const AdminUpload: React.FC = () => {
                 akhir_simpanan_sukarela: parseNumber(row.akhir_simpanan_sukarela),
                 akhir_simpanan_wisata: parseNumber(row.akhir_simpanan_wisata),
                 akhir_pinjaman_berjangka: parseNumber(row.akhir_pinjaman_berjangka),
-                akhir_pinjaman_khusus: parseNumber(row.akhirl_pinjaman_khusus),
+                akhir_pinjaman_khusus: parseNumber(row.akhir_pinjaman_khusus),
                 jumlah_total_simpanan: parseNumber(row.jumlah_total_simpanan),
                 jumlah_total_pinjaman: parseNumber(row.jumlah_total_pinjaman),
             })).filter(k => k.no_anggota);
@@ -273,7 +273,7 @@ const AdminUpload: React.FC = () => {
     };
 
     const anggotaInstructions = `kode_anggota, nama_anggota, no_hp`;
-    const keuanganAwalInstructions = `no, no_anggota, nama_angota, awal_simpanan_pokok, awal_simpanan_wajib, sukarela, awal_simpanan_wisata, awal_pinjaman_berjangka, awal_pinjaman_khusus, transaksi_simpanan_pokok, transaksi_simpanan_wajib, transaksi_simpanan_sukarela, transaksi_simpanan_wisata, transaksi_pinjaman_berjangka, transaksi_pinjaman_khusus, transaksi_simpanan_jasa, transaksi_niaga, transaksi_dana_perlaya, transaksi_dana_katineng, Jumlah_setoran, transaksi_pengambilan_simpanan_pokok, transaksi_pengambilan_simpanan_wajib, transaksi_pengambilan_simpanan_sukarela, transaksi_pengambilan_simpanan_wisata, transaksi_penambahan_pinjaman_berjangka, transaksi_penambahan_pinjaman_khusus, transaksi_penambahan_pinjaman_niaga, akhir_simpanan_pokok, akhir_simpanan_wajib, akhir_simpanan_sukarela, akhir_simpanan_wisata, akhir_pinjaman_berjangka, akhirl_pinjaman_khusus, jumlah_total_simpanan, jumlah_total_pinjaman`;
+    const keuanganAwalInstructions = `no, no_anggota, nama_angota, awal_simpanan_pokok, awal_simpanan_wajib, sukarela, awal_simpanan_wisata, awal_pinjaman_berjangka, awal_pinjaman_khusus, transaksi_simpanan_pokok, transaksi_simpanan_wajib, transaksi_simpanan_sukarela, transaksi_simpanan_wisata, transaksi_pinjaman_berjangka, transaksi_pinjaman_khusus, transaksi_simpanan_jasa, transaksi_niaga, transaksi_dana_perlaya, transaksi_dana_katineng, Jumlah_setoran, transaksi_pengambilan_simpanan_pokok, transaksi_pengambilan_simpanan_wajib, transaksi_pengambilan_simpanan_sukarela, transaksi_pengambilan_simpanan_wisata, transaksi_penambahan_pinjaman_berjangka, transaksi_penambahan_pinjaman_khusus, transaksi_penambahan_pinjaman_niaga, akhir_simpanan_pokok, akhir_simpanan_wajib, akhir_simpanan_sukarela, akhir_simpanan_wisata, akhir_pinjaman_berjangka, akhir_pinjaman_khusus, jumlah_total_simpanan, jumlah_total_pinjaman`;
     const transaksiBulananInstructions = `no_anggota, transaksi_simpanan_pokok, transaksi_simpanan_wajib, transaksi_simpanan_sukarela, transaksi_simpanan_wisata, transaksi_pinjaman_berjangka, transaksi_pinjaman_khusus, transaksi_simpanan_jasa, transaksi_niaga, transaksi_dana_perlaya, transaksi_dana_katineng, Jumlah_setoran, transaksi_pengambilan_simpanan_pokok, transaksi_pengambilan_simpanan_wajib, transaksi_pengambilan_simpanan_sukarela, transaksi_pengambilan_simpanan_wisata, transaksi_penambahan_pinjaman_berjangka, transaksi_penambahan_pinjaman_khusus, transaksi_penambahan_pinjaman_niaga`;
 
     return (
