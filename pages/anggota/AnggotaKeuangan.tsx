@@ -1,71 +1,81 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import Header from '../../components/Header';
-import { Keuangan } from '../../types';
+import { Keuangan, Anggota } from '../../types';
 import { useAuth } from '../../context/AuthContext';
 import { getAnggotaById } from '../../services/anggotaService';
-import { getLaporanBulanan, getAvailableLaporanMonths } from '../../services/keuanganService';
-import { PrintIcon } from '../../components/icons/Icons';
+import { getLaporanBulanan, getAvailableLaporanMonths, getKeuanganByNoAnggota } from '../../services/keuanganService';
+import { PrintIcon, UserCircleIcon } from '../../components/icons/Icons';
 
 const AnggotaKeuangan: React.FC = () => {
     const { user } = useAuth();
     const [data, setData] = useState<Keuangan | null>(null);
+    const [anggota, setAnggota] = useState<Anggota | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [availableMonths, setAvailableMonths] = useState<string[]>([]);
-    const [selectedMonth, setSelectedMonth] = useState<string>('');
+    const [selectedMonth, setSelectedMonth] = useState<string>('latest'); // Default to 'latest'
 
-
+    // Effect to fetch initial metadata (anggota and available months)
     useEffect(() => {
         const fetchInitialData = async () => {
             if (user?.anggotaId) {
-                setIsLoading(true);
-                const anggota = await getAnggotaById(user.anggotaId);
-                if (anggota?.no_anggota) {
-                    const months = await getAvailableLaporanMonths(anggota.no_anggota);
-                    setAvailableMonths(months);
-                    if (months.length > 0) {
-                        setSelectedMonth(months[0]); // Automatically select the latest month
-                    } else {
-                        setIsLoading(false); // No history, stop loading
+                try {
+                    const anggotaData = await getAnggotaById(user.anggotaId);
+                    setAnggota(anggotaData);
+                    if (anggotaData?.no_anggota) {
+                        const months = await getAvailableLaporanMonths(anggotaData.no_anggota);
+                        setAvailableMonths(['latest', ...months]); // Add 'latest' as the first option
                     }
-                } else {
-                     setIsLoading(false);
+                } catch (error) {
+                    console.error("Error fetching initial data:", error);
                 }
             } else {
-                 setIsLoading(false);
+                setIsLoading(false);
             }
         };
         fetchInitialData();
     }, [user]);
 
+    // Effect to fetch financial data based on selected month
     useEffect(() => {
         const fetchDataForMonth = async () => {
-            if (user?.anggotaId && selectedMonth) {
-                setIsLoading(true);
-                 try {
-                    const anggota = await getAnggotaById(user.anggotaId);
-                    if (anggota?.no_anggota) {
-                        const result = await getLaporanBulanan(anggota.no_anggota, selectedMonth);
-                        setData(result);
-                    }
-                } catch (error) {
-                    console.error(`Failed to fetch data for month ${selectedMonth}:`, error);
-                    setData(null);
-                } finally {
-                    setIsLoading(false);
+            if (!anggota?.no_anggota) return;
+
+            setIsLoading(true);
+            try {
+                let result: Keuangan | null = null;
+                if (selectedMonth === 'latest') {
+                    result = await getKeuanganByNoAnggota(anggota.no_anggota);
+                } else {
+                    result = await getLaporanBulanan(anggota.no_anggota, selectedMonth);
                 }
+                setData(result);
+            } catch (error) {
+                console.error(`Failed to fetch data for selection ${selectedMonth}:`, error);
+                setData(null);
+            } finally {
+                setIsLoading(false);
             }
         };
-        
-        if (selectedMonth) {
+
+        if (anggota) { // Only run if we have the member's info
             fetchDataForMonth();
         }
-    }, [user, selectedMonth]);
-
+    }, [anggota, selectedMonth]);
 
     const formatCurrency = (amount: number | undefined) => {
         if (typeof amount !== 'number') return 'Rp 0';
         return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(amount);
+    };
+    
+    const renderMonthOption = (month: string) => {
+        if (month === 'latest') {
+            return <option key="latest" value="latest">Laporan Terkini</option>;
+        }
+        return (
+            <option key={month} value={month}>
+                {new Date(`${month}-02`).toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}
+            </option>
+        );
     };
 
     const DetailCard: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => (
@@ -84,50 +94,55 @@ const AnggotaKeuangan: React.FC = () => {
         </div>
     );
     
-    if (isLoading && !data) {
-        return (
-            <div>
-                <Header title="Rincian Keuangan" />
-                <p className="text-center p-10">Memuat rincian keuangan...</p>
-            </div>
-        );
-    }
-    
     return (
         <div>
-            <div className="flex flex-wrap items-center justify-between gap-4">
-                <Header title="Rincian Keuangan" />
-                 <div className="flex items-center gap-4 mb-8">
+            {/* Custom Header Section */}
+            <div className="bg-white shadow-sm p-6 rounded-lg mb-8 flex flex-wrap items-center justify-between gap-4">
+                <div className="flex items-center space-x-3">
+                    <h1 className="text-3xl font-bold text-dark">Rincian Keuangan</h1>
+                    {anggota && (
+                        <div className="hidden md:flex items-center space-x-2 text-gray-600 border-l pl-3 ml-1">
+                            <UserCircleIcon className="w-6 h-6 text-gray-400" />
+                            <span className="font-medium">{anggota.nama}</span>
+                        </div>
+                    )}
+                </div>
+                 <div className="flex items-center gap-4">
                     <div>
-                        <label htmlFor="month-select" className="text-sm font-medium text-gray-700 sr-only">Pilih Bulan</label>
                         <select
                             id="month-select"
                             value={selectedMonth}
                             onChange={(e) => setSelectedMonth(e.target.value)}
                             className="w-48 bg-white border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary"
-                            disabled={isLoading || availableMonths.length === 0}
+                            disabled={isLoading || availableMonths.length <= 1}
                         >
-                            {availableMonths.length > 0 ? (
-                                availableMonths.map(month => (
-                                <option key={month} value={month}>
-                                    {new Date(`${month}-02`).toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}
-                                </option>
-                                ))
-                            ) : (
-                                <option>Tidak ada riwayat</option>
-                            )}
+                           {(availableMonths.length > 0) ? 
+                                availableMonths.map(renderMonthOption)
+                                : <option>Memuat...</option>
+                           }
                         </select>
                     </div>
-                    <Link to="/anggota/slip" state={{ slipData: data }} className="inline-flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-sm hover:bg-gray-50 transition-colors">
+                    <Link 
+                        to="/anggota/slip" 
+                        state={{ slipData: data }} 
+                        className={`inline-flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-sm hover:bg-gray-50 transition-colors ${!data ? 'pointer-events-none opacity-50' : ''}`}
+                        aria-disabled={!data}
+                    >
                         <PrintIcon className="w-5 h-5 text-gray-600" />
                         Cetak Slip
                     </Link>
                  </div>
             </div>
+
+            {isLoading && (
+                 <p className="text-center p-10">Memuat rincian keuangan...</p>
+            )}
             
-            {!data && !isLoading ? (
+            {!isLoading && !data && (
                 <p className="text-center p-10">Data keuangan tidak ditemukan. Silakan hubungi admin jika terjadi kesalahan.</p>
-            ) : (
+            )}
+
+            {!isLoading && data && (
             <>
                 <DetailCard title="Saldo Awal">
                     <InfoItem label="Simpanan Pokok" value={data.awal_simpanan_pokok} />
