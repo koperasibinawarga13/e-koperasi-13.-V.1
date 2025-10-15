@@ -1,8 +1,18 @@
-import { collection, doc, writeBatch, runTransaction } from 'firebase/firestore';
+import { collection, doc, writeBatch, runTransaction, getDocs } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 import { Keuangan, TransaksiBulanan } from '../types';
 
 const keuanganCollectionRef = collection(db, 'keuangan');
+
+export const getKeuangan = async (): Promise<Keuangan[]> => {
+    try {
+        const data = await getDocs(keuanganCollectionRef);
+        return data.docs.map((doc) => ({ ...doc.data(), id: doc.id } as Keuangan));
+    } catch (error) {
+        console.error("Error fetching financial data: ", error);
+        return [];
+    }
+};
 
 // Menggunakan no_anggota sebagai ID dokumen untuk operasi upsert (update/insert) yang efisien.
 export const batchUpsertKeuangan = async (keuanganList: Keuangan[]): Promise<void> => {
