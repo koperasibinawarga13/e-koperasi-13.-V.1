@@ -167,54 +167,75 @@ const AnggotaPinjaman: React.FC = () => {
 
     return (
         <div>
-            <Header title="Pinjaman Anggota" />
+            <Header title="Pengajuan Pinjaman Anggota" />
             
-            <div className="bg-white p-6 rounded-xl shadow-md mb-8">
-                <h2 className="text-xl font-bold text-dark mb-4">Sisa Pinjaman Anda</h2>
-                {isLoading ? (
-                    <p>Memuat data sisa pinjaman...</p>
-                ) : keuangan ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="bg-yellow-50 p-4 rounded-lg">
-                            <p className="text-sm text-yellow-800 font-medium">Sisa Pinjaman Berjangka</p>
-                            <p className="text-2xl font-bold text-yellow-900">{formatCurrency(keuangan.akhir_pinjaman_berjangka)}</p>
+            <div className="bg-white rounded-xl shadow-md mb-8">
+                <h2 className="text-xl font-bold text-dark bg-gray-100 p-4 rounded-t-xl -m-0 mb-6">Sisa Pinjaman Anda</h2>
+                 <div className="px-6 pb-6">
+                    {isLoading ? (
+                        <p>Memuat data sisa pinjaman...</p>
+                    ) : keuangan ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="bg-yellow-50 p-4 rounded-lg">
+                                <p className="text-sm text-yellow-800 font-medium">Sisa Pinjaman Berjangka</p>
+                                <p className="text-2xl font-bold text-yellow-900">{formatCurrency(keuangan.akhir_pinjaman_berjangka)}</p>
+                            </div>
+                            <div className="bg-orange-50 p-4 rounded-lg">
+                                <p className="text-sm text-orange-800 font-medium">Sisa Pinjaman Khusus</p>
+                                <p className="text-2xl font-bold text-orange-900">{formatCurrency(keuangan.akhir_pinjaman_khusus)}</p>
+                            </div>
                         </div>
-                        <div className="bg-orange-50 p-4 rounded-lg">
-                            <p className="text-sm text-orange-800 font-medium">Sisa Pinjaman Khusus</p>
-                            <p className="text-2xl font-bold text-orange-900">{formatCurrency(keuangan.akhir_pinjaman_khusus)}</p>
-                        </div>
-                    </div>
-                ) : (
-                    <p>Data pinjaman tidak ditemukan.</p>
-                )}
+                    ) : (
+                        <p>Data pinjaman tidak ditemukan.</p>
+                    )}
+                </div>
             </div>
 
-            <div className="bg-white p-6 rounded-xl shadow-md">
-                <h2 className="text-xl font-bold text-dark mb-4 border-b pb-3">Simulasi & Pengajuan Kredit</h2>
-                <form onSubmit={handleCalculate} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-end">
-                    <div>
-                        <label htmlFor="pokok" className="block text-sm font-medium text-gray-700">Pokok Pinjaman (IDR)</label>
-                        <input type="number" id="pokok" value={pokokPinjaman} onChange={e => setPokokPinjaman(Number(e.target.value))} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary" />
-                    </div>
-                     <div>
-                        <label htmlFor="jangka" className="block text-sm font-medium text-gray-700">Jangka Waktu (Bulan)</label>
-                        <input type="number" id="jangka" value={jangkaWaktu} onChange={e => setJangkaWaktu(Number(e.target.value))} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary" />
-                    </div>
-                     <div>
-                        <label htmlFor="bunga" className="block text-sm font-medium text-gray-700">Bunga per Bulan (%)</label>
-                        <input type="number" step="0.1" id="bunga" value={sukuBunga} onChange={e => setSukuBunga(Number(e.target.value))} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary" />
-                    </div>
-                    <div>
-                        <button type="submit" className="w-full bg-primary text-white py-2 px-4 rounded-lg font-semibold hover:bg-blue-800 transition-colors">Hitung Simulasi</button>
-                    </div>
-                     <div className="md:col-span-2 lg:col-span-4">
-                        <label htmlFor="tanggal" className="block text-sm font-medium text-gray-700">Tanggal Mulai</label>
-                        <input type="date" id="tanggal" value={tanggalMulai} onChange={e => setTanggalMulai(e.target.value)} className="mt-1 block w-full md:w-1/4 border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary" />
-                    </div>
-                </form>
+            <div className="bg-white rounded-xl shadow-md">
+                <h2 className="text-xl font-bold text-dark bg-gray-100 p-4 rounded-t-xl -m-0 mb-6">Simulasi & Pengajuan Kredit</h2>
+                <div className="px-6 pb-6">
+                    <form onSubmit={handleCalculate} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-end">
+                        <div>
+                            <label htmlFor="pokok" className="block text-sm font-medium text-gray-700">Pokok Pinjaman (IDR)</label>
+                            <input type="number" id="pokok" value={pokokPinjaman} onChange={e => setPokokPinjaman(Number(e.target.value))} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary" />
+                        </div>
+                         <div>
+                            <label htmlFor="jangka" className="block text-sm font-medium text-gray-700">Jangka Waktu (Bulan)</label>
+                            <input type="number" id="jangka" value={jangkaWaktu} onChange={e => setJangkaWaktu(Number(e.target.value))} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary" />
+                        </div>
+                         <div>
+                            <label htmlFor="bunga" className="block text-sm font-medium text-gray-700">Bunga per Bulan (%)</label>
+                            <input type="number" step="0.1" id="bunga" value={sukuBunga} onChange={e => setSukuBunga(Number(e.target.value))} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary" />
+                        </div>
+                        <div>
+                            <button type="submit" className="w-full bg-primary text-white py-2 px-4 rounded-lg font-semibold hover:bg-blue-800 transition-colors">Hitung Simulasi</button>
+                        </div>
+                         <div className="md:col-span-2 lg:col-span-4">
+                            <label htmlFor="tanggal" className="block text-sm font-medium text-gray-700">Tanggal Mulai</label>
+                            <input type="date" id="tanggal" value={tanggalMulai} onChange={e => setTanggalMulai(e.target.value)} className="mt-1 block w-full md:w-1/4 border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary" />
+                        </div>
+                    </form>
+
+                     {simulasi && (
+                        <div className="mt-8 text-center border-t pt-6">
+                            <button
+                                onClick={handleAjukanPinjaman}
+                                disabled={isSubmitting}
+                                className="bg-secondary text-white py-3 px-8 rounded-lg font-bold text-lg hover:bg-emerald-600 transition-colors disabled:bg-gray-400"
+                            >
+                                {isSubmitting ? 'Mengirim...' : 'Yakin & Ajukan Pinjaman Ini'}
+                            </button>
+                            {submitMessage && (
+                                <p className={`mt-4 text-sm font-semibold ${submitMessage.includes('berhasil') ? 'text-green-600' : 'text-red-600'}`}>
+                                    {submitMessage}
+                                </p>
+                            )}
+                        </div>
+                    )}
+                </div>
 
                 {simulasi && (
-                    <div className="mt-8 border-t pt-6">
+                    <div className="mt-8 border-t pt-6 px-6 pb-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
                              <div>
                                 <h3 className="font-bold text-lg text-dark mb-2">Informasi Pinjaman Anda</h3>
@@ -262,21 +283,6 @@ const AnggotaPinjaman: React.FC = () => {
                                     ))}
                                 </tbody>
                             </table>
-                        </div>
-                        
-                        <div className="mt-8 text-center">
-                            <button
-                                onClick={handleAjukanPinjaman}
-                                disabled={isSubmitting}
-                                className="bg-secondary text-white py-3 px-8 rounded-lg font-bold text-lg hover:bg-emerald-600 transition-colors disabled:bg-gray-400"
-                            >
-                                {isSubmitting ? 'Mengirim...' : 'Yakin & Ajukan Pinjaman Ini'}
-                            </button>
-                            {submitMessage && (
-                                <p className={`mt-4 text-sm font-semibold ${submitMessage.includes('berhasil') ? 'text-green-600' : 'text-red-600'}`}>
-                                    {submitMessage}
-                                </p>
-                            )}
                         </div>
                     </div>
                 )}

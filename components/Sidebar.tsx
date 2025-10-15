@@ -20,7 +20,7 @@ const adminNavItems: NavItem[] = [
 const anggotaNavItems: NavItem[] = [
   { to: '/anggota/dashboard', label: 'Dashboard', icon: <DashboardIcon /> },
   { to: '/anggota/keuangan', label: 'Keuangan', icon: <CreditCardIcon /> },
-  { to: '/anggota/pinjaman', label: 'Pinjaman', icon: <CalculatorIcon /> },
+  { to: '/anggota/pinjaman', label: 'Pengajuan Pinjaman', icon: <CalculatorIcon /> },
   { to: '/anggota/profil', label: 'Profil', icon: <UserCircleIcon /> },
 ];
 
