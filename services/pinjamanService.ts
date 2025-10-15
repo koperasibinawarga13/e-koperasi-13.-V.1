@@ -1,4 +1,4 @@
-import { collection, addDoc, getDocs, query, where, doc, updateDoc } from 'firebase/firestore';
+import { collection, addDoc, getDocs, query, where, doc, updateDoc, orderBy } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 import { PengajuanPinjaman } from '../types';
 
@@ -18,13 +18,26 @@ export const addPengajuanPinjaman = async (pengajuanData: Omit<PengajuanPinjaman
     }
 };
 
-// Get loan applications by status
-export const getPengajuanPinjamanByStatus = async (status: string): Promise<PengajuanPinjaman[]> => {
+// Get all loan applications
+export const getAllPengajuanPinjaman = async (): Promise<PengajuanPinjaman[]> => {
     try {
-        const q = query(pengajuanCollectionRef, where("status", "==", status));
+        const q = query(pengajuanCollectionRef, orderBy("tanggal_pengajuan", "desc"));
         const data = await getDocs(q);
         return data.docs.map((doc) => ({ ...doc.data(), id: doc.id } as PengajuanPinjaman));
     } catch (error) {
+        console.error(`Error fetching all loan applications: `, error);
+        return [];
+    }
+}
+
+// Get loan applications by status
+export const getPengajuanPinjamanByStatus = async (status: string): Promise<PengajuanPinjaman[]> => {
+    try {
+        const q = query(pengajuanCollectionRef, where("status", "==", status), orderBy("tanggal_pengajuan", "desc"));
+        const data = await getDocs(q);
+        return data.docs.map((doc) => ({ ...doc.data(), id: doc.id } as PengajuanPinjaman));
+    } catch (error)
+        {
         console.error(`Error fetching loan applications with status ${status}: `, error);
         return [];
     }

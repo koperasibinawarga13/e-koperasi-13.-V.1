@@ -15,6 +15,7 @@ const adminNavItems: NavItem[] = [
   { to: '/admin/anggota', label: 'Data Anggota', icon: <UsersIcon /> },
   { to: '/admin/upload', label: 'Upload Data', icon: <UploadIcon /> },
   { to: '/admin/laporan', label: 'Laporan', icon: <ChartBarIcon /> },
+  { to: '/admin/pinjaman', label: 'Pengajuan Pinjaman', icon: <CreditCardIcon /> },
 ];
 
 const anggotaNavItems: NavItem[] = [
