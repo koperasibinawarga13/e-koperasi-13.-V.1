@@ -5,6 +5,7 @@ import { useDropzone } from 'react-dropzone';
 import * as XLSX from 'xlsx';
 import Header from '../../components/Header';
 import ProgressBar from '../../components/ProgressBar';
+import Modal from '../../components/Modal';
 import { UploadIcon, TrashIcon } from '../../components/icons/Icons';
 import { batchAddAnggota } from '../../services/anggotaService';
 import { batchUpsertKeuangan, batchProcessTransaksiBulanan, getUploadedMonths, deleteMonthlyReport } from '../../services/keuanganService';
@@ -145,6 +146,10 @@ const AdminUpload: React.FC = () => {
     const [uploadHistory, setUploadHistory] = useState<string[]>([]);
     const [isHistoryLoading, setIsHistoryLoading] = useState(true);
     const [isDeleting, setIsDeleting] = useState<string | null>(null);
+    
+    // State for delete confirmation modal
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [monthToDelete, setMonthToDelete] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchHistory = async () => {
@@ -300,22 +305,29 @@ const AdminUpload: React.FC = () => {
         }
     };
     
-    const handleDeleteMonth = async (month: string) => {
-        const formattedMonth = new Date(`${month}-02`).toLocaleDateString('id-ID', { month: 'long', year: 'numeric'});
-        if (!window.confirm(`Apakah Anda yakin ingin menghapus semua data transaksi untuk bulan ${formattedMonth}? Tindakan ini akan mengembalikan saldo anggota ke bulan sebelumnya dan tidak dapat diurungkan.`)) {
-            return;
-        }
+    const handleDeleteClick = (month: string) => {
+        setMonthToDelete(month);
+        setIsDeleteModalOpen(true);
+    };
 
-        setIsDeleting(month);
+    const handleConfirmDelete = async () => {
+        if (!monthToDelete) return;
+
+        const formattedMonth = new Date(`${monthToDelete}-02`).toLocaleDateString('id-ID', { month: 'long', year: 'numeric'});
+        
+        setIsDeleting(monthToDelete);
+        setIsDeleteModalOpen(false);
+
         try {
-            await deleteMonthlyReport(month);
-            setUploadHistory(prev => prev.filter(m => m !== month));
+            await deleteMonthlyReport(monthToDelete);
+            setUploadHistory(prev => prev.filter(m => m !== monthToDelete));
             alert(`Data untuk bulan ${formattedMonth} berhasil dihapus.`);
         } catch (error) {
             console.error("Failed to delete monthly report:", error);
             alert("Terjadi kesalahan saat menghapus data. Silakan coba lagi.");
         } finally {
             setIsDeleting(null);
+            setMonthToDelete(null);
         }
     };
 
@@ -365,7 +377,7 @@ const AdminUpload: React.FC = () => {
                                     {new Date(`${month}-02`).toLocaleDateString('id-ID', { month: 'long', year: 'numeric'})}
                                 </span>
                                 <button
-                                    onClick={() => handleDeleteMonth(month)}
+                                    onClick={() => handleDeleteClick(month)}
                                     disabled={isDeleting === month}
                                     className="flex items-center gap-2 text-sm text-red-600 hover:text-red-800 font-semibold disabled:text-gray-400 disabled:cursor-wait"
                                 >
@@ -378,6 +390,35 @@ const AdminUpload: React.FC = () => {
                     <p className="text-center text-gray-500 py-4">Belum ada riwayat upload.</p>
                 )}
             </div>
+
+            <Modal
+                isOpen={isDeleteModalOpen}
+                onClose={() => setIsDeleteModalOpen(false)}
+                title="Konfirmasi Hapus Data"
+            >
+                <div>
+                    <p className="text-gray-700 mb-4">
+                        Apakah Anda yakin ingin menghapus semua data transaksi untuk bulan <span className="font-bold">{monthToDelete && new Date(`${monthToDelete}-02`).toLocaleDateString('id-ID', { month: 'long', year: 'numeric'})}</span>?
+                    </p>
+                    <p className="text-sm bg-red-50 text-red-800 p-3 rounded-lg">
+                        <strong>Peringatan:</strong> Tindakan ini akan menghapus semua data transaksi untuk bulan yang dipilih dan mengembalikan saldo anggota ke kondisi bulan sebelumnya. Aksi ini tidak dapat diurungkan.
+                    </p>
+                    <div className="flex justify-end gap-4 mt-6">
+                        <button
+                            onClick={() => setIsDeleteModalOpen(false)}
+                            className="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
+                        >
+                            Batal
+                        </button>
+                        <button
+                            onClick={handleConfirmDelete}
+                            className="bg-red-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-red-700 transition-colors"
+                        >
+                            Ya, Hapus Data
+                        </button>
+                    </div>
+                </div>
+            </Modal>
         </div>
     );
 };
