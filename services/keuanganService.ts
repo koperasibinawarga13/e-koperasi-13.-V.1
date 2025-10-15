@@ -1,4 +1,4 @@
-import { collection, doc, writeBatch, runTransaction, getDocs, getDoc, updateDoc, arrayRemove, deleteDoc, query, orderBy, limit } from 'firebase/firestore';
+import { collection, doc, writeBatch, runTransaction, getDocs, getDoc, updateDoc, arrayRemove, deleteDoc, query, orderBy, limit, setDoc } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 import { Keuangan, TransaksiBulanan } from '../types';
 
@@ -264,4 +264,33 @@ export const deleteMonthlyReport = async (monthToDelete: string): Promise<void> 
     await updateDoc(summaryDocRef, {
         months: arrayRemove(monthToDelete)
     });
+};
+
+export const rebuildUploadHistory = async (): Promise<string[]> => {
+    try {
+        const allKeuanganDocs = await getDocs(keuanganCollectionRef);
+        const uniqueMonths = new Set<string>();
+
+        const historyPromises = allKeuanganDocs.docs.map(anggotaDoc => 
+            getDocs(collection(db, 'keuangan', anggotaDoc.id, 'history'))
+        );
+
+        const allHistorySnapshots = await Promise.all(historyPromises);
+
+        allHistorySnapshots.forEach(historySnapshot => {
+            historySnapshot.forEach(doc => {
+                uniqueMonths.add(doc.id); // doc.id is 'YYYY-MM'
+            });
+        });
+
+        const sortedMonths = Array.from(uniqueMonths).sort((a, b) => b.localeCompare(a));
+        
+        const summaryDocRef = doc(db, 'upload_summary', 'monthly_transactions');
+        await setDoc(summaryDocRef, { months: sortedMonths });
+        
+        return sortedMonths;
+    } catch (error) {
+        console.error("Error rebuilding upload history:", error);
+        throw error;
+    }
 };

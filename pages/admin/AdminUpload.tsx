@@ -8,7 +8,7 @@ import ProgressBar from '../../components/ProgressBar';
 import Modal from '../../components/Modal';
 import { UploadIcon, TrashIcon } from '../../components/icons/Icons';
 import { batchAddAnggota } from '../../services/anggotaService';
-import { batchUpsertKeuangan, batchProcessTransaksiBulanan, getUploadedMonths, deleteMonthlyReport } from '../../services/keuanganService';
+import { batchUpsertKeuangan, batchProcessTransaksiBulanan, getUploadedMonths, deleteMonthlyReport, rebuildUploadHistory } from '../../services/keuanganService';
 import { Anggota, Keuangan, TransaksiBulanan } from '../../types';
 
 type UploadStatus = 'idle' | 'processing' | 'success' | 'error';
@@ -146,6 +146,7 @@ const AdminUpload: React.FC = () => {
     const [uploadHistory, setUploadHistory] = useState<string[]>([]);
     const [isHistoryLoading, setIsHistoryLoading] = useState(true);
     const [isDeleting, setIsDeleting] = useState<string | null>(null);
+    const [isRebuilding, setIsRebuilding] = useState(false);
     
     // State for delete confirmation modal
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -331,6 +332,20 @@ const AdminUpload: React.FC = () => {
         }
     };
 
+    const handleRebuildHistory = async () => {
+        setIsRebuilding(true);
+        try {
+            const updatedMonths = await rebuildUploadHistory();
+            setUploadHistory(updatedMonths);
+            alert('Riwayat berhasil dipindai dan diperbarui!');
+        } catch (error) {
+            console.error("Failed to rebuild history:", error);
+            alert('Gagal memindai riwayat. Silakan coba lagi.');
+        } finally {
+            setIsRebuilding(false);
+        }
+    };
+
     const anggotaInstructions = `kode_anggota, nama_anggota, no_hp`;
     const keuanganAwalInstructions = `no, no_anggota, nama_angota, awal_simpanan_pokok, awal_simpanan_wajib, sukarela, awal_simpanan_wisata, awal_pinjaman_berjangka, awal_pinjaman_khusus, transaksi_simpanan_pokok, transaksi_simpanan_wajib, transaksi_simpanan_sukarela, transaksi_simpanan_wisata, transaksi_pinjaman_berjangka, transaksi_pinjaman_khusus, transaksi_simpanan_jasa, transaksi_niaga, transaksi_dana_perlaya, transaksi_dana_katineng, Jumlah_setoran, transaksi_pengambilan_simpanan_pokok, transaksi_pengambilan_simpanan_wajib, transaksi_pengambilan_simpanan_sukarela, transaksi_pengambilan_simpanan_wisata, transaksi_penambahan_pinjaman_berjangka, transaksi_penambahan_pinjaman_khusus, transaksi_penambahan_pinjaman_niaga, akhir_simpanan_pokok, akhir_simpanan_wajib, akhir_simpanan_sukarela, akhir_simpanan_wisata, akhir_pinjaman_berjangka, akhir_pinjaman_khusus, jumlah_total_simpanan, jumlah_total_pinjaman`;
     const transaksiBulananInstructions = `no_anggota, transaksi_simpanan_pokok, transaksi_simpanan_wajib, transaksi_simpanan_sukarela, transaksi_simpanan_wisata, transaksi_pinjaman_berjangka, transaksi_pinjaman_khusus, transaksi_simpanan_jasa, transaksi_niaga, transaksi_dana_perlaya, transaksi_dana_katineng, Jumlah_setoran, transaksi_pengambilan_simpanan_pokok, transaksi_pengambilan_simpanan_wajib, transaksi_pengambilan_simpanan_sukarela, transaksi_pengambilan_simpanan_wisata, transaksi_penambahan_pinjaman_berjangka, transaksi_penambahan_pinjaman_khusus, transaksi_penambahan_pinjaman_niaga`;
@@ -366,7 +381,17 @@ const AdminUpload: React.FC = () => {
                 />
             </div>
              <div className="mt-8 bg-white p-6 rounded-xl shadow-md">
-                <h2 className="text-xl font-bold text-dark mb-4">Riwayat Upload Transaksi Bulanan</h2>
+                <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-xl font-bold text-dark">Riwayat Upload Transaksi Bulanan</h2>
+                    <button
+                        onClick={handleRebuildHistory}
+                        disabled={isRebuilding}
+                        className="bg-blue-100 text-primary px-3 py-1 rounded-lg text-sm font-semibold hover:bg-blue-200 transition-colors disabled:opacity-50"
+                        title="Pindai data lama dan perbaiki riwayat jika ada yang tidak muncul."
+                    >
+                        {isRebuilding ? 'Memindai...' : 'Pindai & Perbaiki Riwayat'}
+                    </button>
+                </div>
                 {isHistoryLoading ? (
                     <p className="text-center text-gray-500 py-4">Memuat riwayat...</p>
                 ) : uploadHistory.length > 0 ? (
