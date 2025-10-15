@@ -1,4 +1,4 @@
-import { collection, doc, writeBatch, runTransaction, getDocs } from 'firebase/firestore';
+import { collection, doc, writeBatch, runTransaction, getDocs, getDoc } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 import { Keuangan, TransaksiBulanan } from '../types';
 
@@ -13,6 +13,21 @@ export const getKeuangan = async (): Promise<Keuangan[]> => {
         return [];
     }
 };
+
+export const getKeuanganByNoAnggota = async (no_anggota: string): Promise<Keuangan | null> => {
+    try {
+        const docRef = doc(db, 'keuangan', no_anggota);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+            return { ...docSnap.data(), id: docSnap.id } as Keuangan;
+        }
+        console.warn(`No financial data found for no_anggota: ${no_anggota}`);
+        return null;
+    } catch (error) {
+        console.error(`Error fetching financial data for ${no_anggota}: `, error);
+        return null;
+    }
+}
 
 // Menggunakan no_anggota sebagai ID dokumen untuk operasi upsert (update/insert) yang efisien.
 export const batchUpsertKeuangan = async (keuanganList: Keuangan[]): Promise<void> => {

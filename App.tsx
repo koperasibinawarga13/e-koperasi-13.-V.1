@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -13,6 +12,7 @@ import AnggotaDashboard from './pages/anggota/AnggotaDashboard';
 import AnggotaKeuangan from './pages/anggota/AnggotaKeuangan';
 import AnggotaProfil from './pages/anggota/AnggotaProfil';
 import { UserRole } from './types';
+import AdminKeuanganDetail from './pages/admin/AdminKeuanganDetail';
 
 const App: React.FC = () => {
   return (
@@ -40,6 +40,7 @@ const AppRoutes: React.FC = () => {
         <Route path="anggota" element={<AdminAnggota />} />
         <Route path="upload" element={<AdminUpload />} />
         <Route path="laporan" element={<AdminLaporan />} />
+        <Route path="keuangan/:no_anggota" element={<AdminKeuanganDetail />} />
         <Route index element={<Navigate to="dashboard" />} />
       </Route>
 

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import Header from '../../components/Header';
 import StatCard from '../../components/StatCard';
 import { CreditCardIcon, ChartBarIcon } from '../../components/icons/Icons';
@@ -79,7 +80,11 @@ const AdminLaporan: React.FC = () => {
                             <tbody>
                                 {filteredKeuangan.length > 0 ? filteredKeuangan.map((item) => (
                                     <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
-                                        <td className="px-6 py-4 font-medium text-gray-900">{item.no_anggota}</td>
+                                        <td className="px-6 py-4 font-medium text-gray-900">
+                                            <Link to={`/admin/keuangan/${item.no_anggota}`} className="text-primary hover:underline">
+                                                {item.no_anggota}
+                                            </Link>
+                                        </td>
                                         <td className="px-6 py-4">{item.nama_angota}</td>
                                         <td className="px-6 py-4 text-right">{formatCurrency(item.akhir_simpanan_pokok)}</td>
                                         <td className="px-6 py-4 text-right">{formatCurrency(item.akhir_simpanan_wajib)}</td>
