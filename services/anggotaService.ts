@@ -46,6 +46,8 @@ export const findAnggotaByCredentials = async (no_anggota: string, password: str
 };
 
 type NewAnggotaData = Omit<Anggota, 'id'>;
+type NewAnggotaFromUpload = Pick<Anggota, 'no_anggota' | 'nama' | 'no_telepon'>;
+
 
 export const addAnggota = async (newAnggota: NewAnggotaData): Promise<Anggota> => {
     try {
@@ -57,12 +59,23 @@ export const addAnggota = async (newAnggota: NewAnggotaData): Promise<Anggota> =
     }
 };
 
-export const batchAddAnggota = async (anggotaList: NewAnggotaData[]): Promise<void> => {
+export const batchAddAnggota = async (anggotaList: NewAnggotaFromUpload[]): Promise<void> => {
     try {
         const batch = writeBatch(db);
         anggotaList.forEach((anggota) => {
             const docRef = doc(anggotaCollectionRef); // Automatically generate unique ID
-            batch.set(docRef, anggota);
+            const fullAnggotaData: Omit<Anggota, 'id'> = {
+                no_anggota: anggota.no_anggota,
+                nama: anggota.nama,
+                no_telepon: anggota.no_telepon,
+                password: '', // Password to be set by user later during registration
+                nik: '',
+                alamat: '',
+                email: '',
+                tanggal_bergabung: new Date().toISOString().split('T')[0],
+                status: 'Aktif',
+            };
+            batch.set(docRef, fullAnggotaData);
         });
         await batch.commit();
     } catch (error) {
