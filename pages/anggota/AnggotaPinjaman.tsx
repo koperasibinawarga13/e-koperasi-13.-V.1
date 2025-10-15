@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import Header from '../../components/Header';
 import { useAuth } from '../../context/AuthContext';
 import { getKeuanganByNoAnggota } from '../../services/keuanganService';
-import { Keuangan } from '../../types';
+import { Keuangan, Anggota } from '../../types';
 import { getAnggotaById } from '../../services/anggotaService';
+import { addPengajuanPinjaman } from '../../services/pinjamanService';
 
 interface SimulasiResult {
     pokokPinjaman: number;
@@ -27,6 +28,7 @@ interface SimulasiResult {
 const AnggotaPinjaman: React.FC = () => {
     const { user } = useAuth();
     const [keuangan, setKeuangan] = useState<Keuangan | null>(null);
+    const [anggota, setAnggota] = useState<Anggota | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     
     // State for simulator
@@ -36,14 +38,20 @@ const AnggotaPinjaman: React.FC = () => {
     const [tanggalMulai, setTanggalMulai] = useState(new Date().toISOString().split('T')[0]);
     const [simulasi, setSimulasi] = useState<SimulasiResult | null>(null);
 
+    // State for submission
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [submitMessage, setSubmitMessage] = useState('');
+
+
     useEffect(() => {
         const fetchData = async () => {
             if (user?.anggotaId) {
                 setIsLoading(true);
                 try {
-                    const anggota = await getAnggotaById(user.anggotaId);
-                    if (anggota?.no_anggota) {
-                        const result = await getKeuanganByNoAnggota(anggota.no_anggota);
+                    const anggotaData = await getAnggotaById(user.anggotaId);
+                    setAnggota(anggotaData);
+                    if (anggotaData?.no_anggota) {
+                        const result = await getKeuanganByNoAnggota(anggotaData.no_anggota);
                         setKeuangan(result);
                     }
                 } catch (error) {
@@ -73,6 +81,7 @@ const AnggotaPinjaman: React.FC = () => {
 
     const handleCalculate = (e: React.FormEvent) => {
         e.preventDefault();
+        setSubmitMessage(''); // Clear previous submission message
         if (pokokPinjaman <= 0 || jangkaWaktu <= 0 || sukuBunga < 0) {
             alert("Mohon masukkan nilai yang valid.");
             return;
@@ -119,6 +128,36 @@ const AnggotaPinjaman: React.FC = () => {
         });
     };
     
+    const handleAjukanPinjaman = async () => {
+        if (!simulasi || !anggota) {
+            alert("Silakan hitung simulasi terlebih dahulu.");
+            return;
+        }
+        
+        setIsSubmitting(true);
+        setSubmitMessage('');
+
+        try {
+            await addPengajuanPinjaman({
+                no_anggota: anggota.no_anggota,
+                nama_anggota: anggota.nama,
+                pokok_pinjaman: simulasi.pokokPinjaman,
+                jangka_waktu: simulasi.jangkaWaktu,
+                bunga_per_bulan: simulasi.sukuBunga,
+                angsuran_pokok_bulan: simulasi.angsuranPokokBulan,
+                total_bunga: simulasi.totalBunga,
+                total_bayar: simulasi.totalBayar,
+                jadwal_angsuran: simulasi.jadwal
+            });
+            setSubmitMessage('Pengajuan pinjaman Anda berhasil dikirim dan akan segera ditinjau oleh admin.');
+        } catch (error) {
+            setSubmitMessage('Terjadi kesalahan saat mengirim pengajuan. Silakan coba lagi.');
+            console.error(error);
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+    
     const InfoItem: React.FC<{ label: string; value: string; className?: string }> = ({ label, value, className = '' }) => (
         <div className={`flex justify-between items-center py-2 border-b ${className}`}>
             <span className="text-gray-600">{label}</span>
@@ -151,7 +190,7 @@ const AnggotaPinjaman: React.FC = () => {
             </div>
 
             <div className="bg-white p-6 rounded-xl shadow-md">
-                <h2 className="text-xl font-bold text-dark mb-4 border-b pb-3">Simulasi Kredit</h2>
+                <h2 className="text-xl font-bold text-dark mb-4 border-b pb-3">Simulasi & Pengajuan Kredit</h2>
                 <form onSubmit={handleCalculate} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-end">
                     <div>
                         <label htmlFor="pokok" className="block text-sm font-medium text-gray-700">Pokok Pinjaman (IDR)</label>
@@ -223,6 +262,21 @@ const AnggotaPinjaman: React.FC = () => {
                                     ))}
                                 </tbody>
                             </table>
+                        </div>
+                        
+                        <div className="mt-8 text-center">
+                            <button
+                                onClick={handleAjukanPinjaman}
+                                disabled={isSubmitting}
+                                className="bg-secondary text-white py-3 px-8 rounded-lg font-bold text-lg hover:bg-emerald-600 transition-colors disabled:bg-gray-400"
+                            >
+                                {isSubmitting ? 'Mengirim...' : 'Yakin & Ajukan Pinjaman Ini'}
+                            </button>
+                            {submitMessage && (
+                                <p className={`mt-4 text-sm font-semibold ${submitMessage.includes('berhasil') ? 'text-green-600' : 'text-red-600'}`}>
+                                    {submitMessage}
+                                </p>
+                            )}
                         </div>
                     </div>
                 )}

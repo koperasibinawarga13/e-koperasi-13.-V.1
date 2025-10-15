@@ -2,10 +2,11 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import Header from '../../components/Header';
 import StatCard from '../../components/StatCard';
-import { UsersIcon, ChartBarIcon, CreditCardIcon, BuildingOfficeIcon } from '../../components/icons/Icons';
+import { UsersIcon, ChartBarIcon, CreditCardIcon, BuildingOfficeIcon, CheckIcon, XMarkIcon } from '../../components/icons/Icons';
 import { getAnggota } from '../../services/anggotaService';
 import { getKeuangan } from '../../services/keuanganService';
-import { Keuangan } from '../../types';
+import { getPengajuanPinjamanByStatus, updatePengajuanStatus } from '../../services/pinjamanService';
+import { Keuangan, PengajuanPinjaman } from '../../types';
 
 const AdminDashboard: React.FC = () => {
     const [stats, setStats] = useState({
@@ -16,12 +17,18 @@ const AdminDashboard: React.FC = () => {
     });
     const [chartData, setChartData] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [pendingLoans, setPendingLoans] = useState<PengajuanPinjaman[]>([]);
+    const [isUpdatingLoan, setIsUpdatingLoan] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchData = async () => {
             setIsLoading(true);
             try {
-                const [anggotaData, keuanganData] = await Promise.all([getAnggota(), getKeuangan()]);
+                const [anggotaData, keuanganData, pendingLoansData] = await Promise.all([
+                    getAnggota(),
+                    getKeuangan(),
+                    getPengajuanPinjamanByStatus('Menunggu Persetujuan')
+                ]);
 
                 const totalSimpanan = keuanganData.reduce((acc, curr) => acc + (curr.jumlah_total_simpanan || 0), 0);
                 const totalPinjaman = keuanganData.reduce((acc, curr) => acc + (curr.jumlah_total_pinjaman || 0), 0);
@@ -32,6 +39,8 @@ const AdminDashboard: React.FC = () => {
                     totalPinjaman,
                     saldoKas: totalSimpanan - totalPinjaman,
                 });
+
+                setPendingLoans(pendingLoansData);
 
                 // Prepare data for the chart: Aggregate final balances
                 const finalBalanceTotals = keuanganData.reduce((acc, curr) => {
@@ -73,6 +82,23 @@ const AdminDashboard: React.FC = () => {
         return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(amount);
     };
 
+    const handleLoanAction = async (id: string, action: 'Disetujui' | 'Ditolak') => {
+        if (!window.confirm(`Apakah Anda yakin ingin ${action === 'Disetujui' ? 'menyetujui' : 'menolak'} pengajuan ini?`)) {
+            return;
+        }
+        
+        setIsUpdatingLoan(id);
+        try {
+            await updatePengajuanStatus(id, action);
+            setPendingLoans(prevLoans => prevLoans.filter(loan => loan.id !== id));
+        } catch (error) {
+            console.error(`Failed to ${action} loan:`, error);
+            alert(`Gagal memperbarui status pengajuan. Silakan coba lagi.`);
+        } finally {
+            setIsUpdatingLoan(null);
+        }
+    };
+
     if (isLoading) {
         return (
              <div>
@@ -109,6 +135,57 @@ const AdminDashboard: React.FC = () => {
                  ) : (
                     <p className="text-center text-gray-500 py-10">Data tidak tersedia untuk menampilkan grafik.</p>
                  )}
+            </div>
+
+             <div className="mt-8 bg-white p-6 rounded-xl shadow-md">
+                <h2 className="text-xl font-bold text-dark mb-4">Pengajuan Pinjaman Baru</h2>
+                {pendingLoans.length > 0 ? (
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-sm text-left text-gray-500">
+                            <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+                                <tr>
+                                    <th className="px-4 py-3">Nama Anggota</th>
+                                    <th className="px-4 py-3">Tanggal</th>
+                                    <th className="px-4 py-3 text-right">Jumlah Pinjaman</th>
+                                    <th className="px-4 py-3 text-center">Jangka Waktu</th>
+                                    <th className="px-4 py-3 text-center">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {pendingLoans.map(loan => (
+                                    <tr key={loan.id} className="bg-white border-b hover:bg-gray-50">
+                                        <td className="px-4 py-3 font-medium text-gray-900">{loan.nama_anggota}</td>
+                                        <td className="px-4 py-3">{new Date(loan.tanggal_pengajuan).toLocaleDateString('id-ID')}</td>
+                                        <td className="px-4 py-3 text-right">{formatCurrency(loan.pokok_pinjaman)}</td>
+                                        <td className="px-4 py-3 text-center">{loan.jangka_waktu} bulan</td>
+                                        <td className="px-4 py-3 text-center">
+                                            <div className="flex justify-center gap-2">
+                                                <button
+                                                    onClick={() => handleLoanAction(loan.id, 'Disetujui')}
+                                                    disabled={isUpdatingLoan === loan.id}
+                                                    className="p-2 rounded-full bg-green-100 text-green-600 hover:bg-green-200 disabled:opacity-50"
+                                                    title="Setujui"
+                                                >
+                                                    <CheckIcon className="w-4 h-4" />
+                                                </button>
+                                                <button
+                                                    onClick={() => handleLoanAction(loan.id, 'Ditolak')}
+                                                    disabled={isUpdatingLoan === loan.id}
+                                                    className="p-2 rounded-full bg-red-100 text-red-600 hover:bg-red-200 disabled:opacity-50"
+                                                    title="Tolak"
+                                                >
+                                                    <XMarkIcon className="w-4 h-4" />
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                ) : (
+                    <p className="text-center text-gray-500 py-6">Tidak ada pengajuan pinjaman baru.</p>
+                )}
             </div>
         </div>
     );
