@@ -29,6 +29,22 @@ export const getAnggotaById = async (id: string): Promise<Anggota | null> => {
     }
 };
 
+export const getAnggotaByNo = async (no_anggota: string): Promise<Anggota | null> => {
+    try {
+        if (!no_anggota) return null;
+        const q = query(anggotaCollectionRef, where("no_anggota", "==", no_anggota));
+        const querySnapshot = await getDocs(q);
+        if (!querySnapshot.empty) {
+            const doc = querySnapshot.docs[0];
+            return { ...doc.data(), id: doc.id } as Anggota;
+        }
+        return null;
+    } catch (error) {
+        console.error("Error finding anggota by no_anggota: ", error);
+        return null;
+    }
+};
+
 
 export const findAnggotaByCredentials = async (no_anggota: string, password: string): Promise<Anggota | null> => {
     try {
@@ -93,8 +109,8 @@ export const registerAnggota = async (no_anggota: string, no_telepon: string, pa
             throw new Error("Nomor anggota tidak ditemukan.");
         }
 
-        const doc = querySnapshot.docs[0];
-        const anggotaData = doc.data() as Anggota;
+        const anggotaDocument = querySnapshot.docs[0];
+        const anggotaData = anggotaDocument.data() as Anggota;
 
         // Check if password is not an empty string, meaning it's already set
         if (anggotaData.password) {
@@ -106,7 +122,7 @@ export const registerAnggota = async (no_anggota: string, no_telepon: string, pa
         }
         
         // If validation passes, update the document with the new password
-        const anggotaDoc = doc(db, 'anggota', doc.id);
+        const anggotaDoc = doc(db, 'anggota', anggotaDocument.id);
         await updateDoc(anggotaDoc, {
             password: password
         });

@@ -1,8 +1,8 @@
 // FIX: Implemented full content for LoginPage.tsx to provide a functional login screen.
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { BuildingOfficeIcon } from '../components/icons/Icons';
-import { registerAnggota } from '../services/anggotaService';
+import { registerAnggota, getAnggotaByNo } from '../services/anggotaService';
 
 const LoginPage: React.FC = () => {
   const [view, setView] = useState<'login' | 'register'>('login');
@@ -15,11 +15,48 @@ const LoginPage: React.FC = () => {
   const [regNoAnggota, setRegNoAnggota] = useState('');
   const [regNoHp, setRegNoHp] = useState('');
   const [regPassword, setRegPassword] = useState('');
+  const [anggotaName, setAnggotaName] = useState<string | null>(null);
+  const [isNameLoading, setIsNameLoading] = useState(false);
+
 
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
+  
+  useEffect(() => {
+    if (view !== 'register') return;
+
+    if (!regNoAnggota) {
+        setAnggotaName(null);
+        setIsNameLoading(false);
+        return;
+    }
+
+    setIsNameLoading(true);
+    const handler = setTimeout(() => {
+        const fetchAnggotaName = async () => {
+            try {
+                const anggota = await getAnggotaByNo(regNoAnggota);
+                if (anggota) {
+                    setAnggotaName(anggota.nama);
+                } else {
+                    setAnggotaName('No. Anggota tidak ditemukan');
+                }
+            } catch (err) {
+                setAnggotaName('Gagal memuat nama');
+            } finally {
+                setIsNameLoading(false);
+            }
+        };
+        fetchAnggotaName();
+    }, 500); // 500ms delay
+
+    return () => {
+        clearTimeout(handler);
+    };
+  }, [regNoAnggota, view]);
+
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -68,6 +105,7 @@ const LoginPage: React.FC = () => {
     setRegNoAnggota('');
     setRegNoHp('');
     setRegPassword('');
+    setAnggotaName(null);
   }
 
   return (
@@ -139,18 +177,24 @@ const LoginPage: React.FC = () => {
         ) : (
             <form className="mt-6 space-y-6" onSubmit={handleRegister}>
                  <div>
-                  <label htmlFor="regNoAnggota" className="sr-only">
-                    No. Anggota
-                  </label>
-                  <input
-                    id="regNoAnggota"
-                    type="text"
-                    required
-                    className="appearance-none rounded-md relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
-                    placeholder="No. Anggota"
-                    value={regNoAnggota}
-                    onChange={(e) => setRegNoAnggota(e.target.value)}
-                  />
+                    <label htmlFor="regNoAnggota" className="sr-only">No. Anggota</label>
+                    <input
+                        id="regNoAnggota"
+                        type="text"
+                        required
+                        className="appearance-none rounded-md relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
+                        placeholder="No. Anggota"
+                        value={regNoAnggota}
+                        onChange={(e) => setRegNoAnggota(e.target.value)}
+                    />
+                    <div className="pt-2 text-sm text-gray-600 min-h-[20px]">
+                        {isNameLoading && <span className="italic">Mencari nama...</span>}
+                        {anggotaName && !isNameLoading && (
+                            <span className={anggotaName === 'No. Anggota tidak ditemukan' ? 'text-red-500 font-medium' : 'text-green-600 font-semibold'}>
+                                {anggotaName}
+                            </span>
+                        )}
+                    </div>
                 </div>
                 <div>
                   <label htmlFor="regNoHp" className="sr-only">

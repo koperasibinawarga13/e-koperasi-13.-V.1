@@ -13,6 +13,7 @@ import AnggotaKeuangan from './pages/anggota/AnggotaKeuangan';
 import AnggotaProfil from './pages/anggota/AnggotaProfil';
 import { UserRole } from './types';
 import AdminKeuanganDetail from './pages/admin/AdminKeuanganDetail';
+import SlipRincian from './pages/anggota/SlipRincian';
 
 const App: React.FC = () => {
   return (
@@ -52,6 +53,7 @@ const AppRoutes: React.FC = () => {
         <Route path="dashboard" element={<AnggotaDashboard />} />
         <Route path="keuangan" element={<AnggotaKeuangan />} />
         <Route path="profil" element={<AnggotaProfil />} />
+        <Route path="slip" element={<SlipRincian />} />
         <Route index element={<Navigate to="dashboard" />} />
       </Route>
 
