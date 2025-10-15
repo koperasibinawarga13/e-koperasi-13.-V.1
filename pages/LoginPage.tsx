@@ -1,7 +1,8 @@
 // FIX: Implemented full content for LoginPage.tsx to provide a functional login screen.
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { BuildingOfficeIcon } from '../components/icons/Icons';
+import { usePWA } from '../context/PWAContext';
+import { BuildingOfficeIcon, DownloadIcon } from '../components/icons/Icons';
 import { registerAnggota, getAnggotaByNo } from '../services/anggotaService';
 
 const LoginPage: React.FC = () => {
@@ -25,6 +26,7 @@ const LoginPage: React.FC = () => {
   const [success, setSuccess] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
+  const { isInstallable, promptInstall } = usePWA();
   
   // Effect for registration form name lookup
   useEffect(() => {
@@ -158,6 +160,18 @@ const LoginPage: React.FC = () => {
             </div>
              <h2 className="text-xl font-semibold text-dark">{view === 'login' ? 'Selamat Datang' : 'Registrasi Akun'}</h2>
         </div>
+        
+        {isInstallable && (
+          <div className="text-center">
+            <button
+              onClick={promptInstall}
+              className="w-full flex items-center justify-center gap-2 px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-secondary hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary transition-colors"
+            >
+              <DownloadIcon className="w-5 h-5" />
+              Install Aplikasi
+            </button>
+          </div>
+        )}
         
         {error && <p className="text-sm text-red-600 text-center font-semibold bg-red-50 p-3 rounded-md">{error}</p>}
         {success && <p className="text-sm text-green-600 text-center font-semibold bg-green-50 p-3 rounded-md">{success}</p>}

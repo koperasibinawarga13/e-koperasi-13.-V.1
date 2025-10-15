@@ -1,0 +1,21 @@
+{
+  "name": "e-Koperasi 13 Bina Warga",
+  "short_name": "e-Koperasi 13",
+  "description": "A modern, secure, and user-friendly e-banking frontend for e-Koperasi 13 Bina Warga, providing separate portals for administrators and members to manage finances, view reports, and update profiles.",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#F3F4F6",
+  "theme_color": "#1E40AF",
+  "icons": [
+    {
+      "src": "/icon-192x192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/icon-512x512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ]
+}
