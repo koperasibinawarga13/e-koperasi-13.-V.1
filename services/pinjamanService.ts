@@ -33,9 +33,15 @@ export const getAllPengajuanPinjaman = async (): Promise<PengajuanPinjaman[]> =>
 // Get loan applications by status
 export const getPengajuanPinjamanByStatus = async (status: string): Promise<PengajuanPinjaman[]> => {
     try {
-        const q = query(pengajuanCollectionRef, where("status", "==", status), orderBy("tanggal_pengajuan", "desc"));
+        // Query without orderBy to avoid composite index requirement
+        const q = query(pengajuanCollectionRef, where("status", "==", status));
         const data = await getDocs(q);
-        return data.docs.map((doc) => ({ ...doc.data(), id: doc.id } as PengajuanPinjaman));
+        const results = data.docs.map((doc) => ({ ...doc.data(), id: doc.id } as PengajuanPinjaman));
+        
+        // Sort results client-side by date in descending order
+        results.sort((a, b) => new Date(b.tanggal_pengajuan).getTime() - new Date(a.tanggal_pengajuan).getTime());
+
+        return results;
     } catch (error)
         {
         console.error(`Error fetching loan applications with status ${status}: `, error);

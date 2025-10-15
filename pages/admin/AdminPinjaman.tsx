@@ -55,7 +55,7 @@ const AdminPinjaman: React.FC = () => {
         const baseClasses = 'px-2 py-1 text-xs font-semibold rounded-full';
         let colorClasses = '';
         switch (status) {
-            case 'Menunggu Persetujui':
+            case 'Menunggu Persetujuan':
                 colorClasses = 'bg-yellow-100 text-yellow-800';
                 break;
             case 'Disetujui':
@@ -76,7 +76,7 @@ const AdminPinjaman: React.FC = () => {
             <div className="bg-white p-6 rounded-xl shadow-md">
                 <div className="border-b border-gray-200 mb-6">
                     <nav className="-mb-px flex space-x-6">
-                        {(['Menunggu Persetujui', 'Disetujui', 'Ditolak', 'Semua'] as StatusFilter[]).map(tab => (
+                        {(['Menunggu Persetujuan', 'Disetujui', 'Ditolak', 'Semua'] as StatusFilter[]).map(tab => (
                             <button
                                 key={tab}
                                 onClick={() => setActiveTab(tab)}
@@ -116,7 +116,7 @@ const AdminPinjaman: React.FC = () => {
                                         <td className="px-4 py-3 text-center">{p.jangka_waktu} bulan</td>
                                         <td className="px-4 py-3 text-center"><StatusBadge status={p.status} /></td>
                                         <td className="px-4 py-3">
-                                            {p.status === 'Menunggu Persetujui' ? (
+                                            {p.status === 'Menunggu Persetujuan' ? (
                                                 <div className="flex justify-center gap-2">
                                                     <button
                                                         onClick={() => handleStatusUpdate(p.id, 'Disetujui')}
