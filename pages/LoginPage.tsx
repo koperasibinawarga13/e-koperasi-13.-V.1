@@ -8,8 +8,8 @@ const LoginPage: React.FC = () => {
   const [view, setView] = useState<'login' | 'register'>('login');
   
   // Login State
-  const [username, setUsername] = useState('admin@koperasi13.com');
-  const [password, setPassword] = useState('admin123');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   
   // Register State
   const [regNoAnggota, setRegNoAnggota] = useState('');

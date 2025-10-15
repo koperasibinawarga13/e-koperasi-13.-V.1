@@ -73,6 +73,7 @@ export const batchProcessTransaksiBulanan = async (transaksiList: TransaksiBulan
                 
                 const updates: Partial<Keuangan> = {};
                 
+                // Update individual balances first
                 updates.akhir_simpanan_pokok = (currentData.akhir_simpanan_pokok || 0) + (tx.transaksi_simpanan_pokok || 0) - (tx.transaksi_pengambilan_simpanan_pokok || 0);
                 updates.akhir_simpanan_wajib = (currentData.akhir_simpanan_wajib || 0) + (tx.transaksi_simpanan_wajib || 0) - (tx.transaksi_pengambilan_simpanan_wajib || 0);
                 updates.akhir_simpanan_sukarela = (currentData.akhir_simpanan_sukarela || 0) + (tx.transaksi_simpanan_sukarela || 0) - (tx.transaksi_pengambilan_simpanan_sukarela || 0);
@@ -81,10 +82,28 @@ export const batchProcessTransaksiBulanan = async (transaksiList: TransaksiBulan
                 updates.akhir_pinjaman_berjangka = (currentData.akhir_pinjaman_berjangka || 0) - (tx.transaksi_pinjaman_berjangka || 0) + (tx.transaksi_penambahan_pinjaman_berjangka || 0);
                 updates.akhir_pinjaman_khusus = (currentData.akhir_pinjaman_khusus || 0) - (tx.transaksi_pinjaman_khusus || 0) + (tx.transaksi_penambahan_pinjaman_khusus || 0);
                 
-                // Recalculate totals
-                updates.jumlah_total_simpanan = (updates.akhir_simpanan_pokok) + (updates.akhir_simpanan_wajib) + (updates.akhir_simpanan_sukarela) + (updates.akhir_simpanan_wisata);
-                updates.jumlah_total_pinjaman = (updates.akhir_pinjaman_berjangka) + (updates.akhir_pinjaman_khusus); // Note: pinjaman niaga tidak memiliki saldo akhir di struktur
+                // Incrementally update totals based on transactions instead of recalculating
+                const totalSetoranSimpanan = (tx.transaksi_simpanan_pokok || 0) + 
+                                             (tx.transaksi_simpanan_wajib || 0) + 
+                                             (tx.transaksi_simpanan_sukarela || 0) + 
+                                             (tx.transaksi_simpanan_wisata || 0);
+
+                const totalPengambilanSimpanan = (tx.transaksi_pengambilan_simpanan_pokok || 0) +
+                                                 (tx.transaksi_pengambilan_simpanan_wajib || 0) +
+                                                 (tx.transaksi_pengambilan_simpanan_sukarela || 0) +
+                                                 (tx.transaksi_pengambilan_simpanan_wisata || 0);
                 
+                updates.jumlah_total_simpanan = (currentData.jumlah_total_simpanan || 0) + totalSetoranSimpanan - totalPengambilanSimpanan;
+
+                const totalPenambahanPinjaman = (tx.transaksi_penambahan_pinjaman_berjangka || 0) +
+                                                (tx.transaksi_penambahan_pinjaman_khusus || 0) +
+                                                (tx.transaksi_penambahan_pinjaman_niaga || 0);
+
+                const totalAngsuranPinjaman = (tx.transaksi_pinjaman_berjangka || 0) +
+                                              (tx.transaksi_pinjaman_khusus || 0);
+                
+                updates.jumlah_total_pinjaman = (currentData.jumlah_total_pinjaman || 0) + totalPenambahanPinjaman - totalAngsuranPinjaman;
+
                 transaction.update(docRef, updates);
             });
             successCount++;
