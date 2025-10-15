@@ -1,13 +1,13 @@
 // FIX: Implemented full content for AdminUpload.tsx to create the file upload page.
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
 // FIX: Import the 'xlsx' library to handle Excel file parsing.
 import * as XLSX from 'xlsx';
 import Header from '../../components/Header';
 import ProgressBar from '../../components/ProgressBar';
-import { UploadIcon } from '../../components/icons/Icons';
+import { UploadIcon, TrashIcon } from '../../components/icons/Icons';
 import { batchAddAnggota } from '../../services/anggotaService';
-import { batchUpsertKeuangan, batchProcessTransaksiBulanan } from '../../services/keuanganService';
+import { batchUpsertKeuangan, batchProcessTransaksiBulanan, getUploadedMonths, deleteMonthlyReport } from '../../services/keuanganService';
 import { Anggota, Keuangan, TransaksiBulanan } from '../../types';
 
 type UploadStatus = 'idle' | 'processing' | 'success' | 'error';
@@ -142,12 +142,21 @@ const UploadSection: React.FC<{
 
 const AdminUpload: React.FC = () => {
     const [isUploading, setIsUploading] = useState(false);
-    const [uploadMonth, setUploadMonth] = useState(() => {
-        const now = new Date();
-        return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-    });
+    const [uploadHistory, setUploadHistory] = useState<string[]>([]);
+    const [isHistoryLoading, setIsHistoryLoading] = useState(true);
+    const [isDeleting, setIsDeleting] = useState<string | null>(null);
 
-    const readFile = (file: File): Promise<any[]> => {
+    useEffect(() => {
+        const fetchHistory = async () => {
+            setIsHistoryLoading(true);
+            const months = await getUploadedMonths();
+            setUploadHistory(months);
+            setIsHistoryLoading(false);
+        };
+        fetchHistory();
+    }, []);
+
+    const readFile = (file: File): Promise<{ json: any[], sheetName: string }> => {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
             reader.onload = (event) => {
@@ -155,9 +164,12 @@ const AdminUpload: React.FC = () => {
                     const data = new Uint8Array(event.target?.result as ArrayBuffer);
                     const workbook = XLSX.read(data, { type: 'array' });
                     const sheetName = workbook.SheetNames[0];
+                     if (!sheetName) {
+                        return reject(new Error("File Excel tidak memiliki sheet."));
+                    }
                     const worksheet = workbook.Sheets[sheetName];
                     const json: any[] = XLSX.utils.sheet_to_json(worksheet);
-                    resolve(json);
+                    resolve({ json, sheetName });
                 } catch (err) {
                     reject(err);
                 }
@@ -170,7 +182,7 @@ const AdminUpload: React.FC = () => {
     const handleAnggotaUpload = async (file: File) => {
         setIsUploading(true);
         try {
-            const json = await readFile(file);
+            const { json } = await readFile(file);
             const anggotaList = json.map(row => ({
                 no_anggota: String(row.kode_anggota || ''),
                 nama: String(row.nama_anggota || ''),
@@ -190,7 +202,7 @@ const AdminUpload: React.FC = () => {
     const handleKeuanganAwalUpload = async (file: File) => {
         setIsUploading(true);
          try {
-            const json = await readFile(file);
+            const { json } = await readFile(file);
             const keuanganList: Keuangan[] = json.map(row => ({
                 no: parseNumber(row.no),
                 no_anggota: String(row.no_anggota || ''),
@@ -242,13 +254,14 @@ const AdminUpload: React.FC = () => {
 
     const handleTransaksiBulananUpload = async (file: File): Promise<UploadResult> => {
         setIsUploading(true);
-        if (!uploadMonth) {
-            alert("Silakan pilih bulan laporan terlebih dahulu.");
-            setIsUploading(false);
-            return { successCount: 0, errorCount: 0, errors: [] };
-        }
         try {
-            const json = await readFile(file);
+            const { json, sheetName } = await readFile(file);
+            const match = sheetName.match(/^(\d{4})\s(\d{2})$/);
+            if (!match) {
+                throw new Error('Nama sheet Excel harus berformat "YYYY MM" (contoh: "2024 07").');
+            }
+            const uploadMonth = `${match[1]}-${match[2]}`;
+
             const transaksiList: TransaksiBulanan[] = json.map(row => ({
                  no_anggota: String(row.no_anggota || ''),
                  transaksi_simpanan_pokok: parseNumber(row.transaksi_simpanan_pokok),
@@ -273,12 +286,36 @@ const AdminUpload: React.FC = () => {
             
             if (transaksiList.length === 0) throw new Error("File tidak berisi data transaksi yang valid.");
 
-            return await batchProcessTransaksiBulanan(transaksiList, uploadMonth);
+            const result = await batchProcessTransaksiBulanan(transaksiList, uploadMonth);
+            if (result.successCount > 0) {
+                setUploadHistory(await getUploadedMonths());
+            }
+            return result;
+
         } catch (err: any) {
              alert(`Gagal memproses file: ${err.message}`);
              return { successCount: 0, errorCount: 0, errors: [] };
         } finally {
             setIsUploading(false);
+        }
+    };
+    
+    const handleDeleteMonth = async (month: string) => {
+        const formattedMonth = new Date(`${month}-02`).toLocaleDateString('id-ID', { month: 'long', year: 'numeric'});
+        if (!window.confirm(`Apakah Anda yakin ingin menghapus semua data transaksi untuk bulan ${formattedMonth}? Tindakan ini akan mengembalikan saldo anggota ke bulan sebelumnya dan tidak dapat diurungkan.`)) {
+            return;
+        }
+
+        setIsDeleting(month);
+        try {
+            await deleteMonthlyReport(month);
+            setUploadHistory(prev => prev.filter(m => m !== month));
+            alert(`Data untuk bulan ${formattedMonth} berhasil dihapus.`);
+        } catch (error) {
+            console.error("Failed to delete monthly report:", error);
+            alert("Terjadi kesalahan saat menghapus data. Silakan coba lagi.");
+        } finally {
+            setIsDeleting(null);
         }
     };
 
@@ -303,29 +340,43 @@ const AdminUpload: React.FC = () => {
             />
              <div>
                 <div className="bg-white p-6 rounded-t-xl shadow-md border-b">
-                    <div className="flex flex-wrap justify-between items-center gap-4">
-                        <h2 className="text-xl font-bold text-dark">3. Upload Data Transaksi Bulanan</h2>
-                        <div className="flex items-center gap-2">
-                            <label htmlFor="uploadMonth" className="text-sm font-medium text-gray-700">
-                                Bulan Laporan:
-                            </label>
-                            <input
-                                type="month"
-                                id="uploadMonth"
-                                value={uploadMonth}
-                                onChange={(e) => setUploadMonth(e.target.value)}
-                                className="border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary"
-                            />
-                        </div>
-                    </div>
+                    <h2 className="text-xl font-bold text-dark">3. Upload Data Transaksi Bulanan</h2>
+                     <p className="text-sm text-gray-500 mt-1">
+                        Sistem akan secara otomatis mendeteksi bulan laporan dari nama <span className="font-semibold">sheet pertama</span> di file Excel Anda. Pastikan nama sheet berformat <code className="bg-gray-200 px-1 rounded">YYYY MM</code>, contoh: <code className="bg-gray-200 px-1 rounded">2024 07</code>.
+                    </p>
                 </div>
                 <UploadSection
                     title=""
                     hideTitle={true}
                     instructions={transaksiBulananInstructions}
                     onFileUpload={handleTransaksiBulananUpload}
-                    disabled={isUploading}
+                    disabled={isUploading || !!isDeleting}
                 />
+            </div>
+             <div className="mt-8 bg-white p-6 rounded-xl shadow-md">
+                <h2 className="text-xl font-bold text-dark mb-4">Riwayat Upload Transaksi Bulanan</h2>
+                {isHistoryLoading ? (
+                    <p className="text-center text-gray-500 py-4">Memuat riwayat...</p>
+                ) : uploadHistory.length > 0 ? (
+                    <ul className="space-y-3">
+                        {uploadHistory.map(month => (
+                            <li key={month} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                                <span className="font-medium text-gray-800">
+                                    {new Date(`${month}-02`).toLocaleDateString('id-ID', { month: 'long', year: 'numeric'})}
+                                </span>
+                                <button
+                                    onClick={() => handleDeleteMonth(month)}
+                                    disabled={isDeleting === month}
+                                    className="flex items-center gap-2 text-sm text-red-600 hover:text-red-800 font-semibold disabled:text-gray-400 disabled:cursor-wait"
+                                >
+                                    {isDeleting === month ? 'Menghapus...' : <><TrashIcon className="w-4 h-4" /> Hapus</>}
+                                </button>
+                            </li>
+                        ))}
+                    </ul>
+                ) : (
+                    <p className="text-center text-gray-500 py-4">Belum ada riwayat upload.</p>
+                )}
             </div>
         </div>
     );
