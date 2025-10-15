@@ -68,7 +68,7 @@ export const batchAddAnggota = async (anggotaList: NewAnggotaFromUpload[]): Prom
                 no_anggota: anggota.no_anggota,
                 nama: anggota.nama,
                 no_telepon: anggota.no_telepon,
-                password: '', // Password to be set by user later during registration
+                password: '', // Password is empty string initially, to be set by user later
                 nik: '',
                 alamat: '',
                 email: '',
@@ -83,6 +83,39 @@ export const batchAddAnggota = async (anggotaList: NewAnggotaFromUpload[]): Prom
         throw error;
     }
 }
+
+export const registerAnggota = async (no_anggota: string, no_telepon: string, password: string): Promise<void> => {
+    try {
+        const q = query(anggotaCollectionRef, where("no_anggota", "==", no_anggota));
+        const querySnapshot = await getDocs(q);
+
+        if (querySnapshot.empty) {
+            throw new Error("Nomor anggota tidak ditemukan.");
+        }
+
+        const doc = querySnapshot.docs[0];
+        const anggotaData = doc.data() as Anggota;
+
+        // Check if password is not an empty string, meaning it's already set
+        if (anggotaData.password) {
+            throw new Error("Akun ini sudah terdaftar. Silakan login.");
+        }
+
+        if (anggotaData.no_telepon !== no_telepon) {
+            throw new Error("Nomor HP tidak sesuai dengan data kami.");
+        }
+        
+        // If validation passes, update the document with the new password
+        const anggotaDoc = doc(db, 'anggota', doc.id);
+        await updateDoc(anggotaDoc, {
+            password: password
+        });
+        
+    } catch (error) {
+        console.error("Error during member registration:", error);
+        throw error; // Re-throw the error to be caught by the component
+    }
+};
 
 export const updateAnggota = async (updatedAnggota: Anggota): Promise<Anggota> => {
     try {
