@@ -31,7 +31,8 @@ const UploadSection: React.FC<{
     instructions: string;
     onFileUpload: (file: File) => Promise<UploadResult | void>;
     disabled: boolean;
-}> = ({ title, instructions, onFileUpload, disabled }) => {
+    hideTitle?: boolean;
+}> = ({ title, instructions, onFileUpload, disabled, hideTitle = false }) => {
     const [file, setFile] = useState<File | null>(null);
     const [status, setStatus] = useState<UploadStatus>('idle');
     const [progress, setProgress] = useState(0);
@@ -77,8 +78,8 @@ const UploadSection: React.FC<{
     }
 
     return (
-        <div className="bg-white p-6 rounded-xl shadow-md mb-8">
-            <h2 className="text-xl font-bold text-dark mb-4">{title}</h2>
+        <div className={`bg-white p-6 ${hideTitle ? 'pt-0 rounded-b-xl' : 'rounded-xl'} shadow-md mb-8`}>
+            {!hideTitle && <h2 className="text-xl font-bold text-dark mb-4">{title}</h2>}
             <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                 <h3 className="font-bold text-blue-800">Struktur File Excel (.xlsx)</h3>
                 <p className="text-sm text-blue-700 mt-2">Pastikan file Anda memiliki kolom header berikut (urutan dan nama harus sesuai):</p>
@@ -141,6 +142,10 @@ const UploadSection: React.FC<{
 
 const AdminUpload: React.FC = () => {
     const [isUploading, setIsUploading] = useState(false);
+    const [uploadMonth, setUploadMonth] = useState(() => {
+        const now = new Date();
+        return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    });
 
     const readFile = (file: File): Promise<any[]> => {
         return new Promise((resolve, reject) => {
@@ -237,6 +242,11 @@ const AdminUpload: React.FC = () => {
 
     const handleTransaksiBulananUpload = async (file: File): Promise<UploadResult> => {
         setIsUploading(true);
+        if (!uploadMonth) {
+            alert("Silakan pilih bulan laporan terlebih dahulu.");
+            setIsUploading(false);
+            return { successCount: 0, errorCount: 0, errors: [] };
+        }
         try {
             const json = await readFile(file);
             const transaksiList: TransaksiBulanan[] = json.map(row => ({
@@ -263,7 +273,7 @@ const AdminUpload: React.FC = () => {
             
             if (transaksiList.length === 0) throw new Error("File tidak berisi data transaksi yang valid.");
 
-            return await batchProcessTransaksiBulanan(transaksiList);
+            return await batchProcessTransaksiBulanan(transaksiList, uploadMonth);
         } catch (err: any) {
              alert(`Gagal memproses file: ${err.message}`);
              return { successCount: 0, errorCount: 0, errors: [] };
@@ -291,12 +301,32 @@ const AdminUpload: React.FC = () => {
                 onFileUpload={handleKeuanganAwalUpload}
                 disabled={isUploading}
             />
-            <UploadSection 
-                title="3. Upload Data Transaksi Bulanan"
-                instructions={transaksiBulananInstructions}
-                onFileUpload={handleTransaksiBulananUpload}
-                disabled={isUploading}
-            />
+             <div>
+                <div className="bg-white p-6 rounded-t-xl shadow-md border-b">
+                    <div className="flex flex-wrap justify-between items-center gap-4">
+                        <h2 className="text-xl font-bold text-dark">3. Upload Data Transaksi Bulanan</h2>
+                        <div className="flex items-center gap-2">
+                            <label htmlFor="uploadMonth" className="text-sm font-medium text-gray-700">
+                                Bulan Laporan:
+                            </label>
+                            <input
+                                type="month"
+                                id="uploadMonth"
+                                value={uploadMonth}
+                                onChange={(e) => setUploadMonth(e.target.value)}
+                                className="border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary"
+                            />
+                        </div>
+                    </div>
+                </div>
+                <UploadSection
+                    title=""
+                    hideTitle={true}
+                    instructions={transaksiBulananInstructions}
+                    onFileUpload={handleTransaksiBulananUpload}
+                    disabled={isUploading}
+                />
+            </div>
         </div>
     );
 };

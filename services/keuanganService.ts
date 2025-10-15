@@ -1,4 +1,4 @@
-import { collection, doc, writeBatch, runTransaction, getDocs, getDoc } from 'firebase/firestore';
+import { collection, doc, writeBatch, runTransaction, getDocs, getDoc, query, orderBy, documentId } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 import { Keuangan, TransaksiBulanan } from '../types';
 
@@ -29,6 +29,33 @@ export const getKeuanganByNoAnggota = async (no_anggota: string): Promise<Keuang
     }
 }
 
+export const getLaporanBulanan = async (no_anggota: string, month: string): Promise<Keuangan | null> => {
+    try {
+        const docRef = doc(db, 'keuangan', no_anggota, 'history', month);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+            return { ...docSnap.data(), id: docSnap.id } as Keuangan;
+        }
+        return null;
+    } catch (error) {
+        console.error(`Error fetching monthly report for ${no_anggota}, month ${month}:`, error);
+        return null;
+    }
+};
+
+export const getAvailableLaporanMonths = async (no_anggota: string): Promise<string[]> => {
+    try {
+        const historyCollectionRef = collection(db, 'keuangan', no_anggota, 'history');
+        const q = query(historyCollectionRef, orderBy(documentId(), "desc"));
+        const snapshot = await getDocs(q);
+        return snapshot.docs.map(doc => doc.id); // doc.id is 'YYYY-MM'
+    } catch (error) {
+        console.error(`Error fetching available months for ${no_anggota}:`, error);
+        return [];
+    }
+};
+
+
 // Menggunakan no_anggota sebagai ID dokumen untuk operasi upsert (update/insert) yang efisien.
 export const batchUpsertKeuangan = async (keuanganList: Keuangan[]): Promise<void> => {
     try {
@@ -47,10 +74,15 @@ export const batchUpsertKeuangan = async (keuanganList: Keuangan[]): Promise<voi
     }
 };
 
-export const batchProcessTransaksiBulanan = async (transaksiList: TransaksiBulanan[]): Promise<{successCount: number, errorCount: number, errors: any[]}> => {
+export const batchProcessTransaksiBulanan = async (transaksiList: TransaksiBulanan[], month: string): Promise<{successCount: number, errorCount: number, errors: any[]}> => {
     let successCount = 0;
     let errorCount = 0;
     const errors: { no_anggota: string; error: string }[] = [];
+
+    if (!/^\d{4}-\d{2}$/.test(month)) {
+        errors.push({ no_anggota: 'SYSTEM', error: 'Format bulan tidak valid. Gunakan YYYY-MM.' });
+        return { successCount: 0, errorCount: transaksiList.length, errors };
+    }
 
     for (const tx of transaksiList) {
         if (!tx.no_anggota) {
@@ -59,43 +91,51 @@ export const batchProcessTransaksiBulanan = async (transaksiList: TransaksiBulan
             continue;
         }
         
-        const docRef = doc(db, 'keuangan', tx.no_anggota);
+        const mainDocRef = doc(db, 'keuangan', tx.no_anggota);
+        const historyDocRef = doc(db, 'keuangan', tx.no_anggota, 'history', month);
+
 
         try {
             await runTransaction(db, async (transaction) => {
-                const docSnap = await transaction.get(docRef);
+                const docSnap = await transaction.get(mainDocRef);
 
                 if (!docSnap.exists()) {
                     throw new Error(`Data keuangan untuk anggota ${tx.no_anggota} tidak ditemukan. Mohon unggah data awal terlebih dahulu.`);
                 }
 
-                const currentData = docSnap.data() as Keuangan;
-                
-                // Membuat objek pembaruan yang lengkap.
-                // Dimulai dengan menimpa data transaksi dengan data bulan yang baru.
-                const updates: Partial<Keuangan> = { ...tx };
-                
-                // Memperbarui saldo individu berdasarkan saldo akhir bulan sebelumnya dan transaksi baru
-                updates.akhir_simpanan_pokok = (currentData.akhir_simpanan_pokok || 0) + (tx.transaksi_simpanan_pokok || 0) - (tx.transaksi_pengambilan_simpanan_pokok || 0);
-                updates.akhir_simpanan_wajib = (currentData.akhir_simpanan_wajib || 0) + (tx.transaksi_simpanan_wajib || 0) - (tx.transaksi_pengambilan_simpanan_wajib || 0);
-                updates.akhir_simpanan_sukarela = (currentData.akhir_simpanan_sukarela || 0) + (tx.transaksi_simpanan_sukarela || 0) - (tx.transaksi_pengambilan_simpanan_sukarela || 0);
-                updates.akhir_simpanan_wisata = (currentData.akhir_simpanan_wisata || 0) + (tx.transaksi_simpanan_wisata || 0) - (tx.transaksi_pengambilan_simpanan_wisata || 0);
-                
-                updates.akhir_pinjaman_berjangka = (currentData.akhir_pinjaman_berjangka || 0) - (tx.transaksi_pinjaman_berjangka || 0) + (tx.transaksi_penambahan_pinjaman_berjangka || 0);
-                updates.akhir_pinjaman_khusus = (currentData.akhir_pinjaman_khusus || 0) - (tx.transaksi_pinjaman_khusus || 0) + (tx.transaksi_penambahan_pinjaman_khusus || 0);
-                
-                // Menghitung ulang total menggunakan rumus SUM berdasarkan saldo akhir yang baru dihitung.
-                updates.jumlah_total_simpanan = 
-                    (updates.akhir_simpanan_pokok || 0) + 
-                    (updates.akhir_simpanan_wajib || 0) + 
-                    (updates.akhir_simpanan_sukarela || 0) + 
-                    (updates.akhir_simpanan_wisata || 0);
+                const prevMonthData = docSnap.data() as Keuangan;
+                const newReport: Keuangan = { ...prevMonthData, ...tx, periode: month };
 
-                updates.jumlah_total_pinjaman = 
-                    (updates.akhir_pinjaman_berjangka || 0) + 
-                    (updates.akhir_pinjaman_khusus || 0);
+                // Set new "awal" values from previous "akhir"
+                newReport.awal_simpanan_pokok = prevMonthData.akhir_simpanan_pokok || 0;
+                newReport.awal_simpanan_wajib = prevMonthData.akhir_simpanan_wajib || 0;
+                newReport.sukarela = prevMonthData.akhir_simpanan_sukarela || 0;
+                newReport.awal_simpanan_wisata = prevMonthData.akhir_simpanan_wisata || 0;
+                newReport.awal_pinjaman_berjangka = prevMonthData.akhir_pinjaman_berjangka || 0;
+                newReport.awal_pinjaman_khusus = prevMonthData.akhir_pinjaman_khusus || 0;
+                
+                // Recalculate "akhir" values
+                newReport.akhir_simpanan_pokok = newReport.awal_simpanan_pokok + (tx.transaksi_simpanan_pokok || 0) - (tx.transaksi_pengambilan_simpanan_pokok || 0);
+                newReport.akhir_simpanan_wajib = newReport.awal_simpanan_wajib + (tx.transaksi_simpanan_wajib || 0) - (tx.transaksi_pengambilan_simpanan_wajib || 0);
+                newReport.akhir_simpanan_sukarela = newReport.sukarela + (tx.transaksi_simpanan_sukarela || 0) - (tx.transaksi_pengambilan_simpanan_sukarela || 0);
+                newReport.akhir_simpanan_wisata = newReport.awal_simpanan_wisata + (tx.transaksi_simpanan_wisata || 0) - (tx.transaksi_pengambilan_simpanan_wisata || 0);
+                
+                newReport.akhir_pinjaman_berjangka = newReport.awal_pinjaman_berjangka - (tx.transaksi_pinjaman_berjangka || 0) + (tx.transaksi_penambahan_pinjaman_berjangka || 0);
+                newReport.akhir_pinjaman_khusus = newReport.awal_pinjaman_khusus - (tx.transaksi_pinjaman_khusus || 0) + (tx.transaksi_penambahan_pinjaman_khusus || 0);
+                
+                // Recalculate totals
+                newReport.jumlah_total_simpanan = 
+                    (newReport.akhir_simpanan_pokok || 0) + 
+                    (newReport.akhir_simpanan_wajib || 0) + 
+                    (newReport.akhir_simpanan_sukarela || 0) + 
+                    (newReport.akhir_simpanan_wisata || 0);
 
-                transaction.update(docRef, updates);
+                newReport.jumlah_total_pinjaman = 
+                    (newReport.akhir_pinjaman_berjangka || 0) + 
+                    (newReport.akhir_pinjaman_khusus || 0);
+
+                transaction.set(mainDocRef, newReport);
+                transaction.set(historyDocRef, newReport);
             });
             successCount++;
         } catch (error) {

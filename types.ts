@@ -39,6 +39,7 @@ export interface Keuangan {
   no: number;
   no_anggota: string;
   nama_angota: string;
+  periode?: string; // YYYY-MM
   awal_simpanan_pokok: number;
   awal_simpanan_wajib: number;
   sukarela: number;
