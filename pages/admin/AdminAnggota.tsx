@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Header from '../../components/Header';
 import { Anggota } from '../../types';
-import { PlusIcon, PencilIcon, TrashIcon } from '../../components/icons/Icons';
+import { PlusIcon, PencilIcon, TrashIcon, UploadIcon } from '../../components/icons/Icons';
 import Modal from '../../components/Modal';
 import AnggotaForm from '../../components/AnggotaForm';
 import { getAnggota, addAnggota, updateAnggota, deleteAnggota } from '../../services/anggotaService';
@@ -12,6 +13,7 @@ const AdminAnggota: React.FC = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedAnggota, setSelectedAnggota] = useState<Anggota | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchAnggota = async () => {
@@ -76,10 +78,19 @@ const AdminAnggota: React.FC = () => {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
             />
-            <button onClick={handleAdd} className="bg-primary text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-800 transition-colors flex items-center gap-2">
-                <PlusIcon className="w-5 h-5" />
-                Tambah Anggota
-            </button>
+            <div className="flex items-center gap-2">
+                <button 
+                    onClick={() => navigate('/admin/upload')} 
+                    className="bg-secondary text-white px-4 py-2 rounded-lg font-semibold hover:bg-emerald-600 transition-colors flex items-center gap-2"
+                >
+                    <UploadIcon className="w-5 h-5" />
+                    Upload Excel
+                </button>
+                <button onClick={handleAdd} className="bg-primary text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-800 transition-colors flex items-center gap-2">
+                    <PlusIcon className="w-5 h-5" />
+                    Tambah Anggota
+                </button>
+            </div>
         </div>
         <div className="overflow-x-auto">
           {isLoading ? <p>Loading data anggota...</p> : (
