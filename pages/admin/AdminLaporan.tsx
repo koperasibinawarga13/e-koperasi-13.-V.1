@@ -15,7 +15,9 @@ const AdminLaporan: React.FC = () => {
         const fetchData = async () => {
             setIsLoading(true);
             const data = await getKeuangan();
-            setKeuanganList(data);
+            // Sort data by no_anggota in ascending order
+            const sortedData = data.sort((a, b) => a.no_anggota.localeCompare(b.no_anggota));
+            setKeuanganList(sortedData);
             setIsLoading(false);
         };
         fetchData();

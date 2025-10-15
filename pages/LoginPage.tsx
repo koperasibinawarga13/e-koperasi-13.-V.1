@@ -10,6 +10,8 @@ const LoginPage: React.FC = () => {
   // Login State
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [loginAnggotaName, setLoginAnggotaName] = useState<string | null>(null);
+  const [isLoginNameLoading, setIsLoginNameLoading] = useState(false);
   
   // Register State
   const [regNoAnggota, setRegNoAnggota] = useState('');
@@ -24,6 +26,7 @@ const LoginPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
   
+  // Effect for registration form name lookup
   useEffect(() => {
     if (view !== 'register') return;
 
@@ -56,6 +59,41 @@ const LoginPage: React.FC = () => {
         clearTimeout(handler);
     };
   }, [regNoAnggota, view]);
+
+  // Effect for login form name lookup
+  useEffect(() => {
+    if (view !== 'login') return;
+
+    // Don't search if it's an admin email or empty
+    if (!username || username.includes('@')) {
+        setLoginAnggotaName(null);
+        setIsLoginNameLoading(false);
+        return;
+    }
+
+    setIsLoginNameLoading(true);
+    const handler = setTimeout(() => {
+        const fetchAnggotaName = async () => {
+            try {
+                const anggota = await getAnggotaByNo(username);
+                if (anggota) {
+                    setLoginAnggotaName(anggota.nama);
+                } else {
+                    setLoginAnggotaName('No. Anggota tidak ditemukan');
+                }
+            } catch (err) {
+                setLoginAnggotaName('Gagal memuat nama');
+            } finally {
+                setIsLoginNameLoading(false);
+            }
+        };
+        fetchAnggotaName();
+    }, 500);
+
+    return () => {
+        clearTimeout(handler);
+    };
+  }, [username, view]);
 
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -106,6 +144,7 @@ const LoginPage: React.FC = () => {
     setRegNoHp('');
     setRegPassword('');
     setAnggotaName(null);
+    setLoginAnggotaName(null);
   }
 
   return (
@@ -140,6 +179,14 @@ const LoginPage: React.FC = () => {
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                   />
+                  <div className="pt-2 text-sm text-gray-600 min-h-[20px]">
+                        {isLoginNameLoading && <span className="italic">Mencari nama...</span>}
+                        {loginAnggotaName && !isLoginNameLoading && (
+                            <span className={loginAnggotaName === 'No. Anggota tidak ditemukan' ? 'text-red-500 font-medium' : 'text-green-600 font-semibold'}>
+                                {loginAnggotaName}
+                            </span>
+                        )}
+                    </div>
                 </div>
                 <div>
                   <label htmlFor="password"className="sr-only">
