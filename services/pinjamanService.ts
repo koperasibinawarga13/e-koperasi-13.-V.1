@@ -49,6 +49,22 @@ export const getPengajuanPinjamanByStatus = async (status: string): Promise<Peng
     }
 };
 
+export const getPengajuanPinjamanByNoAnggota = async (no_anggota: string): Promise<PengajuanPinjaman[]> => {
+    try {
+        const q = query(pengajuanCollectionRef, where("no_anggota", "==", no_anggota));
+        const data = await getDocs(q);
+        const results = data.docs.map((doc) => ({ ...doc.data(), id: doc.id } as PengajuanPinjaman));
+        
+        // Sort client-side to avoid composite index
+        results.sort((a, b) => new Date(b.tanggal_pengajuan).getTime() - new Date(a.tanggal_pengajuan).getTime());
+
+        return results;
+    } catch (error) {
+        console.error(`Error fetching loan applications for member ${no_anggota}: `, error);
+        return [];
+    }
+};
+
 // Update the status of a loan application
 export const updatePengajuanStatus = async (id: string, newStatus: 'Disetujui' | 'Ditolak'): Promise<void> => {
     try {

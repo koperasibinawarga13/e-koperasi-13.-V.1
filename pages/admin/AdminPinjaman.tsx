@@ -100,6 +100,7 @@ const AdminPinjaman: React.FC = () => {
                             <thead className="text-xs text-gray-700 uppercase bg-gray-50">
                                 <tr>
                                     <th className="px-4 py-3">Nama Anggota</th>
+                                    <th className="px-4 py-3">Jenis Pinjaman</th>
                                     <th className="px-4 py-3">Tanggal</th>
                                     <th className="px-4 py-3 text-right">Jumlah</th>
                                     <th className="px-4 py-3 text-center">Jangka Waktu</th>
@@ -111,9 +112,10 @@ const AdminPinjaman: React.FC = () => {
                                 {filteredPinjaman.map(p => (
                                     <tr key={p.id} className="bg-white border-b hover:bg-gray-50">
                                         <td className="px-4 py-3 font-medium text-gray-900">{p.nama_anggota}</td>
+                                        <td className="px-4 py-3 font-semibold">{p.jenis_pinjaman}</td>
                                         <td className="px-4 py-3">{new Date(p.tanggal_pengajuan).toLocaleDateString('id-ID')}</td>
                                         <td className="px-4 py-3 text-right">{formatCurrency(p.pokok_pinjaman)}</td>
-                                        <td className="px-4 py-3 text-center">{p.jangka_waktu} bulan</td>
+                                        <td className="px-4 py-3 text-center">{p.jangka_waktu ? `${p.jangka_waktu} bulan` : '-'}</td>
                                         <td className="px-4 py-3 text-center"><StatusBadge status={p.status} /></td>
                                         <td className="px-4 py-3">
                                             {p.status === 'Menunggu Persetujuan' ? (

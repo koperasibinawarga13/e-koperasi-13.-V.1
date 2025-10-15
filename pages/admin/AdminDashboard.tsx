@@ -145,6 +145,7 @@ const AdminDashboard: React.FC = () => {
                             <thead className="text-xs text-gray-700 uppercase bg-gray-50">
                                 <tr>
                                     <th className="px-4 py-3">Nama Anggota</th>
+                                    <th className="px-4 py-3">Jenis</th>
                                     <th className="px-4 py-3">Tanggal</th>
                                     <th className="px-4 py-3 text-right">Jumlah Pinjaman</th>
                                     <th className="px-4 py-3 text-center">Jangka Waktu</th>
@@ -155,9 +156,10 @@ const AdminDashboard: React.FC = () => {
                                 {pendingLoans.map(loan => (
                                     <tr key={loan.id} className="bg-white border-b hover:bg-gray-50">
                                         <td className="px-4 py-3 font-medium text-gray-900">{loan.nama_anggota}</td>
+                                        <td className="px-4 py-3 font-semibold">{loan.jenis_pinjaman}</td>
                                         <td className="px-4 py-3">{new Date(loan.tanggal_pengajuan).toLocaleDateString('id-ID')}</td>
                                         <td className="px-4 py-3 text-right">{formatCurrency(loan.pokok_pinjaman)}</td>
-                                        <td className="px-4 py-3 text-center">{loan.jangka_waktu} bulan</td>
+                                        <td className="px-4 py-3 text-center">{loan.jangka_waktu ? `${loan.jangka_waktu} bulan` : '-'}</td>
                                         <td className="px-4 py-3 text-center">
                                             <div className="flex justify-center gap-2">
                                                 <button

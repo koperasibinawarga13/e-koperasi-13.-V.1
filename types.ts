@@ -100,12 +100,14 @@ export interface PengajuanPinjaman {
   no_anggota: string;
   nama_anggota: string;
   pokok_pinjaman: number;
-  jangka_waktu: number;
-  bunga_per_bulan: number;
+  jangka_waktu?: number;
+  bunga_per_bulan?: number;
   tanggal_pengajuan: string; // ISO string
   status: 'Menunggu Persetujuan' | 'Disetujui' | 'Ditolak';
   angsuran_pokok_bulan?: number;
   total_bunga?: number;
   total_bayar?: number;
   jadwal_angsuran?: Array<any>;
+  jenis_pinjaman: 'Berjangka' | 'Khusus';
+  keterangan?: string;
 }
