@@ -165,6 +165,12 @@ const AnggotaPinjaman: React.FC = () => {
         </div>
     );
 
+    const handleCurrencyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        const numericValue = parseInt(value.replace(/[^0-9]/g, ''), 10);
+        setPokokPinjaman(isNaN(numericValue) ? 0 : numericValue);
+    };
+
     return (
         <div>
             <Header title="Pengajuan Pinjaman Anggota" />
@@ -197,7 +203,14 @@ const AnggotaPinjaman: React.FC = () => {
                     <form onSubmit={handleCalculate} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-end">
                         <div>
                             <label htmlFor="pokok" className="block text-sm font-medium text-gray-700">Pokok Pinjaman (IDR)</label>
-                            <input type="number" id="pokok" value={pokokPinjaman} onChange={e => setPokokPinjaman(Number(e.target.value))} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary" />
+                            <input
+                                type="text"
+                                inputMode="numeric"
+                                id="pokok"
+                                value={new Intl.NumberFormat('id-ID').format(pokokPinjaman)}
+                                onChange={handleCurrencyChange}
+                                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary"
+                            />
                         </div>
                          <div>
                             <label htmlFor="jangka" className="block text-sm font-medium text-gray-700">Jangka Waktu (Bulan)</label>
