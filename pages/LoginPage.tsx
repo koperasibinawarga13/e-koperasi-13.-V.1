@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { DownloadIcon, EyeIcon, EyeSlashIcon } from '../components/icons/Icons';
 import { registerAnggota, getAnggotaByNo } from '../services/anggotaService';
+import { LogoKoperasi } from '../components/icons/LogoKoperasi';
 
 const WaveBackground = () => (
     <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0">
@@ -161,7 +162,7 @@ const LoginPage: React.FC = () => {
         <header className="relative w-full h-2/5 min-h-[320px] bg-primary flex flex-col justify-center items-center text-white p-8 z-10 text-center">
             <WaveBackground />
             <div className="relative z-10">
-                <img src="/vite.svg" alt="Logo Koperasi" className="w-20 h-20 mx-auto mb-4" />
+                <LogoKoperasi className="w-20 h-20 mx-auto mb-4 text-primary" />
                 <h1 className="text-4xl font-bold">e-Koperasi</h1>
                 <p className="text-lg opacity-90 mt-1">Bina warga SMP Negeri 13 Tasikmalaya</p>
 
