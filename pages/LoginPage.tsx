@@ -4,43 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { DownloadIcon, EyeIcon, EyeSlashIcon } from '../components/icons/Icons';
 import { registerAnggota, getAnggotaByNo } from '../services/anggotaService';
 import { LogoKoperasi } from '../components/icons/LogoKoperasi';
-
-const WaveBackground = () => (
-    <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0">
-        <svg viewBox="0 0 1440 320" xmlns="http://www.w3.org/2000/svg" className="w-full h-full object-cover">
-            <path fill="#0052FF" fillOpacity="1" d="M0,224L48,208C96,192,192,160,288,165.3C384,171,480,213,576,240C672,267,768,277,864,256C960,235,1056,181,1152,154.7C1248,128,1344,128,1392,128L1440,128L1440,0L1392,0C1344,0,1248,0,1152,0C1056,0,960,0,864,0C768,0,672,0,576,0C480,0,384,0,288,0C192,0,96,0,48,0L0,0Z"></path>
-            <path fill="#0033A1" fillOpacity="0.5" d="M0,288L48,272C96,256,192,224,288,197.3C384,171,480,149,576,165.3C672,181,768,235,864,245.3C960,256,1056,224,1152,197.3C1248,171,1344,149,1392,138.7L1440,128L1440,0L1392,0C1344,0,1248,0,1152,0C1056,0,960,0,864,0C768,0,672,0,576,0C480,0,384,0,288,0C192,0,96,0,48,0L0,0Z"></path>
-        </svg>
-    </div>
-);
-
-const CustomerServiceIllustration = () => (
-    <div className="absolute bottom-0 right-0 w-48 h-auto z-0 pointer-events-none">
-        <svg viewBox="0 0 200 300" xmlns="http://www.w3.org/2000/svg">
-            <g transform="translate(100, 150)">
-                {/* Head */}
-                <circle cx="0" cy="-50" r="30" fill="#f2d6b8"/>
-                {/* Hair */}
-                <path d="M -30 -80 Q 0 -100 30 -80 L 35 -40 Q 0 -30 -35 -40 Z" fill="#333"/>
-                <path d="M -20 -20 Q 0 -10 20 -20 L 25 10 Q 0 20 -25 10 Z" fill="#333"/>
-                {/* Eyes */}
-                <circle cx="-10" cy="-55" r="3" fill="#333"/>
-                <circle cx="10" cy="-55" r="3" fill="#333"/>
-                {/* Mouth */}
-                <path d="M -10 -40 Q 0 -35 10 -40" stroke="#333" fill="none" strokeWidth="2"/>
-                {/* Body */}
-                <path d="M -40 -20 L -50 80 L 50 80 L 40 -20 Z" fill="#0052FF"/>
-                {/* Arms */}
-                <path d="M 40 -10 L 80 30 L 70 40 L 35 0 Z" fill="#0052FF"/>
-                <path d="M -40 -10 L -80 30 L -70 40 L -35 0 Z" fill="#f2d6b8"/>
-                {/* Shirt Collar */}
-                <path d="M -20 -20 L 0 -5 L 20 -20 Z" fill="#f0e68c"/>
-                <rect x="-40" y="-20" width="80" height="5" fill="#0033A1"/>
-            </g>
-        </svg>
-    </div>
-);
-
+import { LoginIllustration } from '../components/icons/LoginIllustration';
 
 const LoginPage: React.FC = () => {
   const [view, setView] = useState<'login' | 'register'>('login');
@@ -147,11 +111,11 @@ const LoginPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white flex flex-col font-sans overflow-hidden">
+    <div className="min-h-screen bg-background flex flex-col items-center font-sans overflow-hidden">
         {installPrompt && (
           <button
               onClick={handleInstallClick}
-              className="absolute top-4 right-4 z-20 flex items-center gap-2 px-3 py-1.5 bg-secondary text-white text-xs font-bold rounded-full shadow-lg hover:bg-emerald-600 transition-transform transform hover:scale-105 focus:outline-none"
+              className="absolute top-4 right-4 z-50 flex items-center gap-2 px-3 py-1.5 bg-secondary text-white text-xs font-bold rounded-full shadow-lg hover:bg-emerald-600 transition-transform transform hover:scale-105 focus:outline-none"
               title="Install Aplikasi"
             >
               <DownloadIcon className="w-4 h-4" />
@@ -159,26 +123,27 @@ const LoginPage: React.FC = () => {
             </button>
         )}
 
-        <header className="relative w-full h-2/5 min-h-[320px] bg-primary flex flex-col justify-center items-center text-white p-8 z-10 text-center">
-            <WaveBackground />
-            <div className="relative z-10">
-                <LogoKoperasi className="w-20 h-20 mx-auto mb-4 text-primary" />
-                <h1 className="text-4xl font-bold">e-Koperasi</h1>
+        <header className="relative w-full bg-primary text-white p-8 pt-16 z-10 text-center flex flex-col items-center">
+             <div className="absolute -bottom-16 w-32 h-32 bg-white rounded-full p-3 shadow-lg flex items-center justify-center z-30">
+                <LogoKoperasi className="w-full h-full text-primary" />
+            </div>
+            <div className="relative z-10 w-full max-w-md">
+                <h1 className="text-5xl font-bold">e-Koperasi</h1>
                 <p className="text-lg opacity-90 mt-1">Bina warga SMP Negeri 13 Tasikmalaya</p>
-
                 <div className="mt-8 transition-all duration-300 min-h-[32px] flex items-center justify-center">
-                    <p className="text-xl font-bold">
+                    <p className="text-xl font-bold bg-black/10 px-4 py-1 rounded-full">
                       {isNameLoading ? '...' : (view === 'login' ? loginAnggotaName : regAnggotaName) || 'Selamat Datang'}
                     </p>
                 </div>
             </div>
+             <div className="absolute bottom-0 left-0 w-full h-16 bg-background rounded-t-3xl z-20"></div>
         </header>
 
-        <main className="relative flex-grow w-full bg-white rounded-t-3xl shadow-2xl -mt-8 z-10 p-8 flex flex-col">
-           <CustomerServiceIllustration />
-           <div className="w-full max-w-md z-10">
-                <h2 className="text-xl font-bold text-dark mb-1">{view === 'login' ? 'Masuk ke Akun Anda' : 'Buat Akun Baru'}</h2>
-                <p className="text-sm text-gray-500 mb-4">{view === 'login' ? 'Silakan masukkan kredensial Anda.' : 'Lengkapi data untuk mendaftar.'}</p>
+        <main className="relative w-full flex-grow bg-background z-10 p-8 flex flex-col items-center">
+           <LoginIllustration className="absolute bottom-0 right-0 w-48 h-auto z-0 opacity-80" />
+           <div className="w-full max-w-md z-10 pt-8">
+                <h2 className="text-2xl font-bold text-dark mb-1">{view === 'login' ? 'Masuk ke Akun Anda' : 'Buat Akun Baru'}</h2>
+                <p className="text-sm text-gray-500 mb-6">{view === 'login' ? 'Silakan masukkan kredensial Anda.' : 'Lengkapi data untuk mendaftar.'}</p>
                 
                 {error && <p className="text-sm text-red-600 text-center font-semibold bg-red-50 p-3 rounded-md mb-4">{error}</p>}
                 {success && <p className="text-sm text-green-600 text-center font-semibold bg-green-50 p-3 rounded-md mb-4">{success}</p>}
@@ -190,7 +155,7 @@ const LoginPage: React.FC = () => {
                         type="text"
                         autoComplete="username"
                         required
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-white"
                         placeholder="No. Anggota / Email Admin"
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
@@ -201,7 +166,7 @@ const LoginPage: React.FC = () => {
                         type={showPassword ? "text" : "password"}
                         autoComplete="current-password"
                         required
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-white"
                         placeholder="Password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
@@ -231,7 +196,7 @@ const LoginPage: React.FC = () => {
                         <input
                             type="text"
                             required
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-white"
                             placeholder="No. Anggota"
                             value={regNoAnggota}
                             onChange={(e) => setRegNoAnggota(e.target.value)}
@@ -241,7 +206,7 @@ const LoginPage: React.FC = () => {
                       <input
                         type="tel"
                         required
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-white"
                         placeholder="No. HP (Contoh: 081234...)"
                         value={regNoHp}
                         onChange={(e) => setRegNoHp(e.target.value)}
@@ -251,7 +216,7 @@ const LoginPage: React.FC = () => {
                       <input
                         type={showPassword ? "text" : "password"}
                         required
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-white"
                         placeholder="Buat Password Baru"
                         value={regPassword}
                         onChange={(e) => setRegPassword(e.target.value)}
