@@ -29,28 +29,16 @@ const SlipRincian: React.FC = () => {
                     setIsLoading(false);
                 }
             } else {
-                setIsLoading(false);
+                setIsLoading(false); // No user, stop loading
             }
         };
         fetchData();
     }, [user]);
 
-    // Automatically trigger print dialog after a short delay to allow rendering
-    useEffect(() => {
-        if (!isLoading && keuangan && anggota) {
-            const timer = setTimeout(() => {
-                window.print();
-            }, 500);
-            return () => clearTimeout(timer);
-        }
-    }, [isLoading, keuangan, anggota]);
-
     const formatCurrency = (amount: number | undefined) => {
         if (typeof amount !== 'number' || isNaN(amount) || amount === 0) return '-';
         return new Intl.NumberFormat('id-ID').format(amount);
     };
-
-    const slipDate = new Intl.DateTimeFormat('id-ID', { month: 'long', year: 'numeric' }).format(new Date());
 
     if (isLoading) {
         return <div className="flex justify-center items-center h-screen">Memuat slip...</div>;
@@ -69,122 +57,139 @@ const SlipRincian: React.FC = () => {
         );
     }
     
-    const SlipRow: React.FC<{ label: string; value: number | undefined; isEqual?: boolean }> = ({ label, value, isEqual = false }) => (
-        <div className="flex justify-between items-baseline text-xs mb-1">
-            <span className="truncate pr-2">{isEqual ? '=' : '-'} {label}</span>
-            <div className="flex items-baseline flex-shrink-0">
-                <span>Rp</span>
-                <span className="w-24 text-right">{formatCurrency(value)}</span>
+    // Helper Components for the new layout
+    const Section: React.FC<{ title: string; color: string; children: React.ReactNode }> = ({ title, color, children }) => (
+        <div className="mb-4">
+            <h3 className={`p-2 rounded-md text-center font-bold text-sm tracking-wider ${color}`}>
+                {title}
+            </h3>
+            <div className="mt-2 px-2 space-y-1">
+                {children}
             </div>
         </div>
     );
-    
-    const SlipSection: React.FC<{title: string, children: React.ReactNode, bgColor?: string}> = ({title, children, bgColor = 'bg-gray-100'}) => (
-        <section className="mb-3">
-            <h3 className={`font-bold text-xs p-1 ${bgColor} text-black text-center tracking-wider`}>{title}</h3>
-            <div className="pt-2 px-1">
-                {children}
+
+    const Item: React.FC<{ label: string; value: number | undefined }> = ({ label, value }) => (
+        <div className="flex justify-between items-start text-sm py-1 font-mono">
+            <span className="text-gray-700 mr-2">- {label}</span>
+            <div className="flex items-baseline flex-shrink-0">
+                <span className="text-gray-500 mr-1">Rp</span>
+                <span className="text-right w-24 font-semibold text-dark">{formatCurrency(value)}</span>
             </div>
-        </section>
+        </div>
     );
 
+    const TotalItem: React.FC<{ label: string; value: number | undefined; color: string }> = ({ label, value, color }) => (
+        <div className={`flex justify-between items-center p-2 rounded-md font-bold text-sm ${color}`}>
+            <span>{label}</span>
+            <div className="flex items-baseline flex-shrink-0 font-mono">
+                <span className="opacity-80 mr-1">Rp</span>
+                <span className="text-right w-24">{formatCurrency(value)}</span>
+            </div>
+        </div>
+    );
+
+
     return (
-        <div className="bg-gray-100 min-h-screen font-mono print:bg-white">
-            <div className="max-w-md mx-auto p-4 flex justify-between items-center print:hidden">
-                <button onClick={() => navigate(-1)} className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-sm hover:bg-gray-50 font-sans">
-                    <ChevronLeftIcon className="w-5 h-5" />
-                    Kembali
-                </button>
-                <button onClick={() => window.print()} className="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg shadow-sm hover:bg-primary-dark font-sans">
-                    <PrintIcon className="w-5 h-5" />
-                    Cetak Ulang
-                </button>
+        <div className="bg-background min-h-screen font-sans">
+            <div className="max-w-4xl mx-auto p-4 print:hidden">
+                 <div className="flex justify-between items-center mb-4">
+                    <button onClick={() => navigate(-1)} className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-sm hover:bg-gray-50">
+                        <ChevronLeftIcon className="w-5 h-5" />
+                        Kembali
+                    </button>
+                    <button onClick={() => window.print()} className="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg shadow-sm hover:bg-primary-dark">
+                        <PrintIcon className="w-5 h-5" />
+                        Cetak
+                    </button>
+                </div>
             </div>
 
-            <div id="slip-content" className="max-w-md mx-auto bg-white p-4 border text-black print:p-2 print:border-none print:shadow-none">
-                <header className="text-center pb-2 border-t-2 border-b-4 border-black">
-                    <h1 className="font-bold text-sm">KOPERASI BINA WARGA</h1>
-                    <h2 className="font-bold text-sm">SMP NEGERI 13 TASIKMALAYA</h2>
-                    <p className="text-xs">Jln Letjend H. Ibrahim Adjie Km2. Indihiang Tasikmalaya</p>
-                </header>
+            <div id="slip-content" className="max-w-4xl mx-auto bg-white p-4 md:p-6 rounded-lg shadow-lg print:shadow-none print:p-2">
+                <div className="border-b-2 border-black pb-2 mb-4">
+                    <h2 className="text-lg font-bold">Nama Anggota: {anggota.nama}</h2>
+                    <p className="text-sm text-gray-500">No. Anggota: {anggota.no_anggota}</p>
+                </div>
 
-                <section className="my-3 text-xs">
-                    <div className="flex justify-between items-start">
-                        <div className="grid grid-cols-[auto,1fr] gap-x-2">
-                           <span className="font-bold">No Anggota</span>   <span>: {anggota.no_anggota}</span>
-                           <span className="font-bold">Nama Anggota</span> <span>: {anggota.nama}</span>
-                        </div>
-                        <div className="text-right">
-                           <p>Bulan: <strong>{slipDate}</strong></p>
-                        </div>
-                    </div>
-                </section>
-
-                <main className="grid grid-cols-2 gap-x-4">
-                    {/* LEFT COLUMN */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
+                    {/* Left Column */}
                     <div>
-                        <SlipSection title="KEADAAN AWAL BULAN" bgColor="bg-blue-100">
-                            <SlipRow label="Simpanan Pokok" value={keuangan.awal_simpanan_pokok} />
-                            <SlipRow label="Simpanan Wajib" value={keuangan.awal_simpanan_wajib} />
-                            <SlipRow label="Simpanan Sukarela" value={keuangan.sukarela} />
-                            <SlipRow label="Simpanan Wisata" value={keuangan.awal_simpanan_wisata} />
-                            <SlipRow label="Pinjaman Berjangka" value={keuangan.awal_pinjaman_berjangka} />
-                            <SlipRow label="Pinjaman Khusus" value={keuangan.awal_pinjaman_khusus} />
-                        </SlipSection>
-                        <SlipSection title="KEADAAN AKHIR" bgColor="bg-blue-100">
-                            <SlipRow label="Simpanan Pokok" value={keuangan.akhir_simpanan_pokok} />
-                            <SlipRow label="Simpanan Wajib" value={keuangan.akhir_simpanan_wajib} />
-                            <SlipRow label="Simpanan Sukarela" value={keuangan.akhir_simpanan_sukarela} />
-                            <SlipRow label="Simpanan Wisata" value={keuangan.akhir_simpanan_wisata} />
-                            <SlipRow label="Pinjaman Berjangka" value={keuangan.akhir_pinjaman_berjangka} />
-                            <SlipRow label="Pinjaman Khusus" value={keuangan.akhir_pinjaman_khusus} />
-                        </SlipSection>
+                        <Section title="KEADAAN AWAL BULAN" color="bg-blue-100 text-blue-800">
+                            <Item label="Simpanan Pokok" value={keuangan.awal_simpanan_pokok} />
+                            <Item label="Simpanan Wajib" value={keuangan.awal_simpanan_wajib} />
+                            <Item label="Simpanan Sukarela" value={keuangan.sukarela} />
+                            <Item label="Simpanan Wisata" value={keuangan.awal_simpanan_wisata} />
+                            <Item label="Pinjaman Berjangka" value={keuangan.awal_pinjaman_berjangka} />
+                            <Item label="Pinjaman Khusus" value={keuangan.awal_pinjaman_khusus} />
+                        </Section>
+                        
+                        <Section title="KEADAAN AKHIR BULAN" color="bg-blue-100 text-blue-800">
+                            <Item label="Simpanan Pokok" value={keuangan.akhir_simpanan_pokok} />
+                            <Item label="Simpanan Wajib" value={keuangan.akhir_simpanan_wajib} />
+                            <Item label="Simpanan Sukarela" value={keuangan.akhir_simpanan_sukarela} />
+                            <Item label="Simpanan Wisata" value={keuangan.akhir_simpanan_wisata} />
+                            <Item label="Pinjaman Berjangka" value={keuangan.akhir_pinjaman_berjangka} />
+                            <Item label="Pinjaman Khusus" value={keuangan.akhir_pinjaman_khusus} />
+                        </Section>
                     </div>
 
-                    {/* RIGHT COLUMN */}
+                    {/* Right Column */}
                     <div>
-                         <SlipSection title="PENGAMBILAN SIMPANAN" bgColor="bg-rose-100">
-                            <SlipRow label="Simpanan Pokok" value={keuangan.transaksi_pengambilan_simpanan_pokok} />
-                            <SlipRow label="Simpanan Wajib" value={keuangan.transaksi_pengambilan_simpanan_wajib} />
-                            <SlipRow label="Simpanan Sukarela" value={keuangan.transaksi_pengambilan_simpanan_sukarela} />
-                            <SlipRow label="Simpanan Wisata" value={keuangan.transaksi_pengambilan_simpanan_wisata} />
-                        </SlipSection>
-                        <SlipSection title="PENAMBAHAN PINJAMAN" bgColor="bg-rose-100">
-                             <SlipRow label="Pinjaman Berjangka" isEqual={true} value={keuangan.transaksi_penambahan_pinjaman_berjangka} />
-                             <SlipRow label="Pinjaman Khusus" isEqual={true} value={keuangan.transaksi_penambahan_pinjaman_khusus} />
-                        </SlipSection>
-                         <SlipSection title="SETORAN BULAN INI" bgColor="bg-green-100">
-                            <SlipRow label="Simpanan Pokok" value={keuangan.transaksi_simpanan_pokok} />
-                            <SlipRow label="Simpanan Wajib" value={keuangan.transaksi_simpanan_wajib} />
-                            <SlipRow label="Angs Pinj Berjangka" value={keuangan.transaksi_pinjaman_berjangka} />
-                            <SlipRow label="Angs Pinj Khusus" value={keuangan.transaksi_pinjaman_khusus} />
-                             <div className="flex justify-between items-baseline font-bold text-xs mt-2 pt-1 border-t border-black">
-                                <span>JUMLAH SETORAN</span>
-                                <div className="flex items-baseline">
-                                    <span>Rp</span>
-                                    <span className="w-24 text-right">{formatCurrency(keuangan.Jumlah_setoran)}</span>
-                                </div>
-                            </div>
-                        </SlipSection>
-                    </div>
-                </main>
-                
-                <footer className="mt-8">
-                    <div className="flex justify-between text-center text-xs">
-                        <div>
-                            <p>Mengetahui,</p>
-                            <p className="font-bold">Ketua</p>
-                            <div className="h-12"></div>
-                            <p className="font-bold underline">N Dedi Z, M.Pd.</p>
-                        </div>
-                        <div>
-                             <p>Bendahara,</p>
-                             <div className="h-12"></div>
-                             <p className="font-bold underline">R.B. Kustianto, S.Pd.</p>
+                         <Section title="PENGAMBILAN SIMPANAN" color="bg-rose-100 text-rose-800">
+                            <Item label="Simpanan Pokok" value={keuangan.transaksi_pengambilan_simpanan_pokok} />
+                            <Item label="Simpanan Wajib" value={keuangan.transaksi_pengambilan_simpanan_wajib} />
+                            <Item label="Simpanan Sukarela" value={keuangan.transaksi_pengambilan_simpanan_sukarela} />
+                            <Item label="Simpanan Wisata" value={keuangan.transaksi_pengambilan_simpanan_wisata} />
+                        </Section>
+
+                        <Section title="PENAMBAHAN PINJAMAN" color="bg-rose-100 text-rose-800">
+                             <Item label="Pinjaman Berjangka" value={keuangan.transaksi_penambahan_pinjaman_berjangka} />
+                             <Item label="Pinjaman Khusus" value={keuangan.transaksi_penambahan_pinjaman_khusus} />
+                             <Item label="Pinjaman Niaga" value={keuangan.transaksi_penambahan_pinjaman_niaga} />
+                        </Section>
+                        
+                        <Section title="SETORAN BULAN INI" color="bg-rose-100 text-rose-800">
+                            <Item label="Simpanan Pokok" value={keuangan.transaksi_simpanan_pokok} />
+                            <Item label="Simpanan Wajib" value={keuangan.transaksi_simpanan_wajib} />
+                            <Item label="Simpanan Sukarela" value={keuangan.transaksi_simpanan_sukarela} />
+                            <Item label="Simpanan Wisata" value={keuangan.transaksi_simpanan_wisata} />
+                            <Item label="Angsuran P. Berjangka" value={keuangan.transaksi_pinjaman_berjangka} />
+                            <Item label="Angsuran P. Khusus" value={keuangan.transaksi_pinjaman_khusus} />
+                            <Item label="Jasa" value={keuangan.transaksi_simpanan_jasa} />
+                            <Item label="Niaga" value={keuangan.transaksi_niaga} />
+                            <Item label="Dana Perlaya" value={keuangan.transaksi_dana_perlaya} />
+                            <Item label="Dana Katineng" value={keuangan.transaksi_dana_katineng} />
+                        </Section>
+                        
+                        <div className="px-2 mt-2">
+                             <TotalItem label="JUMLAH SETORAN" value={keuangan.Jumlah_setoran} color="bg-gray-800 text-white" />
                         </div>
                     </div>
-                </footer>
+                </div>
             </div>
+            
+            <style>{`
+                @media print {
+                    body {
+                        background-color: white;
+                    }
+                    .print\\:hidden {
+                        display: none;
+                    }
+                    .print\\:shadow-none {
+                        box-shadow: none;
+                    }
+                     .print\\:p-2 {
+                        padding: 0.5rem;
+                    }
+                    #slip-content {
+                        position: absolute;
+                        left: 0;
+                        top: 0;
+                        width: 100%;
+                    }
+                }
+            `}</style>
         </div>
     );
 };
