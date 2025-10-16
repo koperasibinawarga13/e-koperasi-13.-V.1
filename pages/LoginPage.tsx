@@ -90,7 +90,7 @@ const LoginPage: React.FC = () => {
     const handler = setTimeout(async () => {
         try {
             const anggota = await getAnggotaByNo(searchInput);
-            setName(anggota ? anggota.nama.split(' ')[0] : 'Anggota tidak ditemukan');
+            setName(anggota ? anggota.nama : 'Anggota tidak ditemukan');
         } catch (err) {
             setName('Gagal memuat nama');
         } finally {
@@ -162,8 +162,8 @@ const LoginPage: React.FC = () => {
             <WaveBackground />
             <div className="absolute top-4 left-4 text-white/80 text-sm">Cek Saldo Anda ▾</div>
             <div className="relative z-10">
-                <p className="text-2xl opacity-90">Halo,</p>
-                <h1 className="text-5xl font-bold uppercase transition-all duration-300 h-14">
+                <p className="text-lg font-medium opacity-90">Halo,</p>
+                <h1 className="text-2xl font-bold transition-all duration-300 min-h-[40px] flex items-center justify-center break-words max-w-full px-2">
                   {isNameLoading ? '...' : (view === 'login' ? loginAnggotaName : regAnggotaName) || 'Selamat Datang'}
                 </h1>
             </div>
