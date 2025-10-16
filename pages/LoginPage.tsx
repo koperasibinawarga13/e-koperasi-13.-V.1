@@ -158,14 +158,17 @@ const LoginPage: React.FC = () => {
             </button>
         )}
 
-        <header className="relative w-full h-2/5 min-h-[280px] bg-primary flex flex-col justify-center items-center text-white p-8 z-10 text-center">
+        <header className="relative w-full h-2/5 min-h-[320px] bg-primary flex flex-col justify-center items-center text-white p-8 z-10 text-center">
             <WaveBackground />
-            <div className="absolute top-4 left-4 text-white/80 text-sm">Cek Saldo Anda ▾</div>
             <div className="relative z-10">
-                <p className="text-lg font-medium opacity-90">Halo,</p>
-                <h1 className="text-2xl font-bold transition-all duration-300 min-h-[40px] flex items-center justify-center break-words max-w-full px-2">
-                  {isNameLoading ? '...' : (view === 'login' ? loginAnggotaName : regAnggotaName) || 'Selamat Datang'}
-                </h1>
+                <h1 className="text-4xl font-bold">e-Koperasi</h1>
+                <p className="text-lg opacity-90 mt-1">Bina warga SMP Negeri 13 Tasikmalaya</p>
+
+                <div className="mt-8 transition-all duration-300 min-h-[32px] flex items-center justify-center">
+                    <p className="text-xl font-bold">
+                      {isNameLoading ? '...' : (view === 'login' ? loginAnggotaName : regAnggotaName) || 'Selamat Datang'}
+                    </p>
+                </div>
             </div>
         </header>
 
