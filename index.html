@@ -5,6 +5,11 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>e-Koperasi 13</title>
+    
+    <!-- PWA -->
+    <meta name="theme-color" content="#0052FF"/>
+    <link rel="manifest" href="/manifest.json" />
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
@@ -15,6 +20,7 @@
               'primary-dark': '#0033A1',
               'primary-light': '#E6F0FF',
               'secondary': '#10B981',
+              'accent': '#FBBF24', // Amber 400
               'background': '#F7F8FC',
               'dark': '#1A202C',
               'gray-text': '#5A677D',
@@ -49,5 +55,16 @@
   <body class="bg-background">
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').then(registration => {
+            console.log('ServiceWorker registration successful with scope: ', registration.scope);
+          }, err => {
+            console.log('ServiceWorker registration failed: ', err);
+          });
+        });
+      }
+    </script>
   </body>
 </html>

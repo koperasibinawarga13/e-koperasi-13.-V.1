@@ -1,99 +1,105 @@
 // FIX: Implemented full content for LoginPage.tsx to provide a functional login screen.
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { BuildingOfficeIcon } from '../components/icons/Icons';
+import { DownloadIcon, EyeIcon, EyeSlashIcon } from '../components/icons/Icons';
 import { registerAnggota, getAnggotaByNo } from '../services/anggotaService';
+
+const WaveBackground = () => (
+    <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0">
+        <svg viewBox="0 0 1440 320" xmlns="http://www.w3.org/2000/svg" className="w-full h-full object-cover">
+            <path fill="#0052FF" fillOpacity="1" d="M0,224L48,208C96,192,192,160,288,165.3C384,171,480,213,576,240C672,267,768,277,864,256C960,235,1056,181,1152,154.7C1248,128,1344,128,1392,128L1440,128L1440,0L1392,0C1344,0,1248,0,1152,0C1056,0,960,0,864,0C768,0,672,0,576,0C480,0,384,0,288,0C192,0,96,0,48,0L0,0Z"></path>
+            <path fill="#0033A1" fillOpacity="0.5" d="M0,288L48,272C96,256,192,224,288,197.3C384,171,480,149,576,165.3C672,181,768,235,864,245.3C960,256,1056,224,1152,197.3C1248,171,1344,149,1392,138.7L1440,128L1440,0L1392,0C1344,0,1248,0,1152,0C1056,0,960,0,864,0C768,0,672,0,576,0C480,0,384,0,288,0C192,0,96,0,48,0L0,0Z"></path>
+        </svg>
+    </div>
+);
+
+const CustomerServiceIllustration = () => (
+    <div className="absolute bottom-0 right-0 w-48 h-auto z-0 pointer-events-none">
+        <svg viewBox="0 0 200 300" xmlns="http://www.w3.org/2000/svg">
+            <g transform="translate(100, 150)">
+                {/* Head */}
+                <circle cx="0" cy="-50" r="30" fill="#f2d6b8"/>
+                {/* Hair */}
+                <path d="M -30 -80 Q 0 -100 30 -80 L 35 -40 Q 0 -30 -35 -40 Z" fill="#333"/>
+                <path d="M -20 -20 Q 0 -10 20 -20 L 25 10 Q 0 20 -25 10 Z" fill="#333"/>
+                {/* Eyes */}
+                <circle cx="-10" cy="-55" r="3" fill="#333"/>
+                <circle cx="10" cy="-55" r="3" fill="#333"/>
+                {/* Mouth */}
+                <path d="M -10 -40 Q 0 -35 10 -40" stroke="#333" fill="none" strokeWidth="2"/>
+                {/* Body */}
+                <path d="M -40 -20 L -50 80 L 50 80 L 40 -20 Z" fill="#0052FF"/>
+                {/* Arms */}
+                <path d="M 40 -10 L 80 30 L 70 40 L 35 0 Z" fill="#0052FF"/>
+                <path d="M -40 -10 L -80 30 L -70 40 L -35 0 Z" fill="#f2d6b8"/>
+                {/* Shirt Collar */}
+                <path d="M -20 -20 L 0 -5 L 20 -20 Z" fill="#f0e68c"/>
+                <rect x="-40" y="-20" width="80" height="5" fill="#0033A1"/>
+            </g>
+        </svg>
+    </div>
+);
+
 
 const LoginPage: React.FC = () => {
   const [view, setView] = useState<'login' | 'register'>('login');
   
-  // Login State
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loginAnggotaName, setLoginAnggotaName] = useState<string | null>(null);
-  const [isLoginNameLoading, setIsLoginNameLoading] = useState(false);
   
-  // Register State
   const [regNoAnggota, setRegNoAnggota] = useState('');
   const [regNoHp, setRegNoHp] = useState('');
   const [regPassword, setRegPassword] = useState('');
-  const [anggotaName, setAnggotaName] = useState<string | null>(null);
-  const [isNameLoading, setIsNameLoading] = useState(false);
-
+  const [regAnggotaName, setRegAnggotaName] = useState<string | null>(null);
 
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isNameLoading, setIsNameLoading] = useState(false);
   const { login } = useAuth();
   
-  // Effect for registration form name lookup
-  useEffect(() => {
-    if (view !== 'register') return;
+  const [installPrompt, setInstallPrompt] = useState<any>(null);
 
-    if (!regNoAnggota) {
-        setAnggotaName(null);
+  useEffect(() => {
+    const handleBeforeInstallPrompt = (e: Event) => {
+      e.preventDefault();
+      setInstallPrompt(e);
+    };
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+  }, []);
+
+  const handleInstallClick = () => {
+    installPrompt?.prompt();
+    installPrompt?.userChoice.then(() => setInstallPrompt(null));
+  };
+
+  useEffect(() => {
+    const searchInput = view === 'login' ? username : regNoAnggota;
+    const setName = view === 'login' ? setLoginAnggotaName : setRegAnggotaName;
+
+    if (!searchInput || (view === 'login' && searchInput.includes('@'))) {
+        setName(null);
         setIsNameLoading(false);
         return;
     }
 
     setIsNameLoading(true);
-    const handler = setTimeout(() => {
-        const fetchAnggotaName = async () => {
-            try {
-                const anggota = await getAnggotaByNo(regNoAnggota);
-                if (anggota) {
-                    setAnggotaName(anggota.nama);
-                } else {
-                    setAnggotaName('No. Anggota tidak ditemukan');
-                }
-            } catch (err) {
-                setAnggotaName('Gagal memuat nama');
-            } finally {
-                setIsNameLoading(false);
-            }
-        };
-        fetchAnggotaName();
-    }, 500); // 500ms delay
-
-    return () => {
-        clearTimeout(handler);
-    };
-  }, [regNoAnggota, view]);
-
-  // Effect for login form name lookup
-  useEffect(() => {
-    if (view !== 'login') return;
-
-    // Don't search if it's an admin email or empty
-    if (!username || username.includes('@')) {
-        setLoginAnggotaName(null);
-        setIsLoginNameLoading(false);
-        return;
-    }
-
-    setIsLoginNameLoading(true);
-    const handler = setTimeout(() => {
-        const fetchAnggotaName = async () => {
-            try {
-                const anggota = await getAnggotaByNo(username);
-                if (anggota) {
-                    setLoginAnggotaName(anggota.nama);
-                } else {
-                    setLoginAnggotaName('No. Anggota tidak ditemukan');
-                }
-            } catch (err) {
-                setLoginAnggotaName('Gagal memuat nama');
-            } finally {
-                setIsLoginNameLoading(false);
-            }
-        };
-        fetchAnggotaName();
+    const handler = setTimeout(async () => {
+        try {
+            const anggota = await getAnggotaByNo(searchInput);
+            setName(anggota ? anggota.nama.split(' ')[0] : 'Anggota tidak ditemukan');
+        } catch (err) {
+            setName('Gagal memuat nama');
+        } finally {
+            setIsNameLoading(false);
+        }
     }, 500);
 
-    return () => {
-        clearTimeout(handler);
-    };
-  }, [username, view]);
+    return () => clearTimeout(handler);
+  }, [username, regNoAnggota, view]);
 
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -101,12 +107,10 @@ const LoginPage: React.FC = () => {
     setError('');
     setSuccess('');
     setIsLoading(true);
-
     try {
       await login(username, password);
-      // Navigation is handled by AppRoutes
     } catch (err: any) {
-      setError(err.message || 'Login gagal. Silakan coba lagi.');
+      setError(err.message || 'Login gagal.');
     } finally {
       setIsLoading(false);
     }
@@ -117,17 +121,12 @@ const LoginPage: React.FC = () => {
     setError('');
     setSuccess('');
     setIsLoading(true);
-
     try {
         await registerAnggota(regNoAnggota, regNoHp, regPassword);
-        setSuccess('Registrasi berhasil! Silakan login dengan password baru Anda.');
-        setView('login'); // Switch back to login view
-        // Clear registration form
-        setRegNoAnggota('');
-        setRegNoHp('');
-        setRegPassword('');
+        setSuccess('Registrasi berhasil! Silakan login.');
+        switchView('login');
     } catch (err: any) {
-        setError(err.message || 'Registrasi gagal. Silakan coba lagi.');
+        setError(err.message || 'Registrasi gagal.');
     } finally {
         setIsLoading(false);
     }
@@ -137,160 +136,143 @@ const LoginPage: React.FC = () => {
     setView(targetView);
     setError('');
     setSuccess('');
-    // Clear form fields on view switch
     setUsername('');
     setPassword('');
     setRegNoAnggota('');
     setRegNoHp('');
     setRegPassword('');
-    setAnggotaName(null);
     setLoginAnggotaName(null);
+    setRegAnggotaName(null);
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-light">
-      <div className="w-full max-w-sm p-8 space-y-6 bg-white rounded-xl shadow-lg">
-        <div className="text-center">
-            <div className="flex flex-col justify-center items-center mb-4">
-                <BuildingOfficeIcon className="w-12 h-12 text-primary" />
-                <h1 className="text-2xl font-bold text-primary mt-2">e-Koperasi 13</h1>
-                <p className="text-sm text-gray-500">Bina Warga</p>
-            </div>
-             <h2 className="text-xl font-semibold text-dark">{view === 'login' ? 'Selamat Datang' : 'Registrasi Akun'}</h2>
-        </div>
-        
-        {error && <p className="text-sm text-red-600 text-center font-semibold bg-red-50 p-3 rounded-md">{error}</p>}
-        {success && <p className="text-sm text-green-600 text-center font-semibold bg-green-50 p-3 rounded-md">{success}</p>}
-
-        {view === 'login' ? (
-            <form className="mt-6 space-y-6" onSubmit={handleLogin}>
-              <div>
-                  <label htmlFor="username" className="sr-only">
-                    Username / No. Anggota
-                  </label>
-                  <input
-                    id="username"
-                    name="username"
-                    type="text"
-                    autoComplete="username"
-                    required
-                    className="appearance-none rounded-md relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
-                    placeholder="Username / No. Anggota"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                  />
-                  <div className="pt-2 text-sm text-gray-600 min-h-[20px]">
-                        {isLoginNameLoading && <span className="italic">Mencari nama...</span>}
-                        {loginAnggotaName && !isLoginNameLoading && (
-                            <span className={loginAnggotaName === 'No. Anggota tidak ditemukan' ? 'text-red-500 font-medium' : 'text-green-600 font-semibold'}>
-                                {loginAnggotaName}
-                            </span>
-                        )}
-                    </div>
-                </div>
-                <div>
-                  <label htmlFor="password"className="sr-only">
-                    Password
-                  </label>
-                  <input
-                    id="password"
-                    name="password"
-                    type="password"
-                    autoComplete="current-password"
-                    required
-                    className="appearance-none rounded-md relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
-                </div>
-
-              <div>
-                <button
-                  type="submit"
-                  disabled={isLoading}
-                  className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors disabled:bg-gray-400"
-                >
-                  {isLoading ? 'Memproses...' : 'Login'}
-                </button>
-              </div>
-               <p className="text-center text-sm text-gray-600">
-                    Belum punya akun?{' '}
-                    <button type="button" onClick={() => switchView('register')} className="font-medium text-primary hover:underline">
-                        Registrasi di sini
-                    </button>
-                </p>
-            </form>
-        ) : (
-            <form className="mt-6 space-y-6" onSubmit={handleRegister}>
-                 <div>
-                    <label htmlFor="regNoAnggota" className="sr-only">No. Anggota</label>
-                    <input
-                        id="regNoAnggota"
-                        type="text"
-                        required
-                        className="appearance-none rounded-md relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
-                        placeholder="No. Anggota"
-                        value={regNoAnggota}
-                        onChange={(e) => setRegNoAnggota(e.target.value)}
-                    />
-                    <div className="pt-2 text-sm text-gray-600 min-h-[20px]">
-                        {isNameLoading && <span className="italic">Mencari nama...</span>}
-                        {anggotaName && !isNameLoading && (
-                            <span className={anggotaName === 'No. Anggota tidak ditemukan' ? 'text-red-500 font-medium' : 'text-green-600 font-semibold'}>
-                                {anggotaName}
-                            </span>
-                        )}
-                    </div>
-                </div>
-                <div>
-                  <label htmlFor="regNoHp" className="sr-only">
-                    No. HP
-                  </label>
-                  <input
-                    id="regNoHp"
-                    type="tel"
-                    required
-                    className="appearance-none rounded-md relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
-                    placeholder="No. HP (Contoh: 08123456789)"
-                    value={regNoHp}
-                    onChange={(e) => setRegNoHp(e.target.value)}
-                  />
-                </div>
-                <div>
-                  <label htmlFor="regPassword"className="sr-only">
-                    Password Baru
-                  </label>
-                  <input
-                    id="regPassword"
-                    type="password"
-                    required
-                    className="appearance-none rounded-md relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
-                    placeholder="Buat Password Baru"
-                    value={regPassword}
-                    onChange={(e) => setRegPassword(e.target.value)}
-                  />
-                </div>
-
-              <div>
-                <button
-                  type="submit"
-                  disabled={isLoading}
-                  className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-secondary hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary transition-colors disabled:bg-gray-400"
-                >
-                  {isLoading ? 'Memproses...' : 'Daftar'}
-                </button>
-              </div>
-                <p className="text-center text-sm text-gray-600">
-                    Sudah punya akun?{' '}
-                    <button type="button" onClick={() => switchView('login')} className="font-medium text-primary hover:underline">
-                        Login di sini
-                    </button>
-                </p>
-            </form>
+    <div className="min-h-screen bg-white flex flex-col font-sans overflow-hidden">
+        {installPrompt && (
+          <button
+              onClick={handleInstallClick}
+              className="absolute top-4 right-4 z-20 flex items-center gap-2 px-3 py-1.5 bg-secondary text-white text-xs font-bold rounded-full shadow-lg hover:bg-emerald-600 transition-transform transform hover:scale-105 focus:outline-none"
+              title="Install Aplikasi"
+            >
+              <DownloadIcon className="w-4 h-4" />
+              <span>Install App</span>
+            </button>
         )}
 
-      </div>
+        <header className="relative w-full h-2/5 min-h-[280px] bg-primary flex flex-col justify-center items-center text-white p-8 z-10 text-center">
+            <WaveBackground />
+            <div className="absolute top-4 left-4 text-white/80 text-sm">Cek Saldo Anda ▾</div>
+            <div className="relative z-10">
+                <p className="text-2xl opacity-90">Halo,</p>
+                <h1 className="text-5xl font-bold uppercase transition-all duration-300 h-14">
+                  {isNameLoading ? '...' : (view === 'login' ? loginAnggotaName : regAnggotaName) || 'Selamat Datang'}
+                </h1>
+            </div>
+        </header>
+
+        <main className="relative flex-grow w-full bg-white rounded-t-3xl shadow-2xl -mt-8 z-10 p-8 flex flex-col">
+           <CustomerServiceIllustration />
+           <div className="w-full max-w-md z-10">
+                <h2 className="text-xl font-bold text-dark mb-1">{view === 'login' ? 'Masuk ke Akun Anda' : 'Buat Akun Baru'}</h2>
+                <p className="text-sm text-gray-500 mb-4">{view === 'login' ? 'Silakan masukkan kredensial Anda.' : 'Lengkapi data untuk mendaftar.'}</p>
+                
+                {error && <p className="text-sm text-red-600 text-center font-semibold bg-red-50 p-3 rounded-md mb-4">{error}</p>}
+                {success && <p className="text-sm text-green-600 text-center font-semibold bg-green-50 p-3 rounded-md mb-4">{success}</p>}
+
+                {view === 'login' ? (
+                  <form className="space-y-4" onSubmit={handleLogin}>
+                    <div>
+                      <input
+                        type="text"
+                        autoComplete="username"
+                        required
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                        placeholder="No. Anggota / Email Admin"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                      />
+                    </div>
+                    <div className="relative">
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        autoComplete="current-password"
+                        required
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                        placeholder="Password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                      />
+                      <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500">
+                        {showPassword ? <EyeSlashIcon className="w-5 h-5"/> : <EyeIcon className="w-5 h-5"/>}
+                      </button>
+                    </div>
+
+                    <button
+                      type="submit"
+                      disabled={isLoading}
+                      className="w-full py-3 px-4 text-sm font-bold rounded-lg text-dark bg-accent hover:bg-amber-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent transition-colors disabled:bg-gray-400"
+                    >
+                      {isLoading ? 'MEMPROSES...' : 'LOGIN'}
+                    </button>
+                    <p className="text-center text-sm text-gray-600 pt-2">
+                        Belum punya akun?{' '}
+                        <button type="button" onClick={() => switchView('register')} className="font-medium text-primary hover:underline">
+                            Registrasi
+                        </button>
+                    </p>
+                </form>
+                ) : (
+                <form className="space-y-4" onSubmit={handleRegister}>
+                    <div>
+                        <input
+                            type="text"
+                            required
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                            placeholder="No. Anggota"
+                            value={regNoAnggota}
+                            onChange={(e) => setRegNoAnggota(e.target.value)}
+                        />
+                    </div>
+                    <div>
+                      <input
+                        type="tel"
+                        required
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                        placeholder="No. HP (Contoh: 081234...)"
+                        value={regNoHp}
+                        onChange={(e) => setRegNoHp(e.target.value)}
+                      />
+                    </div>
+                    <div className="relative">
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        required
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                        placeholder="Buat Password Baru"
+                        value={regPassword}
+                        onChange={(e) => setRegPassword(e.target.value)}
+                      />
+                       <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500">
+                        {showPassword ? <EyeSlashIcon className="w-5 h-5"/> : <EyeIcon className="w-5 h-5"/>}
+                      </button>
+                    </div>
+
+                    <button
+                      type="submit"
+                      disabled={isLoading || !regAnggotaName || regAnggotaName === 'Anggota tidak ditemukan'}
+                      className="w-full py-3 px-4 text-sm font-bold rounded-lg text-white bg-secondary hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary transition-colors disabled:bg-gray-400"
+                    >
+                      {isLoading ? 'MEMPROSES...' : 'DAFTAR'}
+                    </button>
+                    <p className="text-center text-sm text-gray-600 pt-2">
+                        Sudah punya akun?{' '}
+                        <button type="button" onClick={() => switchView('login')} className="font-medium text-primary hover:underline">
+                            Login
+                        </button>
+                    </p>
+                </form>
+                )}
+           </div>
+        </main>
     </div>
   );
 };
