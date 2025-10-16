@@ -4,7 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { getKeuanganByNoAnggota } from '../../services/keuanganService';
 import { getAnggotaById } from '../../services/anggotaService';
 import { Keuangan, Anggota } from '../../types';
-import { BuildingOfficeIcon, PrintIcon, ChevronLeftIcon } from '../../components/icons/Icons';
+import { PrintIcon, ChevronLeftIcon } from '../../components/icons/Icons';
 
 const SlipRincian: React.FC = () => {
     const { user } = useAuth();
@@ -68,74 +68,62 @@ const SlipRincian: React.FC = () => {
             </div>
         );
     }
-
-    const SlipRow: React.FC<{ label: string; value: number | undefined }> = ({ label, value }) => (
-        <div className="flex justify-between items-baseline text-sm mb-1">
-            <span>- {label}</span>
-            <div className="flex items-baseline">
+    
+    const SlipRow: React.FC<{ label: string; value: number | undefined; isEqual?: boolean }> = ({ label, value, isEqual = false }) => (
+        <div className="flex justify-between items-baseline text-xs mb-1">
+            <span className="truncate pr-2">{isEqual ? '=' : '-'} {label}</span>
+            <div className="flex items-baseline flex-shrink-0">
                 <span>Rp</span>
                 <span className="w-24 text-right">{formatCurrency(value)}</span>
             </div>
         </div>
     );
     
-    const SlipSection: React.FC<{title: string, children: React.ReactNode, bgColor?: string}> = ({title, children, bgColor = 'bg-gray-200'}) => (
-        <section className="mb-4">
-            <h3 className={`font-bold text-sm p-1 ${bgColor} text-black`}>{title}</h3>
-            <div className="pt-2">
+    const SlipSection: React.FC<{title: string, children: React.ReactNode, bgColor?: string}> = ({title, children, bgColor = 'bg-gray-100'}) => (
+        <section className="mb-3">
+            <h3 className={`font-bold text-xs p-1 ${bgColor} text-black text-center tracking-wider`}>{title}</h3>
+            <div className="pt-2 px-1">
                 {children}
             </div>
         </section>
     );
 
     return (
-        <div className="bg-gray-100 min-h-screen font-sans print:bg-white">
-            <div className="max-w-4xl mx-auto p-4 flex justify-between items-center print:hidden">
-                <button onClick={() => navigate(-1)} className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-sm hover:bg-gray-50">
+        <div className="bg-gray-100 min-h-screen font-mono print:bg-white">
+            <div className="max-w-md mx-auto p-4 flex justify-between items-center print:hidden">
+                <button onClick={() => navigate(-1)} className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-sm hover:bg-gray-50 font-sans">
                     <ChevronLeftIcon className="w-5 h-5" />
                     Kembali
                 </button>
-                <button onClick={() => window.print()} className="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg shadow-sm hover:bg-blue-800">
+                <button onClick={() => window.print()} className="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg shadow-sm hover:bg-primary-dark font-sans">
                     <PrintIcon className="w-5 h-5" />
                     Cetak Ulang
                 </button>
             </div>
 
-            <div id="slip-content" className="max-w-4xl mx-auto bg-white p-6 border text-black print:border-none print:shadow-none">
-                <header className="flex justify-between items-start pb-4 border-b-2 border-black">
-                    <div className="flex items-center gap-4">
-                        <BuildingOfficeIcon className="w-16 h-16 text-primary flex-shrink-0" />
-                        <div>
-                            <h1 className="font-bold text-lg">KOPERASI BINA WARGA SMP NEGERI 13 TASIKMALAYA</h1>
-                            <p className="text-sm">Jln Letjend H. Ibrahim Adjie Km2. Indihiang Tasikmalaya</p>
-                            <h1 className="font-bold text-lg">Tasikmalaya</h1>
-                        </div>
-                    </div>
-                    <div className="text-right flex-shrink-0 ml-4">
-                        <h2 className="font-bold text-lg">SLIP RINCIAN</h2>
-                        <p>{slipDate}</p>
-                    </div>
+            <div id="slip-content" className="max-w-md mx-auto bg-white p-4 border text-black print:p-2 print:border-none print:shadow-none">
+                <header className="text-center pb-2 border-t-2 border-b-4 border-black">
+                    <h1 className="font-bold text-sm">KOPERASI BINA WARGA</h1>
+                    <h2 className="font-bold text-sm">SMP NEGERI 13 TASIKMALAYA</h2>
+                    <p className="text-xs">Jln Letjend H. Ibrahim Adjie Km2. Indihiang Tasikmalaya</p>
                 </header>
 
-                <section className="my-4 text-sm">
-                    <table className="w-1/2">
-                        <tbody>
-                            <tr>
-                                <td className="w-28 font-semibold">No Anggota</td>
-                                <td>: {anggota.no_anggota}</td>
-                            </tr>
-                            <tr>
-                                <td className="w-28 font-semibold">Nama Anggota</td>
-                                <td>: {anggota.nama}</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <section className="my-3 text-xs">
+                    <div className="flex justify-between items-start">
+                        <div className="grid grid-cols-[auto,1fr] gap-x-2">
+                           <span className="font-bold">No Anggota</span>   <span>: {anggota.no_anggota}</span>
+                           <span className="font-bold">Nama Anggota</span> <span>: {anggota.nama}</span>
+                        </div>
+                        <div className="text-right">
+                           <p>Bulan: <strong>{slipDate}</strong></p>
+                        </div>
+                    </div>
                 </section>
 
-                <main className="grid grid-cols-2 gap-x-12">
+                <main className="grid grid-cols-2 gap-x-4">
                     {/* LEFT COLUMN */}
                     <div>
-                        <SlipSection title="KEADAAN AWAL BULAN" bgColor="bg-blue-200">
+                        <SlipSection title="KEADAAN AWAL BULAN" bgColor="bg-blue-100">
                             <SlipRow label="Simpanan Pokok" value={keuangan.awal_simpanan_pokok} />
                             <SlipRow label="Simpanan Wajib" value={keuangan.awal_simpanan_wajib} />
                             <SlipRow label="Simpanan Sukarela" value={keuangan.sukarela} />
@@ -143,7 +131,7 @@ const SlipRincian: React.FC = () => {
                             <SlipRow label="Pinjaman Berjangka" value={keuangan.awal_pinjaman_berjangka} />
                             <SlipRow label="Pinjaman Khusus" value={keuangan.awal_pinjaman_khusus} />
                         </SlipSection>
-                        <SlipSection title="KEADAAN AKHIR BULAN" bgColor="bg-blue-200">
+                        <SlipSection title="KEADAAN AKHIR" bgColor="bg-blue-100">
                             <SlipRow label="Simpanan Pokok" value={keuangan.akhir_simpanan_pokok} />
                             <SlipRow label="Simpanan Wajib" value={keuangan.akhir_simpanan_wajib} />
                             <SlipRow label="Simpanan Sukarela" value={keuangan.akhir_simpanan_sukarela} />
@@ -155,29 +143,22 @@ const SlipRincian: React.FC = () => {
 
                     {/* RIGHT COLUMN */}
                     <div>
-                         <SlipSection title="PENGAMBILAN SIMPANAN" bgColor="bg-red-200">
+                         <SlipSection title="PENGAMBILAN SIMPANAN" bgColor="bg-rose-100">
                             <SlipRow label="Simpanan Pokok" value={keuangan.transaksi_pengambilan_simpanan_pokok} />
                             <SlipRow label="Simpanan Wajib" value={keuangan.transaksi_pengambilan_simpanan_wajib} />
                             <SlipRow label="Simpanan Sukarela" value={keuangan.transaksi_pengambilan_simpanan_sukarela} />
                             <SlipRow label="Simpanan Wisata" value={keuangan.transaksi_pengambilan_simpanan_wisata} />
                         </SlipSection>
-                        <SlipSection title="PENAMBAHAN PINJAMAN" bgColor="bg-red-200">
-                             <SlipRow label="Pinjaman Berjangka" value={keuangan.transaksi_penambahan_pinjaman_berjangka} />
-                             <SlipRow label="Pinjaman Khusus" value={keuangan.transaksi_penambahan_pinjaman_khusus} />
-                             <SlipRow label="Pinjaman Niaga" value={keuangan.transaksi_penambahan_pinjaman_niaga} />
+                        <SlipSection title="PENAMBAHAN PINJAMAN" bgColor="bg-rose-100">
+                             <SlipRow label="Pinjaman Berjangka" isEqual={true} value={keuangan.transaksi_penambahan_pinjaman_berjangka} />
+                             <SlipRow label="Pinjaman Khusus" isEqual={true} value={keuangan.transaksi_penambahan_pinjaman_khusus} />
                         </SlipSection>
-                         <SlipSection title="SETORAN BULAN INI" bgColor="bg-red-200">
+                         <SlipSection title="SETORAN BULAN INI" bgColor="bg-green-100">
                             <SlipRow label="Simpanan Pokok" value={keuangan.transaksi_simpanan_pokok} />
                             <SlipRow label="Simpanan Wajib" value={keuangan.transaksi_simpanan_wajib} />
-                            <SlipRow label="Simpanan Sukarela" value={keuangan.transaksi_simpanan_sukarela} />
-                            <SlipRow label="Simpanan Wisata" value={keuangan.transaksi_simpanan_wisata} />
-                            <SlipRow label="Pinjaman Berjangka" value={keuangan.transaksi_pinjaman_berjangka} />
-                            <SlipRow label="Pinjaman Khusus" value={keuangan.transaksi_pinjaman_khusus} />
-                            <SlipRow label="Jasa" value={keuangan.transaksi_simpanan_jasa} />
-                            <SlipRow label="Niaga" value={keuangan.transaksi_niaga} />
-                            <SlipRow label="Dana Perlaya" value={keuangan.transaksi_dana_perlaya} />
-                            <SlipRow label="Dana Katineng" value={keuangan.transaksi_dana_katineng} />
-                            <div className="flex justify-between items-baseline font-bold text-sm mt-2 pt-2 border-t border-black">
+                            <SlipRow label="Angs Pinj Berjangka" value={keuangan.transaksi_pinjaman_berjangka} />
+                            <SlipRow label="Angs Pinj Khusus" value={keuangan.transaksi_pinjaman_khusus} />
+                             <div className="flex justify-between items-baseline font-bold text-xs mt-2 pt-1 border-t border-black">
                                 <span>JUMLAH SETORAN</span>
                                 <div className="flex items-baseline">
                                     <span>Rp</span>
@@ -188,26 +169,21 @@ const SlipRincian: React.FC = () => {
                     </div>
                 </main>
                 
-                <footer className="mt-4 border-t-4 border-black pt-2">
-                    <div className="flex justify-between items-center text-sm">
-                        <span className="font-bold">Jumlah Potongan</span>
-                        <div className="bg-gray-200 p-1 font-bold">Nol Rupiah</div>
+                <footer className="mt-8">
+                    <div className="flex justify-between text-center text-xs">
+                        <div>
+                            <p>Mengetahui,</p>
+                            <p className="font-bold">Ketua</p>
+                            <div className="h-12"></div>
+                            <p className="font-bold underline">N Dedi Z, M.Pd.</p>
+                        </div>
+                        <div>
+                             <p>Bendahara,</p>
+                             <div className="h-12"></div>
+                             <p className="font-bold underline">R.B. Kustianto, S.Pd.</p>
+                        </div>
                     </div>
                 </footer>
-
-                <section className="mt-12 flex justify-between text-center text-sm">
-                    <div>
-                        <p>Mengetahui,</p>
-                        <p className="font-bold">Ketua</p>
-                        <div className="h-20 w-20 my-2 mx-auto border flex items-center justify-center text-gray-400 text-xs">QR Code</div>
-                        <p className="font-bold underline">N Dedi Z, M.Pd.</p>
-                    </div>
-                    <div>
-                         <p>Bendahara,</p>
-                         <div className="h-20 w-20 my-2 mx-auto border flex items-center justify-center text-gray-400 text-xs">QR Code</div>
-                         <p className="font-bold underline">R.B. Kustianto, S.Pd.</p>
-                    </div>
-                </section>
             </div>
         </div>
     );
