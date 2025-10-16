@@ -5,19 +5,19 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>e-Koperasi 13</title>
-    <link rel="manifest" href="/manifest.json" />
-    <meta name="theme-color" content="#1E40AF" />
-    <link rel="apple-touch-icon" href="/icon-192x192.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
         theme: {
           extend: {
             colors: {
-              'primary': '#1E40AF', // blue-800
-              'secondary': '#10B981', // emerald-500
-              'light': '#F3F4F6', // gray-100
-              'dark': '#1F2937', // gray-800
+              'primary': '#0052FF',
+              'primary-dark': '#0033A1',
+              'primary-light': '#E6F0FF',
+              'secondary': '#10B981',
+              'background': '#F7F8FC',
+              'dark': '#1A202C',
+              'gray-text': '#5A677D',
             },
           },
         },
@@ -46,7 +46,7 @@
 }
 </script>
 </head>
-  <body class="bg-light">
+  <body class="bg-background">
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>
   </body>

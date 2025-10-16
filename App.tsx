@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import LoginPage from './pages/LoginPage';
@@ -16,30 +16,13 @@ import AdminKeuanganDetail from './pages/admin/AdminKeuanganDetail';
 import SlipRincian from './pages/anggota/SlipRincian';
 import AnggotaPinjaman from './pages/anggota/AnggotaPinjaman';
 import AdminPinjaman from './pages/admin/AdminPinjaman';
-import { PWAProvider } from './context/PWAContext';
 
 const App: React.FC = () => {
-  useEffect(() => {
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js')
-          .then(registration => {
-            console.log('SW registered: ', registration);
-          })
-          .catch(registrationError => {
-            console.log('SW registration failed: ', registrationError);
-          });
-      });
-    }
-  }, []);
-
   return (
     <AuthProvider>
-      <PWAProvider>
-        <HashRouter>
-          <AppRoutes />
-        </HashRouter>
-      </PWAProvider>
+      <HashRouter>
+        <AppRoutes />
+      </HashRouter>
     </AuthProvider>
   );
 };

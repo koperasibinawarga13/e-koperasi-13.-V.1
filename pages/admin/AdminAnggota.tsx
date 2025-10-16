@@ -69,24 +69,24 @@ const AdminAnggota: React.FC = () => {
   return (
     <div>
       <Header title="Data Anggota" />
-      <div className="bg-white p-6 rounded-xl shadow-md">
+      <div className="bg-white p-6 rounded-xl border border-gray-200">
         <div className="flex flex-wrap justify-between items-center mb-6 gap-4">
             <input
                 type="text"
                 placeholder="Cari anggota (nama, no. anggota, No. HP)..."
-                className="border border-gray-300 rounded-lg px-4 py-2 w-full sm:w-1/3"
+                className="border border-gray-300 rounded-lg px-4 py-2 w-full sm:w-1/3 focus:ring-1 focus:ring-primary focus:border-primary"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
             />
             <div className="flex items-center gap-2">
                 <button 
                     onClick={() => navigate('/admin/upload')} 
-                    className="bg-secondary text-white px-4 py-2 rounded-lg font-semibold hover:bg-emerald-600 transition-colors flex items-center gap-2"
+                    className="bg-secondary text-white px-4 py-2 rounded-lg font-semibold hover:bg-emerald-600 transition-all transform hover:scale-105"
                 >
                     <UploadIcon className="w-5 h-5" />
                     Upload Excel
                 </button>
-                <button onClick={handleAdd} className="bg-primary text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-800 transition-colors flex items-center gap-2">
+                <button onClick={handleAdd} className="bg-primary text-white px-4 py-2 rounded-lg font-semibold hover:bg-primary-dark transition-all transform hover:scale-105 flex items-center gap-2">
                     <PlusIcon className="w-5 h-5" />
                     Tambah Anggota
                 </button>
@@ -94,20 +94,20 @@ const AdminAnggota: React.FC = () => {
         </div>
         <div className="overflow-x-auto">
           {isLoading ? <p>Loading data anggota...</p> : (
-            <table className="w-full text-sm text-left text-gray-500">
-                <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+            <table className="w-full text-sm text-left text-gray-600">
+                <thead className="text-xs text-gray-500 uppercase">
                     <tr>
-                        <th scope="col" className="px-6 py-3">No. Anggota</th>
-                        <th scope="col" className="px-6 py-3">Nama</th>
-                        <th scope="col" className="px-6 py-3">No. HP</th>
-                        <th scope="col" className="px-6 py-3">Status</th>
-                        <th scope="col" className="px-6 py-3">Aksi</th>
+                        <th scope="col" className="px-6 py-4 font-semibold border-b-2 border-gray-200">No. Anggota</th>
+                        <th scope="col" className="px-6 py-4 font-semibold border-b-2 border-gray-200">Nama</th>
+                        <th scope="col" className="px-6 py-4 font-semibold border-b-2 border-gray-200">No. HP</th>
+                        <th scope="col" className="px-6 py-4 font-semibold border-b-2 border-gray-200">Status</th>
+                        <th scope="col" className="px-6 py-4 font-semibold border-b-2 border-gray-200">Aksi</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody className="divide-y divide-gray-100">
                     {filteredAnggota.map((anggota) => (
-                        <tr key={anggota.id} className="bg-white border-b hover:bg-gray-50">
-                            <td className="px-6 py-4 font-medium text-gray-900">{anggota.no_anggota}</td>
+                        <tr key={anggota.id} className="hover:bg-primary-light transition-colors">
+                            <td className="px-6 py-4 font-medium text-dark">{anggota.no_anggota}</td>
                             <td className="px-6 py-4">{anggota.nama}</td>
                             <td className="px-6 py-4">{anggota.no_telepon}</td>
                             <td className="px-6 py-4">

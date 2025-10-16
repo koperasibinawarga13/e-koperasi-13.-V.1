@@ -40,7 +40,7 @@ const AnggotaDashboard: React.FC = () => {
         return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(amount);
     };
 
-    const COLORS = ['#1E40AF', '#10B981', '#F59E0B', '#EF4444'];
+    const COLORS = ['#0052FF', '#10B981', '#F59E0B', '#EF4444'];
     
     const pieChartData = keuangan ? [
         { name: 'Simpanan Pokok', value: keuangan.akhir_simpanan_pokok || 0 },
@@ -56,7 +56,7 @@ const AnggotaDashboard: React.FC = () => {
     if (isLoading) {
         return (
             <div>
-                <Header title="Dashboard Anggota" />
+                <Header title="Dashboard" />
                 <p className="text-center p-10">Memuat data dashboard...</p>
             </div>
         );
@@ -65,7 +65,7 @@ const AnggotaDashboard: React.FC = () => {
      if (!keuangan) {
         return (
              <div>
-                <Header title="Dashboard Anggota" />
+                <Header title="Dashboard" />
                 <p className="text-center p-10">Data keuangan tidak ditemukan. Silakan hubungi admin.</p>
             </div>
         );
@@ -73,13 +73,13 @@ const AnggotaDashboard: React.FC = () => {
 
   return (
     <div>
-      <Header title="Dashboard Anggota" />
+      <Header title="Dashboard" />
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <StatCard title="Saldo Akhir" value={formatCurrency(saldoAkhir)} icon={<CreditCardIcon className="w-8 h-8 text-white" />} color="bg-blue-500" />
-        <StatCard title="Total Simpanan" value={formatCurrency(totalSimpanan)} icon={<CreditCardIcon className="w-8 h-8 text-white" />} color="bg-green-500" />
-        <StatCard title="Total Pinjaman" value={formatCurrency(totalPinjaman)} icon={<ChartBarIcon className="w-8 h-8 text-white" />} color="bg-yellow-500" />
+        <StatCard title="Saldo Akhir" value={formatCurrency(saldoAkhir)} icon={<CreditCardIcon className="w-6 h-6 text-white" />} color="bg-blue-500" />
+        <StatCard title="Total Simpanan" value={formatCurrency(totalSimpanan)} icon={<CreditCardIcon className="w-6 h-6 text-white" />} color="bg-green-500" />
+        <StatCard title="Total Pinjaman" value={formatCurrency(totalPinjaman)} icon={<ChartBarIcon className="w-6 h-6 text-white" />} color="bg-yellow-500" />
       </div>
-      <div className="bg-white p-6 rounded-xl shadow-md">
+      <div className="bg-white p-6 rounded-xl border border-gray-200">
         <h2 className="text-xl font-bold text-dark mb-4">Rincian Simpanan</h2>
         <div style={{ width: '100%', height: 300 }}>
           <ResponsiveContainer>

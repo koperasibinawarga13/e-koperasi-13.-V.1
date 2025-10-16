@@ -51,38 +51,38 @@ const AdminLaporan: React.FC = () => {
             <Header title="Laporan Keuangan" />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                <StatCard title="Total Simpanan Keseluruhan" value={formatCurrency(summaryData.totalSimpanan)} icon={<CreditCardIcon className="w-8 h-8 text-white" />} color="bg-green-500" />
-                <StatCard title="Total Pinjaman Keseluruhan" value={formatCurrency(summaryData.totalPinjaman)} icon={<ChartBarIcon className="w-8 h-8 text-white" />} color="bg-yellow-500" />
+                <StatCard title="Total Simpanan Keseluruhan" value={formatCurrency(summaryData.totalSimpanan)} icon={<CreditCardIcon className="w-6 h-6 text-white" />} color="bg-green-500" />
+                <StatCard title="Total Pinjaman Keseluruhan" value={formatCurrency(summaryData.totalPinjaman)} icon={<ChartBarIcon className="w-6 h-6 text-white" />} color="bg-yellow-500" />
             </div>
 
-            <div className="bg-white p-6 rounded-xl shadow-md">
+            <div className="bg-white p-6 rounded-xl border border-gray-200">
                 <div className="flex flex-wrap justify-between items-center mb-6 gap-4">
                     <h2 className="text-xl font-bold text-dark">Rincian Keuangan Anggota</h2>
                      <input
                         type="text"
                         placeholder="Cari (nama, no. anggota)..."
-                        className="border border-gray-300 rounded-lg px-4 py-2 w-full sm:w-1/3"
+                        className="border border-gray-300 rounded-lg px-4 py-2 w-full sm:w-1/3 focus:ring-1 focus:ring-primary focus:border-primary"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
                 </div>
                 <div className="overflow-x-auto">
                     {isLoading ? <p>Memuat data laporan...</p> : (
-                        <table className="w-full text-sm text-left text-gray-500">
-                            <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+                        <table className="w-full text-sm text-left text-gray-600">
+                            <thead className="text-xs text-gray-500 uppercase">
                                 <tr>
-                                    <th scope="col" className="px-6 py-3">No. Anggota</th>
-                                    <th scope="col" className="px-6 py-3">Nama</th>
-                                    <th scope="col" className="px-6 py-3 text-right">Simpanan Pokok</th>
-                                    <th scope="col" className="px-6 py-3 text-right">Simpanan Wajib</th>
-                                    <th scope="col" className="px-6 py-3 text-right">Total Simpanan</th>
-                                    <th scope="col" className="px-6 py-3 text-right">Total Pinjaman</th>
+                                    <th scope="col" className="px-6 py-4 font-semibold border-b-2 border-gray-200">No. Anggota</th>
+                                    <th scope="col" className="px-6 py-4 font-semibold border-b-2 border-gray-200">Nama</th>
+                                    <th scope="col" className="px-6 py-4 font-semibold border-b-2 border-gray-200 text-right">Simpanan Pokok</th>
+                                    <th scope="col" className="px-6 py-4 font-semibold border-b-2 border-gray-200 text-right">Simpanan Wajib</th>
+                                    <th scope="col" className="px-6 py-4 font-semibold border-b-2 border-gray-200 text-right">Total Simpanan</th>
+                                    <th scope="col" className="px-6 py-4 font-semibold border-b-2 border-gray-200 text-right">Total Pinjaman</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody className="divide-y divide-gray-100">
                                 {filteredKeuangan.length > 0 ? filteredKeuangan.map((item) => (
-                                    <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
-                                        <td className="px-6 py-4 font-medium text-gray-900">
+                                    <tr key={item.id} className="hover:bg-primary-light transition-colors">
+                                        <td className="px-6 py-4 font-medium text-dark">
                                             <Link to={`/admin/keuangan/${item.no_anggota}`} className="text-primary hover:underline">
                                                 {item.no_anggota}
                                             </Link>

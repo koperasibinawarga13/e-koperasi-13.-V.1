@@ -112,12 +112,12 @@ const AdminDashboard: React.FC = () => {
         <div>
             <Header title="Dashboard Admin" />
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <StatCard title="Total Anggota" value={stats.totalAnggota.toLocaleString('id-ID')} icon={<UsersIcon className="w-8 h-8 text-white" />} color="bg-blue-500" />
-                <StatCard title="Total Simpanan" value={formatCurrency(stats.totalSimpanan)} icon={<CreditCardIcon className="w-8 h-8 text-white" />} color="bg-green-500" />
-                <StatCard title="Total Pinjaman" value={formatCurrency(stats.totalPinjaman)} icon={<ChartBarIcon className="w-8 h-8 text-white" />} color="bg-yellow-500" />
-                <StatCard title="Saldo Kas" value={formatCurrency(stats.saldoKas)} icon={<BuildingOfficeIcon className="w-8 h-8 text-white" />} color="bg-red-500" />
+                <StatCard title="Total Anggota" value={stats.totalAnggota.toLocaleString('id-ID')} icon={<UsersIcon className="w-6 h-6 text-white" />} color="bg-blue-500" />
+                <StatCard title="Total Simpanan" value={formatCurrency(stats.totalSimpanan)} icon={<CreditCardIcon className="w-6 h-6 text-white" />} color="bg-green-500" />
+                <StatCard title="Total Pinjaman" value={formatCurrency(stats.totalPinjaman)} icon={<ChartBarIcon className="w-6 h-6 text-white" />} color="bg-yellow-500" />
+                <StatCard title="Saldo Kas" value={formatCurrency(stats.saldoKas)} icon={<BuildingOfficeIcon className="w-6 h-6 text-white" />} color="bg-red-500" />
             </div>
-            <div className="bg-white p-6 rounded-xl shadow-md">
+            <div className="bg-white p-6 rounded-xl border border-gray-200">
                 <h2 className="text-xl font-bold text-dark mb-4">Ringkasan Saldo Akhir</h2>
                  {chartData.length > 0 ? (
                     <div style={{ width: '100%', height: 400 }}>
@@ -128,7 +128,7 @@ const AdminDashboard: React.FC = () => {
                                 <YAxis tickFormatter={(tick) => `${(tick / 1000000).toLocaleString('id-ID')} Jt`} />
                                 <Tooltip formatter={(value: number) => formatCurrency(value)} />
                                 <Legend />
-                                <Bar dataKey="total" name="Total Saldo Akhir" fill="#1E40AF" />
+                                <Bar dataKey="total" name="Total Saldo Akhir" fill="#0052FF" />
                             </BarChart>
                         </ResponsiveContainer>
                     </div>
@@ -137,30 +137,30 @@ const AdminDashboard: React.FC = () => {
                  )}
             </div>
 
-             <div className="mt-8 bg-white p-6 rounded-xl shadow-md">
+             <div className="mt-8 bg-white p-6 rounded-xl border border-gray-200">
                 <h2 className="text-xl font-bold text-dark mb-4">Pengajuan Pinjaman Baru</h2>
                 {pendingLoans.length > 0 ? (
                     <div className="overflow-x-auto">
-                        <table className="w-full text-sm text-left text-gray-500">
-                            <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+                        <table className="w-full text-sm text-left text-gray-600">
+                            <thead className="text-xs text-gray-500 uppercase">
                                 <tr>
-                                    <th className="px-4 py-3">Nama Anggota</th>
-                                    <th className="px-4 py-3">Jenis</th>
-                                    <th className="px-4 py-3">Tanggal</th>
-                                    <th className="px-4 py-3 text-right">Jumlah Pinjaman</th>
-                                    <th className="px-4 py-3 text-center">Jangka Waktu</th>
-                                    <th className="px-4 py-3 text-center">Aksi</th>
+                                    <th className="px-4 py-4 font-semibold border-b-2 border-gray-200">Nama Anggota</th>
+                                    <th className="px-4 py-4 font-semibold border-b-2 border-gray-200">Jenis</th>
+                                    <th className="px-4 py-4 font-semibold border-b-2 border-gray-200">Tanggal</th>
+                                    <th className="px-4 py-4 font-semibold border-b-2 border-gray-200 text-right">Jumlah Pinjaman</th>
+                                    <th className="px-4 py-4 font-semibold border-b-2 border-gray-200 text-center">Jangka Waktu</th>
+                                    <th className="px-4 py-4 font-semibold border-b-2 border-gray-200 text-center">Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody className="divide-y divide-gray-100">
                                 {pendingLoans.map(loan => (
-                                    <tr key={loan.id} className="bg-white border-b hover:bg-gray-50">
-                                        <td className="px-4 py-3 font-medium text-gray-900">{loan.nama_anggota}</td>
-                                        <td className="px-4 py-3 font-semibold">{loan.jenis_pinjaman}</td>
-                                        <td className="px-4 py-3">{new Date(loan.tanggal_pengajuan).toLocaleDateString('id-ID')}</td>
-                                        <td className="px-4 py-3 text-right">{formatCurrency(loan.pokok_pinjaman)}</td>
-                                        <td className="px-4 py-3 text-center">{loan.jangka_waktu ? `${loan.jangka_waktu} bulan` : '-'}</td>
-                                        <td className="px-4 py-3 text-center">
+                                    <tr key={loan.id} className="hover:bg-primary-light transition-colors">
+                                        <td className="px-4 py-4 font-medium text-dark">{loan.nama_anggota}</td>
+                                        <td className="px-4 py-4 font-semibold">{loan.jenis_pinjaman}</td>
+                                        <td className="px-4 py-4">{new Date(loan.tanggal_pengajuan).toLocaleDateString('id-ID')}</td>
+                                        <td className="px-4 py-4 text-right">{formatCurrency(loan.pokok_pinjaman)}</td>
+                                        <td className="px-4 py-4 text-center">{loan.jangka_waktu ? `${loan.jangka_waktu} bulan` : '-'}</td>
+                                        <td className="px-4 py-4 text-center">
                                             <div className="flex justify-center gap-2">
                                                 <button
                                                     onClick={() => handleLoanAction(loan.id, 'Disetujui')}
