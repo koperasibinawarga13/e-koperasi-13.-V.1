@@ -1,4 +1,5 @@
 
+
 // FIX: Implemented full content for LoginPage.tsx to provide a functional login screen.
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
@@ -27,43 +28,30 @@ const LoginPage: React.FC = () => {
   const { login } = useAuth();
   
   const [installPrompt, setInstallPrompt] = useState<any>(null);
-  const [isAppInstalled, setIsAppInstalled] = useState(
-    () => window.matchMedia('(display-mode: standalone)').matches
-  );
 
   useEffect(() => {
     const handleBeforeInstallPrompt = (e: Event) => {
+      // Prevent the mini-infobar from appearing on mobile
       e.preventDefault();
-      // Always set the prompt if the event fires.
-      // The render logic will handle whether to show it or not.
+      // Stash the event so it can be triggered later.
       setInstallPrompt(e);
-    };
-
-    const handleAppInstalled = () => {
-      setIsAppInstalled(true);
-      setInstallPrompt(null); // Clear the prompt after installation
     };
     
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-    window.addEventListener('appinstalled', handleAppInstalled);
 
     return () => {
-        window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-        window.removeEventListener('appinstalled', handleAppInstalled);
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     };
-  }, []); // Run this effect only once on component mount
+  }, []);
 
   const handleInstallClick = () => {
     if (!installPrompt) return;
+    // Show the install prompt
     installPrompt.prompt();
-    installPrompt.userChoice.then((choice: { outcome: string }) => {
-        if(choice.outcome === 'accepted') {
-            console.log('User accepted the install prompt');
-            setIsAppInstalled(true);
-        } else {
-            console.log('User dismissed the install prompt');
-        }
-        setInstallPrompt(null);
+    // Wait for the user to respond to the prompt
+    installPrompt.userChoice.then(() => {
+      // The prompt can only be used once, so we clear it
+      setInstallPrompt(null);
     });
   };
 
@@ -159,11 +147,11 @@ const LoginPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col items-center font-sans overflow-hidden">
-        <header className="relative w-full bg-primary text-white p-6 pt-10 z-10 text-center flex flex-col items-center">
+        <header className="relative w-full bg-primary text-white p-6 pt-10 pb-16 z-10 text-center flex flex-col items-center">
              <div className="absolute -bottom-10 w-20 h-20 bg-white rounded-full p-1.5 shadow-lg flex items-center justify-center z-30">
                 <LogoKoperasi className="w-full h-full text-primary" />
             </div>
-            <div className="relative z-10 w-full max-w-md">
+            <div className="relative z-20 w-full max-w-md">
                 <h1 className="text-3xl sm:text-4xl font-bold">e-Koperasi</h1>
                 <p className="text-base sm:text-lg opacity-90 mt-1">Bina warga SMP Negeri 13 Tasikmalaya</p>
                 <div className="mt-4 transition-all duration-300 min-h-[28px] flex items-center justify-center">
@@ -172,7 +160,7 @@ const LoginPage: React.FC = () => {
                     </p>
                 </div>
             </div>
-             <div className="absolute bottom-0 left-0 w-full h-12 bg-background rounded-t-3xl z-20"></div>
+             <div className="absolute bottom-0 left-0 w-full h-12 bg-background rounded-t-3xl z-10"></div>
         </header>
 
         <main className="relative w-full flex-grow bg-background z-10 p-4 sm:p-8 flex flex-col items-center">
@@ -279,7 +267,7 @@ const LoginPage: React.FC = () => {
                 )}
            </div>
 
-           {installPrompt && !isAppInstalled && (
+           {installPrompt && (
                 <div className="w-full max-w-md md:fixed md:bottom-4 md:right-4 md:max-w-sm md:w-auto z-50">
                     <InstallBanner />
                 </div>
