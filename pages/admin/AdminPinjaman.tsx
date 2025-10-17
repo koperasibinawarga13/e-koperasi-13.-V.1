@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import Header from '../../components/Header';
 import { PengajuanPinjaman } from '../../types';
 import { CheckIcon, XMarkIcon } from '../../components/icons/Icons';
@@ -99,6 +100,7 @@ const AdminPinjaman: React.FC = () => {
                         <table className="w-full text-sm text-left text-gray-500">
                             <thead className="text-xs text-gray-700 uppercase bg-gray-50">
                                 <tr>
+                                    <th className="px-4 py-3">No. Pengajuan</th>
                                     <th className="px-4 py-3">Nama Anggota</th>
                                     <th className="px-4 py-3">Jenis Pinjaman</th>
                                     <th className="px-4 py-3">Tanggal</th>
@@ -111,6 +113,11 @@ const AdminPinjaman: React.FC = () => {
                             <tbody>
                                 {filteredPinjaman.map(p => (
                                     <tr key={p.id} className="bg-white border-b hover:bg-gray-50">
+                                        <td className="px-4 py-3">
+                                            <Link to={`/admin/pinjaman/${p.id}`} className="text-primary font-semibold hover:underline">
+                                                {`${p.no_anggota}/${new Date(p.tanggal_pengajuan).toLocaleDateString('sv-SE')}`}
+                                            </Link>
+                                        </td>
                                         <td className="px-4 py-3 font-medium text-gray-900">{p.nama_anggota}</td>
                                         <td className="px-4 py-3 font-semibold">{p.jenis_pinjaman}</td>
                                         <td className="px-4 py-3">{new Date(p.tanggal_pengajuan).toLocaleDateString('id-ID')}</td>

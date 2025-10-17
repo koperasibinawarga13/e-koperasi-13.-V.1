@@ -1,4 +1,4 @@
-import { collection, addDoc, getDocs, query, where, doc, updateDoc, orderBy } from 'firebase/firestore';
+import { collection, addDoc, getDocs, query, where, doc, updateDoc, orderBy, getDoc } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 import { PengajuanPinjaman } from '../types';
 
@@ -75,5 +75,19 @@ export const updatePengajuanStatus = async (id: string, newStatus: 'Disetujui' |
     } catch (error) {
         console.error(`Error updating status for application ${id}: `, error);
         throw error;
+    }
+};
+
+export const getPengajuanPinjamanById = async (id: string): Promise<PengajuanPinjaman | null> => {
+    try {
+        const docRef = doc(db, 'pengajuan_pinjaman', id);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+            return { ...docSnap.data(), id: docSnap.id } as PengajuanPinjaman;
+        }
+        return null;
+    } catch (error) {
+        console.error(`Error fetching loan application with id ${id}: `, error);
+        return null;
     }
 };
