@@ -1,5 +1,4 @@
 
-
 // FIX: Implemented full content for LoginPage.tsx to provide a functional login screen.
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
@@ -113,27 +112,47 @@ const LoginPage: React.FC = () => {
     setRegAnggotaName(null);
   }
 
+  const InstallBanner = () => (
+    <div className="bg-[#2d3748] text-white p-6 shadow-lg rounded-lg animate-fade-in-up">
+        <div className="flex flex-col items-start gap-4">
+            <div>
+                <h3 className="text-lg font-bold">Instal Aplikasi untuk Pengalaman Terbaik</h3>
+                <p className="text-sm text-slate-300 mt-1">
+                    Akses lebih cepat dan fitur offline dengan menambahkan aplikasi ini ke layar utama (home screen) Anda.
+                </p>
+            </div>
+            <button
+                onClick={handleInstallClick}
+                className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-secondary font-bold rounded-lg hover:bg-emerald-600 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#2d3748] focus:ring-secondary"
+            >
+                <DownloadIcon className="w-5 h-5" />
+                <span>Instal Aplikasi</span>
+            </button>
+        </div>
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-background flex flex-col items-center font-sans overflow-hidden">
-        <header className="relative w-full bg-primary text-white p-8 pt-16 z-10 text-center flex flex-col items-center">
-             <div className="absolute -bottom-16 w-32 h-32 bg-white rounded-full p-3 shadow-lg flex items-center justify-center z-30">
+        <header className="relative w-full bg-primary text-white p-6 pt-10 z-10 text-center flex flex-col items-center">
+             <div className="absolute -bottom-10 w-20 h-20 bg-white rounded-full p-1.5 shadow-lg flex items-center justify-center z-30">
                 <LogoKoperasi className="w-full h-full text-primary" />
             </div>
             <div className="relative z-10 w-full max-w-md">
-                <h1 className="text-4xl sm:text-5xl font-bold">e-Koperasi</h1>
+                <h1 className="text-3xl sm:text-4xl font-bold">e-Koperasi</h1>
                 <p className="text-base sm:text-lg opacity-90 mt-1">Bina warga SMP Negeri 13 Tasikmalaya</p>
-                <div className="mt-8 transition-all duration-300 min-h-[32px] flex items-center justify-center">
-                    <p className="text-lg sm:text-xl font-bold bg-black/10 px-4 py-1 rounded-full">
+                <div className="mt-4 transition-all duration-300 min-h-[28px] flex items-center justify-center">
+                    <p className="text-base sm:text-lg font-bold bg-black/10 px-4 py-1 rounded-full">
                       {isNameLoading ? '...' : (view === 'login' ? loginAnggotaName : regAnggotaName) || 'Selamat Datang'}
                     </p>
                 </div>
             </div>
-             <div className="absolute bottom-0 left-0 w-full h-16 bg-background rounded-t-3xl z-20"></div>
+             <div className="absolute bottom-0 left-0 w-full h-12 bg-background rounded-t-3xl z-20"></div>
         </header>
 
-        <main className="relative w-full flex-grow bg-background z-10 p-8 flex flex-col items-center">
+        <main className="relative w-full flex-grow bg-background z-10 p-4 sm:p-8 flex flex-col items-center">
            <LoginIllustration className="absolute bottom-0 right-0 w-48 h-auto z-0 opacity-80" />
-           <div className="w-full max-w-md z-10 pt-8">
+           <div className="w-full max-w-md z-10 pt-8 pb-12">
                 <h2 className="text-xl sm:text-2xl font-bold text-dark mb-1">{view === 'login' ? 'Masuk ke Akun Anda' : 'Buat Akun Baru'}</h2>
                 <p className="text-sm text-gray-500 mb-6">{view === 'login' ? 'Silakan masukkan kredensial Anda.' : 'Lengkapi data untuk mendaftar.'}</p>
                 
@@ -234,28 +253,14 @@ const LoginPage: React.FC = () => {
                 </form>
                 )}
            </div>
-        </main>
 
-        {/* MODIFICATION FOR TESTING: This is set to true so you can always see the banner. Change back to 'installPrompt &&' for production. */}
-        {true && (
-            <div className="fixed bottom-0 left-0 right-0 bg-[#2d3748] text-white p-6 shadow-lg z-50 animate-fade-in-up md:left-auto md:bottom-4 md:right-4 md:max-w-md md:rounded-lg">
-                <div className="flex flex-col items-start gap-4">
-                    <div>
-                        <h3 className="text-xl font-bold">Instal Aplikasi untuk Pengalaman Terbaik</h3>
-                        <p className="text-sm text-slate-300 mt-1">
-                            Akses lebih cepat dan fitur offline dengan menambahkan aplikasi ini ke layar utama (home screen) Anda.
-                        </p>
-                    </div>
-                    <button
-                        onClick={handleInstallClick}
-                        className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-secondary font-bold rounded-lg hover:bg-emerald-600 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#2d3748] focus:ring-secondary"
-                    >
-                        <DownloadIcon className="w-5 h-5" />
-                        <span>Instal Aplikasi</span>
-                    </button>
+           {/* MODIFICATION FOR TESTING & RESPONSIVENESS */}
+            {true && (
+                <div className="w-full max-w-md md:fixed md:bottom-4 md:right-4 md:max-w-sm md:w-auto z-50">
+                    <InstallBanner />
                 </div>
-            </div>
-        )}
+            )}
+        </main>
     </div>
   );
 };
