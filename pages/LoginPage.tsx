@@ -115,17 +115,6 @@ const LoginPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col items-center font-sans overflow-hidden">
-        {installPrompt && (
-          <button
-              onClick={handleInstallClick}
-              className="absolute top-4 right-4 z-50 flex items-center gap-2 px-3 py-1.5 bg-secondary text-white text-xs font-bold rounded-full shadow-lg hover:bg-emerald-600 transition-transform transform hover:scale-105 focus:outline-none"
-              title="Install Aplikasi"
-            >
-              <DownloadIcon className="w-4 h-4" />
-              <span>Install App</span>
-            </button>
-        )}
-
         <header className="relative w-full bg-primary text-white p-8 pt-16 z-10 text-center flex flex-col items-center">
              <div className="absolute -bottom-16 w-32 h-32 bg-white rounded-full p-3 shadow-lg flex items-center justify-center z-30">
                 <LogoKoperasi className="w-full h-full text-primary" />
@@ -246,6 +235,26 @@ const LoginPage: React.FC = () => {
                 )}
            </div>
         </main>
+
+        {installPrompt && (
+            <div className="fixed bottom-0 left-0 right-0 bg-[#2d3748] text-white p-6 shadow-lg z-50 animate-fade-in-up md:left-auto md:bottom-4 md:right-4 md:max-w-md md:rounded-lg">
+                <div className="flex flex-col items-start gap-4">
+                    <div>
+                        <h3 className="text-xl font-bold">Instal Aplikasi untuk Pengalaman Terbaik</h3>
+                        <p className="text-sm text-slate-300 mt-1">
+                            Akses lebih cepat dan fitur offline dengan menambahkan aplikasi ini ke layar utama (home screen) Anda.
+                        </p>
+                    </div>
+                    <button
+                        onClick={handleInstallClick}
+                        className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-secondary font-bold rounded-lg hover:bg-emerald-600 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#2d3748] focus:ring-secondary"
+                    >
+                        <DownloadIcon className="w-5 h-5" />
+                        <span>Instal Aplikasi</span>
+                    </button>
+                </div>
+            </div>
+        )}
     </div>
   );
 };
