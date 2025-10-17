@@ -111,9 +111,31 @@ const AdminAnggota: React.FC = () => {
                             <td className="px-6 py-4">{anggota.nama}</td>
                             <td className="px-6 py-4">{anggota.no_telepon}</td>
                             <td className="px-6 py-4">
-                                <span className={`px-2 py-1 text-xs font-semibold rounded-full ${anggota.status === 'Aktif' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                                    {anggota.status}
-                                </span>
+                                {(() => {
+                                    if (anggota.status === 'Tidak Aktif') {
+                                        return (
+                                            <span className="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
+                                                Tidak Aktif
+                                            </span>
+                                        );
+                                    }
+
+                                    const hasRegistered = anggota.password && anggota.password.length > 0;
+
+                                    if (hasRegistered) {
+                                        return (
+                                            <span className="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                                                Aktif
+                                            </span>
+                                        );
+                                    } else {
+                                        return (
+                                            <span className="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                                Belum Registrasi
+                                            </span>
+                                        );
+                                    }
+                                })()}
                             </td>
                             <td className="px-6 py-4 flex gap-2">
                                 <button onClick={() => handleEdit(anggota)} className="text-blue-600 hover:text-blue-800"><PencilIcon className="w-5 h-5"/></button>
