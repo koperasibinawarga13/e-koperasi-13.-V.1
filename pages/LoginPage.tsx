@@ -55,7 +55,8 @@ const LoginPage: React.FC = () => {
     setIsNameLoading(true);
     const handler = setTimeout(async () => {
         try {
-            const anggota = await getAnggotaByNo(searchInput);
+            // FIX: Convert search input to uppercase for case-insensitive matching
+            const anggota = await getAnggotaByNo(searchInput.toUpperCase());
             setName(anggota ? anggota.nama : 'Anggota tidak ditemukan');
         } catch (err) {
             setName('Gagal memuat nama');
