@@ -28,7 +28,7 @@ const AdminLayout: React.FC = () => {
         >
           <MenuIcon className="w-6 h-6" />
         </button>
-        <main className={`flex-1 p-8 transition-all duration-300 ease-in-out ml-0 ${isSidebarCollapsed ? 'md:ml-20' : 'md:ml-64'}`}>
+        <main className={`flex-1 p-4 md:p-8 transition-all duration-300 ease-in-out ml-0 ${isSidebarCollapsed ? 'md:ml-20' : 'md:ml-64'}`}>
           <Outlet />
         </main>
       </div>

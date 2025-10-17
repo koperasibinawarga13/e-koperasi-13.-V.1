@@ -80,7 +80,7 @@ const UploadSection: React.FC<{
 
     return (
         <div className={`bg-white p-6 ${hideTitle ? 'pt-0 rounded-b-xl' : 'rounded-xl'} shadow-md mb-8`}>
-            {!hideTitle && <h2 className="text-xl font-bold text-dark mb-4">{title}</h2>}
+            {!hideTitle && <h2 className="text-lg md:text-xl font-bold text-dark mb-4">{title}</h2>}
             <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                 <h3 className="font-bold text-blue-800">Struktur File Excel (.xlsx)</h3>
                 <p className="text-sm text-blue-700 mt-2">Pastikan file Anda memiliki kolom header berikut (urutan dan nama harus sesuai):</p>
@@ -367,7 +367,7 @@ const AdminUpload: React.FC = () => {
             />
              <div>
                 <div className="bg-white p-6 rounded-t-xl shadow-md border-b">
-                    <h2 className="text-xl font-bold text-dark">3. Upload Data Transaksi Bulanan</h2>
+                    <h2 className="text-lg md:text-xl font-bold text-dark">3. Upload Data Transaksi Bulanan</h2>
                      <p className="text-sm text-gray-500 mt-1">
                         Sistem akan secara otomatis mendeteksi bulan laporan dari nama <span className="font-semibold">sheet pertama</span> di file Excel Anda. Pastikan nama sheet berformat <code className="bg-gray-200 px-1 rounded">YYYY MM</code>, contoh: <code className="bg-gray-200 px-1 rounded">2024 07</code>.
                     </p>
@@ -382,7 +382,7 @@ const AdminUpload: React.FC = () => {
             </div>
              <div className="mt-8 bg-white p-6 rounded-xl shadow-md">
                 <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-xl font-bold text-dark">Riwayat Upload Transaksi Bulanan</h2>
+                    <h2 className="text-lg md:text-xl font-bold text-dark">Riwayat Upload Transaksi Bulanan</h2>
                     <button
                         onClick={handleRebuildHistory}
                         disabled={isRebuilding}

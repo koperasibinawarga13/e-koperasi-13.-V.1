@@ -1,4 +1,5 @@
 
+
 // FIX: Implemented full content for LoginPage.tsx to provide a functional login screen.
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
@@ -130,10 +131,10 @@ const LoginPage: React.FC = () => {
                 <LogoKoperasi className="w-full h-full text-primary" />
             </div>
             <div className="relative z-10 w-full max-w-md">
-                <h1 className="text-5xl font-bold">e-Koperasi</h1>
-                <p className="text-lg opacity-90 mt-1">Bina warga SMP Negeri 13 Tasikmalaya</p>
+                <h1 className="text-4xl sm:text-5xl font-bold">e-Koperasi</h1>
+                <p className="text-base sm:text-lg opacity-90 mt-1">Bina warga SMP Negeri 13 Tasikmalaya</p>
                 <div className="mt-8 transition-all duration-300 min-h-[32px] flex items-center justify-center">
-                    <p className="text-xl font-bold bg-black/10 px-4 py-1 rounded-full">
+                    <p className="text-lg sm:text-xl font-bold bg-black/10 px-4 py-1 rounded-full">
                       {isNameLoading ? '...' : (view === 'login' ? loginAnggotaName : regAnggotaName) || 'Selamat Datang'}
                     </p>
                 </div>
@@ -144,7 +145,7 @@ const LoginPage: React.FC = () => {
         <main className="relative w-full flex-grow bg-background z-10 p-8 flex flex-col items-center">
            <LoginIllustration className="absolute bottom-0 right-0 w-48 h-auto z-0 opacity-80" />
            <div className="w-full max-w-md z-10 pt-8">
-                <h2 className="text-2xl font-bold text-dark mb-1">{view === 'login' ? 'Masuk ke Akun Anda' : 'Buat Akun Baru'}</h2>
+                <h2 className="text-xl sm:text-2xl font-bold text-dark mb-1">{view === 'login' ? 'Masuk ke Akun Anda' : 'Buat Akun Baru'}</h2>
                 <p className="text-sm text-gray-500 mb-6">{view === 'login' ? 'Silakan masukkan kredensial Anda.' : 'Lengkapi data untuk mendaftar.'}</p>
                 
                 {error && <p className="text-sm text-red-600 text-center font-semibold bg-red-50 p-3 rounded-md mb-4">{error}</p>}

@@ -80,7 +80,7 @@ const AnggotaDashboard: React.FC = () => {
         <StatCard title="Total Pinjaman" value={formatCurrency(totalPinjaman)} icon={<ChartBarIcon className="w-6 h-6 text-white" />} color="bg-yellow-500" />
       </div>
       <div className="bg-white p-6 rounded-xl border border-gray-200">
-        <h2 className="text-xl font-bold text-dark mb-4">Rincian Simpanan</h2>
+        <h2 className="text-lg md:text-xl font-bold text-dark mb-4">Rincian Simpanan</h2>
         <div style={{ width: '100%', height: 300 }}>
           <ResponsiveContainer>
             {pieChartData.length > 0 ? (

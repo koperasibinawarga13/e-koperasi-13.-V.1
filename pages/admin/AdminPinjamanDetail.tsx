@@ -111,7 +111,7 @@ const AdminPinjamanDetail: React.FC = () => {
 
             {/* Financial Summary Card */}
             <div className="bg-white p-6 rounded-xl shadow-md mb-8">
-                <h3 className="text-xl font-bold text-dark border-b pb-3 mb-4">Ringkasan Finansial</h3>
+                <h3 className="text-lg md:text-xl font-bold text-dark border-b pb-3 mb-4">Ringkasan Finansial</h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                     <InfoItem label="Jenis Pinjaman" value={<span className="font-bold">{pinjaman.jenis_pinjaman}</span>} />
                     <InfoItem label="Pokok Pinjaman" value={<span className="text-green-600 font-bold">{formatCurrency(pinjaman.pokok_pinjaman)}</span>} />
@@ -136,7 +136,7 @@ const AdminPinjamanDetail: React.FC = () => {
             {/* Action Buttons */}
             {pinjaman.status === 'Menunggu Persetujuan' && (
                 <div className="bg-white p-6 rounded-xl shadow-md mb-8 flex justify-center items-center gap-6">
-                    <h3 className="text-lg font-semibold text-dark">Tindakan Persetujuan:</h3>
+                    <h3 className="text-base md:text-lg font-semibold text-dark">Tindakan Persetujuan:</h3>
                     <button onClick={() => handleStatusUpdate('Disetujui')} disabled={isUpdating} className="flex items-center gap-2 bg-green-500 text-white px-6 py-2 rounded-lg font-bold hover:bg-green-600 disabled:bg-gray-400">
                         <CheckIcon className="w-5 h-5" /> {isUpdating ? 'Memproses...' : 'Setujui'}
                     </button>
@@ -149,7 +149,7 @@ const AdminPinjamanDetail: React.FC = () => {
             {/* Installment Table */}
             {pinjaman.jenis_pinjaman === 'Berjangka' && pinjaman.jadwal_angsuran && (
                 <div className="bg-white p-6 rounded-xl shadow-md">
-                    <h3 className="text-xl font-bold text-dark mb-4">Jadwal Angsuran</h3>
+                    <h3 className="text-lg md:text-xl font-bold text-dark mb-4">Jadwal Angsuran</h3>
                     <div className="overflow-x-auto">
                         <table className="w-full text-sm text-left text-gray-500">
                              <thead className="text-xs text-gray-700 uppercase bg-gray-50">

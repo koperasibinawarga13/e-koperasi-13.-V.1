@@ -118,7 +118,7 @@ const AdminDashboard: React.FC = () => {
                 <StatCard title="Saldo Kas" value={formatCurrency(stats.saldoKas)} icon={<BuildingOfficeIcon className="w-6 h-6 text-white" />} color="bg-red-500" />
             </div>
             <div className="bg-white p-6 rounded-xl border border-gray-200">
-                <h2 className="text-xl font-bold text-dark mb-4">Ringkasan Saldo Akhir</h2>
+                <h2 className="text-lg md:text-xl font-bold text-dark mb-4">Ringkasan Saldo Akhir</h2>
                  {chartData.length > 0 ? (
                     <div style={{ width: '100%', height: 400 }}>
                         <ResponsiveContainer>
@@ -138,7 +138,7 @@ const AdminDashboard: React.FC = () => {
             </div>
 
              <div className="mt-8 bg-white p-6 rounded-xl border border-gray-200">
-                <h2 className="text-xl font-bold text-dark mb-4">Pengajuan Pinjaman Baru</h2>
+                <h2 className="text-lg md:text-xl font-bold text-dark mb-4">Pengajuan Pinjaman Baru</h2>
                 {pendingLoans.length > 0 ? (
                     <div className="overflow-x-auto">
                         <table className="w-full text-sm text-left text-gray-600">

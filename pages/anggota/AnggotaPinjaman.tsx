@@ -204,17 +204,17 @@ const AnggotaPinjaman: React.FC = () => {
             <Header title="Pengajuan Pinjaman Anggota" />
             
             <div className="bg-white rounded-xl shadow-md mb-8">
-                <h2 className="text-xl font-bold text-dark bg-gray-100 p-4 rounded-t-xl -m-0 mb-6">Sisa Pinjaman Anda</h2>
+                <h2 className="text-lg md:text-xl font-bold text-dark bg-gray-100 p-4 rounded-t-xl -m-0 mb-6">Sisa Pinjaman Anda</h2>
                  <div className="px-6 pb-6">
                     {isLoading ? <p>Memuat data sisa pinjaman...</p> : keuangan ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="bg-yellow-50 p-4 rounded-lg">
                                 <p className="text-sm text-yellow-800 font-medium">Sisa Pinjaman Berjangka</p>
-                                <p className="text-2xl font-bold text-yellow-900">{formatCurrency(keuangan.akhir_pinjaman_berjangka)}</p>
+                                <p className="text-xl md:text-2xl font-bold text-yellow-900">{formatCurrency(keuangan.akhir_pinjaman_berjangka)}</p>
                             </div>
                             <div className="bg-orange-50 p-4 rounded-lg">
                                 <p className="text-sm text-orange-800 font-medium">Sisa Pinjaman Khusus</p>
-                                <p className="text-2xl font-bold text-orange-900">{formatCurrency(keuangan.akhir_pinjaman_khusus)}</p>
+                                <p className="text-xl md:text-2xl font-bold text-orange-900">{formatCurrency(keuangan.akhir_pinjaman_khusus)}</p>
                             </div>
                         </div>
                     ) : <p>Data pinjaman tidak ditemukan.</p>}
@@ -222,7 +222,7 @@ const AnggotaPinjaman: React.FC = () => {
             </div>
 
             <div className="bg-white rounded-xl shadow-md">
-                <h2 className="text-xl font-bold text-dark bg-gray-100 p-4 rounded-t-xl -m-0">Simulasi & Pengajuan Kredit</h2>
+                <h2 className="text-lg md:text-xl font-bold text-dark bg-gray-100 p-4 rounded-t-xl -m-0">Simulasi & Pengajuan Kredit</h2>
                  <nav className="flex border-b">
                     <button onClick={() => {setActiveTab('berjangka'); setSubmitMessage({type: '', text: ''})}} className={`py-3 px-6 font-semibold text-sm ${activeTab === 'berjangka' ? 'text-primary border-b-2 border-primary' : 'text-gray-500 hover:bg-gray-50'}`}>Pinjaman Berjangka (Dengan Simulasi)</button>
                     <button onClick={() => {setActiveTab('khusus'); setSubmitMessage({type: '', text: ''})}} className={`py-3 px-6 font-semibold text-sm ${activeTab === 'khusus' ? 'text-primary border-b-2 border-primary' : 'text-gray-500 hover:bg-gray-50'}`}>Pinjaman Khusus</button>
@@ -253,7 +253,7 @@ const AnggotaPinjaman: React.FC = () => {
                         </form>
                         {simulasi && (
                         <div className="mt-8 text-center border-t pt-6">
-                            <button onClick={handleAjukanPinjamanBerjangka} disabled={isSubmitting} className="bg-secondary text-white py-3 px-8 rounded-lg font-bold text-lg hover:bg-emerald-600 disabled:bg-gray-400">
+                            <button onClick={handleAjukanPinjamanBerjangka} disabled={isSubmitting} className="bg-secondary text-white py-3 px-8 rounded-lg font-bold text-base md:text-lg hover:bg-emerald-600 disabled:bg-gray-400">
                                 {isSubmitting ? 'Mengirim...' : 'Yakin & Ajukan Pinjaman Ini'}
                             </button>
                         </div>
@@ -287,16 +287,16 @@ const AnggotaPinjaman: React.FC = () => {
                     <div className="mt-8 border-t pt-6 px-6 pb-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
                              <div>
-                                <h3 className="font-bold text-lg text-dark mb-2">Informasi Pinjaman Anda</h3>
+                                <h3 className="font-bold text-base md:text-lg text-dark mb-2">Informasi Pinjaman Anda</h3>
                                 <div className="bg-gray-50 p-4 rounded-lg"><InfoItem label="Pokok Pinjaman" value={formatCurrency(simulasi.pokokPinjaman)} /><InfoItem label="Jangka Waktu" value={`${simulasi.jangkaWaktu} Bulan`} /><InfoItem label="Bunga per Bulan" value={`${simulasi.sukuBunga} %`} /><InfoItem label="Tanggal Mulai" value={formatDate(simulasi.tanggalMulai)} /></div>
                              </div>
                              <div>
-                                <h3 className="font-bold text-lg text-dark mb-2">Informasi Angsuran Anda</h3>
-                                <div className="bg-gray-50 p-4 rounded-lg"><InfoItem label="Angsuran Pokok / Bulan" value={formatCurrency(simulasi.angsuranPokokBulan)} /><InfoItem label="Total Bunga" value={formatCurrency(simulasi.totalBunga)} /><InfoItem label="Total yang Dibayarkan" value={formatCurrency(simulasi.totalBayar)} className="font-bold text-lg bg-yellow-100 -mx-4 px-4" /><InfoItem label="Tanggal Lunas" value={formatDate(simulasi.tanggalLunas)} /></div>
+                                <h3 className="font-bold text-base md:text-lg text-dark mb-2">Informasi Angsuran Anda</h3>
+                                <div className="bg-gray-50 p-4 rounded-lg"><InfoItem label="Angsuran Pokok / Bulan" value={formatCurrency(simulasi.angsuranPokokBulan)} /><InfoItem label="Total Bunga" value={formatCurrency(simulasi.totalBunga)} /><InfoItem label="Total yang Dibayarkan" value={formatCurrency(simulasi.totalBayar)} className="font-bold text-base md:text-lg bg-yellow-100 -mx-4 px-4" /><InfoItem label="Tanggal Lunas" value={formatDate(simulasi.tanggalLunas)} /></div>
                              </div>
                         </div>
                         <div className="mt-8 overflow-x-auto">
-                             <h3 className="font-bold text-lg text-dark mb-4">Tabel Angsuran Kredit Anda</h3>
+                             <h3 className="font-bold text-base md:text-lg text-dark mb-4">Tabel Angsuran Kredit Anda</h3>
                             <table className="w-full text-sm text-left text-gray-500">
                                 <thead className="text-xs text-gray-700 uppercase bg-gray-100"><tr><th className="px-4 py-3">#</th><th className="px-4 py-3">Tanggal</th><th className="px-4 py-3 text-right">Angsuran Pokok</th><th className="px-4 py-3 text-right">Angsuran Bunga</th><th className="px-4 py-3 text-right">Total Angsuran</th><th className="px-4 py-3 text-right">Saldo Pinjaman</th></tr></thead>
                                 <tbody>
@@ -308,7 +308,7 @@ const AnggotaPinjaman: React.FC = () => {
                 )}
             </div>
             <div className="mt-8 bg-white p-6 rounded-xl shadow-md">
-                 <h2 className="text-xl font-bold text-dark mb-4">Riwayat Pengajuan Pinjaman</h2>
+                 <h2 className="text-lg md:text-xl font-bold text-dark mb-4">Riwayat Pengajuan Pinjaman</h2>
                  <div className="overflow-x-auto">
                      {isLoading ? <p>Memuat riwayat...</p> : riwayat.length > 0 ? (
                          <table className="w-full text-sm text-left text-gray-500">

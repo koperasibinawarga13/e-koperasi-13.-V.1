@@ -83,7 +83,7 @@ const AnggotaProfil: React.FC = () => {
         <div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6 border-b pb-6 mb-6">
           <UserCircleIcon className="w-24 h-24 text-gray-300 flex-shrink-0" />
           <div className="text-center sm:text-left">
-            <h2 className="text-2xl font-bold text-dark">{profileData.nama}</h2>
+            <h2 className="text-xl sm:text-2xl font-bold text-dark">{profileData.nama}</h2>
             <p className="text-gray-500">No. Anggota: {profileData.no_anggota}</p>
           </div>
         </div>

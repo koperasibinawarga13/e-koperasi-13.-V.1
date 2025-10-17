@@ -97,20 +97,20 @@ const AdminAnggota: React.FC = () => {
             <table className="w-full text-sm text-left text-gray-600">
                 <thead className="text-xs text-gray-500 uppercase">
                     <tr>
-                        <th scope="col" className="px-6 py-4 font-semibold border-b-2 border-gray-200">No. Anggota</th>
-                        <th scope="col" className="px-6 py-4 font-semibold border-b-2 border-gray-200">Nama</th>
-                        <th scope="col" className="px-6 py-4 font-semibold border-b-2 border-gray-200">No. HP</th>
-                        <th scope="col" className="px-6 py-4 font-semibold border-b-2 border-gray-200">Status</th>
-                        <th scope="col" className="px-6 py-4 font-semibold border-b-2 border-gray-200">Aksi</th>
+                        <th scope="col" className="px-4 py-4 sm:px-6 font-semibold border-b-2 border-gray-200">No. Anggota</th>
+                        <th scope="col" className="px-4 py-4 sm:px-6 font-semibold border-b-2 border-gray-200">Nama</th>
+                        <th scope="col" className="px-4 py-4 sm:px-6 font-semibold border-b-2 border-gray-200">No. HP</th>
+                        <th scope="col" className="px-4 py-4 sm:px-6 font-semibold border-b-2 border-gray-200">Status</th>
+                        <th scope="col" className="px-4 py-4 sm:px-6 font-semibold border-b-2 border-gray-200">Aksi</th>
                     </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                     {filteredAnggota.map((anggota) => (
                         <tr key={anggota.id} className="hover:bg-primary-light transition-colors">
-                            <td className="px-6 py-4 font-medium text-dark">{anggota.no_anggota}</td>
-                            <td className="px-6 py-4">{anggota.nama}</td>
-                            <td className="px-6 py-4">{anggota.no_telepon}</td>
-                            <td className="px-6 py-4">
+                            <td className="px-4 py-4 sm:px-6 font-medium text-dark">{anggota.no_anggota}</td>
+                            <td className="px-4 py-4 sm:px-6">{anggota.nama}</td>
+                            <td className="px-4 py-4 sm:px-6">{anggota.no_telepon}</td>
+                            <td className="px-4 py-4 sm:px-6">
                                 {(() => {
                                     if (anggota.status === 'Tidak Aktif') {
                                         return (
@@ -137,7 +137,7 @@ const AdminAnggota: React.FC = () => {
                                     }
                                 })()}
                             </td>
-                            <td className="px-6 py-4 flex gap-2">
+                            <td className="px-4 py-4 sm:px-6 flex gap-2">
                                 <button onClick={() => handleEdit(anggota)} className="text-blue-600 hover:text-blue-800"><PencilIcon className="w-5 h-5"/></button>
                                 <button onClick={() => handleDelete(anggota.id)} className="text-red-600 hover:text-red-800"><TrashIcon className="w-5 h-5"/></button>
                             </td>

@@ -80,7 +80,7 @@ const AnggotaKeuangan: React.FC = () => {
 
     const DetailCard: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => (
         <div className="bg-white p-6 rounded-xl shadow-md mb-8">
-            <h3 className="text-xl font-bold text-dark border-b pb-3 mb-4">{title}</h3>
+            <h3 className="text-lg sm:text-xl font-bold text-dark border-b pb-3 mb-4">{title}</h3>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-4">
                 {children}
             </div>
@@ -99,7 +99,7 @@ const AnggotaKeuangan: React.FC = () => {
             {/* Custom Header Section */}
             <div className="bg-white shadow-sm p-6 rounded-lg mb-8 flex flex-wrap items-center justify-between gap-4">
                 <div className="flex items-center space-x-3">
-                    <h1 className="text-3xl font-bold text-dark">Rincian Keuangan</h1>
+                    <h1 className="text-2xl sm:text-3xl font-bold text-dark">Rincian Keuangan</h1>
                     {anggota && (
                         <div className="hidden md:flex items-center space-x-2 text-gray-600 border-l pl-3 ml-1">
                             <UserCircleIcon className="w-6 h-6 text-gray-400" />
