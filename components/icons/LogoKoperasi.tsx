@@ -2,24 +2,29 @@ import React from 'react';
 
 export const LogoKoperasi: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
   <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" {...props}>
+    {/* Modern Abstract Logo for Koperasi 13 */}
     <g>
-      {/* House shape */}
-      <path d="M50 15 L15 45 v40 h70 V45 L50 15z" fill="currentColor"/>
+      {/* Blue Roof/Growth Arrow, subtly forming the number '1' on the left */}
+      <path
+        d="M50 15 L18 85 H42 L56 55 Q 65 85 82 85 L 50 15 Z"
+        fill="currentColor"
+      />
       
-      {/* Roof accent */}
-      <path d="M50 15 L85 45 H15 L50 15z" fill="none" strokeWidth="4" strokeLinejoin="round" className="stroke-current opacity-20" />
-      
-      {/* Door/inner part */}
-      <path d="M40 85 V60 H60 V85" fill="none" strokeWidth="4" strokeLinejoin="round" className="stroke-current opacity-20"/>
+      {/* Green Leaf accent for growth and community */}
+      <path
+        d="M26 65 Q 40 75 42 58 C 43 45 30 50 26 65 Z"
+        className="text-secondary"
+        fill="currentColor"
+      />
 
-      {/* Number '13' inside a notched area */}
-      <g transform="translate(48, 30)">
-          <path d="M25 0 L0 10 V30 H18 V10 L25 5 Z" fill="#ffffff" />
-          <text x="10" y="21" fontFamily="Poppins, sans-serif" fontSize="12" fontWeight="bold" fill="#0052FF" textAnchor="middle">13</text>
-          
-          {/* Green leaf accent */}
-          <line x1="8" y1="9" x2="16" y2="14" stroke="#10B981" strokeWidth="2.5" strokeLinecap="round" />
-      </g>
+      {/* White cutout to define the number '3' on the right side of the roof */}
+       <path
+        d="M55 42 C 65 42, 65 58, 55 58 M55 50 H 70"
+        fill="none"
+        stroke="#FFFFFF"
+        strokeWidth="7"
+        strokeLinecap="round"
+      />
     </g>
   </svg>
 );

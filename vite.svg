@@ -6,11 +6,28 @@
         </linearGradient>
     </defs>
     <circle cx="50" cy="50" r="50" fill="url(#grad1)"/>
-    <g transform="translate(15, 15) scale(0.7)">
-      <circle cx="50" cy="50" r="48" fill="#FFFFFF"/>
-      <path d="M 30 80 V 45 L 50 25 L 70 45 V 80 H 30 Z" fill="#0052FF" opacity="0.9" />
-      <path d="M 50 50 C 50 50, 40 60, 50 70 C 60 60, 50 50, 50 50 Z" fill="#10B981" transform="rotate(45 50 50)"/>
-      <path d="M 50 48 L 50 65" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" transform="rotate(45 50 50)"/>
-      <text x="50" y="79" font-family="Poppins, sans-serif" font-size="18" font-weight="bold" fill="#FFFFFF" text-anchor="middle">13</text>
+    
+    {/* New Koperasi 13 Icon */}
+    <g transform="translate(10, 10) scale(0.8)">
+      {/* Base Shape */}
+      <path
+        d="M50 15 L18 85 H42 L56 55 Q 65 85 82 85 L 50 15 Z"
+        fill="#FFFFFF"
+      />
+      
+      {/* Leaf accent */}
+      <path
+        d="M26 65 Q 40 75 42 58 C 43 45 30 50 26 65 Z"
+        fill="#10B981"
+      />
+      
+       {/* '3' Cutout - using primary color from gradient */}
+       <path
+        d="M55 42 C 65 42, 65 58, 55 58 M55 50 H 70"
+        fill="none"
+        stroke="#0052FF"
+        strokeWidth="7"
+        strokeLinecap="round"
+      />
     </g>
 </svg>
