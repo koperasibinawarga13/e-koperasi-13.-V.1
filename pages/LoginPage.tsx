@@ -27,19 +27,44 @@ const LoginPage: React.FC = () => {
   const { login } = useAuth();
   
   const [installPrompt, setInstallPrompt] = useState<any>(null);
+  const [isAppInstalled, setIsAppInstalled] = useState(
+    () => window.matchMedia('(display-mode: standalone)').matches
+  );
 
   useEffect(() => {
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
+      // Always set the prompt if the event fires.
+      // The render logic will handle whether to show it or not.
       setInstallPrompt(e);
     };
+
+    const handleAppInstalled = () => {
+      setIsAppInstalled(true);
+      setInstallPrompt(null); // Clear the prompt after installation
+    };
+    
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-    return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-  }, []);
+    window.addEventListener('appinstalled', handleAppInstalled);
+
+    return () => {
+        window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+        window.removeEventListener('appinstalled', handleAppInstalled);
+    };
+  }, []); // Run this effect only once on component mount
 
   const handleInstallClick = () => {
-    installPrompt?.prompt();
-    installPrompt?.userChoice.then(() => setInstallPrompt(null));
+    if (!installPrompt) return;
+    installPrompt.prompt();
+    installPrompt.userChoice.then((choice: { outcome: string }) => {
+        if(choice.outcome === 'accepted') {
+            console.log('User accepted the install prompt');
+            setIsAppInstalled(true);
+        } else {
+            console.log('User dismissed the install prompt');
+        }
+        setInstallPrompt(null);
+    });
   };
 
   useEffect(() => {
@@ -254,8 +279,7 @@ const LoginPage: React.FC = () => {
                 )}
            </div>
 
-           {/* MODIFICATION FOR TESTING & RESPONSIVENESS */}
-            {true && (
+           {installPrompt && !isAppInstalled && (
                 <div className="w-full max-w-md md:fixed md:bottom-4 md:right-4 md:max-w-sm md:w-auto z-50">
                     <InstallBanner />
                 </div>

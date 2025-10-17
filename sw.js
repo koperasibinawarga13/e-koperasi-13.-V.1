@@ -4,6 +4,8 @@ const urlsToCache = [
   '/index.html',
   '/manifest.json',
   '/vite.svg',
+  '/icon-192x192.png',
+  '/icon-512x512.png',
   'https://cdn.tailwindcss.com',
   // Other assets will be cached on the fly by the fetch handler
 ];
@@ -39,7 +41,7 @@ self.addEventListener('activate', event => {
   );
 });
 
-// Intercept network requests and serve from cache if available (Cache-first strategy)
+// Intercept network requests and serve from cache if available (Cache-first, network fallback strategy)
 self.addEventListener('fetch', event => {
   // Don't cache API calls to Firestore
   if (event.request.url.includes('firestore.googleapis.com')) {
@@ -72,7 +74,10 @@ self.addEventListener('fetch', event => {
           }
         ).catch(error => {
           console.error('Service Worker: Fetch failed', error);
-          // Optionally return a fallback offline page here
+          // If a navigation request fails (e.g., offline), return the cached index.html.
+          if (event.request.mode === 'navigate') {
+            return caches.match('/index.html');
+          }
         });
       })
   );
