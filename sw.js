@@ -1,4 +1,4 @@
-const CACHE_NAME = 'e-koperasi-cache-v2'; // Incremented version
+const CACHE_NAME = 'e-koperasi-cache-v3'; // Incremented version for cache busting
 const urlsToCache = [
   // App Shell
   '/',
@@ -57,13 +57,13 @@ const urlsToCache = [
 
   // Resources from importmap
   'https://aistudiocdn.com/react@^19.2.0',
-  'https://aistudiocdn.com/react-dom@^19.2.0/client', // Specific import from client
+  'https://aistudiocdn.com/react-dom@^19.2.0/client',
   'https://aistudiocdn.com/react-router-dom@^7.9.4',
   'https://aistudiocdn.com/recharts@^3.2.1',
-  'https://aistudiocdn.com/firebase@^12.4.0/app', // Specific import
-  'https://aistudiocdn.com/firebase@^12.4.0/firestore', // Specific import
+  'https://aistudiocdn.com/firebase@^12.4.0/app',
+  'https://aistudiocdn.com/firebase@^12.4.0/firestore',
   'https://aistudiocdn.com/react-dropzone@^14.3.8',
-  'https://aistudiocdn.com/xlsx@^0.18.5'
+  'https://aistudiocdn.com/xlsx@^0.18.5',
 ];
 
 // Install the service worker and cache all critical assets
@@ -72,12 +72,16 @@ self.addEventListener('install', event => {
     caches.open(CACHE_NAME)
       .then(cache => {
         console.log('Service Worker: Caching all critical assets');
-        return cache.addAll(urlsToCache);
+        // Use addAll with a catch to prevent a single failed asset from stopping the entire cache process.
+        // This is more resilient for external resources.
+        const cachePromises = urlsToCache.map(urlToCache => {
+          return cache.add(urlToCache).catch(err => {
+            console.warn(`Failed to cache ${urlToCache}:`, err);
+          });
+        });
+        return Promise.all(cachePromises);
       })
-      .then(() => self.skipWaiting()) // Force the waiting service worker to become the active one.
-      .catch(error => {
-        console.error('Service Worker: Failed to cache all assets during install', error);
-      })
+      .then(() => self.skipWaiting())
   );
 });
 
@@ -94,48 +98,55 @@ self.addEventListener('activate', event => {
           }
         })
       );
-    }).then(() => self.clients.claim()) // Take control of clients without waiting for reload.
+    }).then(() => self.clients.claim())
   );
 });
 
-// Intercept network requests and serve from cache if available (Cache-first, network fallback strategy)
+
 self.addEventListener('fetch', event => {
-  // Don't cache API calls to Firestore
+  // Always go to the network for Firestore requests. Do not cache them.
   if (event.request.url.includes('firestore.googleapis.com')) {
     event.respondWith(fetch(event.request));
     return;
   }
 
+  // Handle navigation requests (e.g., loading a page) for our SPA.
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      // Try the network first to get the latest version.
+      fetch(event.request).catch(() => {
+        // If the network fails (offline), serve the cached index.html.
+        // This is the core of the "App Shell" model.
+        return caches.match('/index.html');
+      })
+    );
+    return;
+  }
+
+  // For all other requests (assets like JS, CSS, images, fonts),
+  // use a "cache-first, then network" strategy.
   event.respondWith(
-    caches.match(event.request)
-      .then(cachedResponse => {
-        // Return the cached response if it exists
-        if (cachedResponse) {
-          return cachedResponse;
+    caches.match(event.request).then(cachedResponse => {
+      // If we have a match in the cache, return it.
+      if (cachedResponse) {
+        return cachedResponse;
+      }
+      
+      // If not in cache, fetch from the network.
+      return fetch(event.request).then(networkResponse => {
+        // Don't cache opaque responses (from third-party CDNs without CORS).
+        if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
+          return networkResponse;
         }
 
-        // If not in cache, fetch from the network
-        return fetch(event.request).then(networkResponse => {
-            // Check for a valid response
-            if (!networkResponse || networkResponse.status !== 200) {
-                 return networkResponse;
-            }
-          
-            // Clone the response and add it to the cache for next time
-            const responseToCache = networkResponse.clone();
-            caches.open(CACHE_NAME)
-              .then(cache => {
-                cache.put(event.request, responseToCache);
-              });
-            return networkResponse;
-          }
-        ).catch(error => {
-          console.error('Service Worker: Fetch failed', error);
-          // If a navigation request fails (e.g., offline), return the cached index.html.
-          if (event.request.mode === 'navigate') {
-            return caches.match('/index.html');
-          }
+        // Clone the response and add it to the cache for next time.
+        const responseToCache = networkResponse.clone();
+        caches.open(CACHE_NAME).then(cache => {
+          cache.put(event.request, responseToCache);
         });
-      })
+        
+        return networkResponse;
+      });
+    })
   );
 });
