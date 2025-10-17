@@ -236,7 +236,8 @@ const LoginPage: React.FC = () => {
            </div>
         </main>
 
-        {installPrompt && (
+        {/* MODIFICATION FOR TESTING: This is set to true so you can always see the banner. Change back to 'installPrompt &&' for production. */}
+        {true && (
             <div className="fixed bottom-0 left-0 right-0 bg-[#2d3748] text-white p-6 shadow-lg z-50 animate-fade-in-up md:left-auto md:bottom-4 md:right-4 md:max-w-md md:rounded-lg">
                 <div className="flex flex-col items-start gap-4">
                     <div>
