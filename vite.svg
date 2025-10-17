@@ -9,25 +9,16 @@
     
     {/* New Koperasi 13 Icon */}
     <g transform="translate(10, 10) scale(0.8)">
-      {/* Base Shape */}
+      {/* Blue shape, but white to contrast with the gradient background */}
       <path
-        d="M50 15 L18 85 H42 L56 55 Q 65 85 82 85 L 50 15 Z"
+        d="M 30 85 A 45 45 0 1 1 85 70 L 65 70 A 25 25 0 1 0 30 85 Z"
         fill="#FFFFFF"
       />
       
-      {/* Leaf accent */}
+      {/* Green growth accent */}
       <path
-        d="M26 65 Q 40 75 42 58 C 43 45 30 50 26 65 Z"
+        d="M 50 65 A 20 20 0 1 1 70 45 L 50 25 Z"
         fill="#10B981"
-      />
-      
-       {/* '3' Cutout - using primary color from gradient */}
-       <path
-        d="M55 42 C 65 42, 65 58, 55 58 M55 50 H 70"
-        fill="none"
-        stroke="#0052FF"
-        strokeWidth="7"
-        strokeLinecap="round"
       />
     </g>
 </svg>
