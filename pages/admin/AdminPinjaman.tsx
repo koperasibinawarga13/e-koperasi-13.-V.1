@@ -115,7 +115,7 @@ const AdminPinjaman: React.FC = () => {
                                     <tr key={p.id} className="bg-white border-b hover:bg-gray-50">
                                         <td className="px-4 py-3">
                                             <Link to={`/admin/pinjaman/${p.id}`} className="text-primary font-semibold hover:underline">
-                                                {`${p.no_anggota}/${new Date(p.tanggal_pengajuan).toLocaleDateString('sv-SE')}`}
+                                                {`${p.no_anggota.replace(/-/g, '')}${new Date(p.tanggal_pengajuan).toLocaleDateString('sv-SE').replace(/-/g, '')}`}
                                             </Link>
                                         </td>
                                         <td className="px-4 py-3 font-medium text-gray-900">{p.nama_anggota}</td>

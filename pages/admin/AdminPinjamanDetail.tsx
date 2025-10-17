@@ -86,7 +86,7 @@ const AdminPinjamanDetail: React.FC = () => {
         );
     }
 
-    const pengajuanId = `${pinjaman.no_anggota}/${new Date(pinjaman.tanggal_pengajuan).toLocaleDateString('sv-SE')}`;
+    const pengajuanId = `${pinjaman.no_anggota.replace(/-/g, '')}${new Date(pinjaman.tanggal_pengajuan).toLocaleDateString('sv-SE').replace(/-/g, '')}`;
 
     return (
         <div>
@@ -122,6 +122,7 @@ const AdminPinjamanDetail: React.FC = () => {
                             <InfoItem label="Total Bunga" value={formatCurrency(pinjaman.total_bunga)} />
                             <InfoItem label="Total Pembayaran" value={<span className="text-blue-600 font-bold">{formatCurrency(pinjaman.total_bayar)}</span>} />
                             <InfoItem label="Angsuran Pokok/Bulan" value={formatCurrency(pinjaman.angsuran_pokok_bulan)} />
+                            <InfoItem label="Total Angsuran/Bulan" value={formatCurrency(pinjaman.jadwal_angsuran?.[0]?.totalAngsuran)} />
                         </>
                     )}
                 </div>
