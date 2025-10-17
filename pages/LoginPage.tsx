@@ -1,3 +1,4 @@
+
 // FIX: Implemented full content for LoginPage.tsx to provide a functional login screen.
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
