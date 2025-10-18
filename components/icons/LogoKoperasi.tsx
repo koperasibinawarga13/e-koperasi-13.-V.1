@@ -1,21 +1,66 @@
 import React from 'react';
 
 export const LogoKoperasi: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
-  <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" {...props}>
-    {/* Modern, abstract logo representing synergy and growth */}
-    <g>
-      {/* Blue: The larger, stable cooperative body, providing support */}
-      <path
-        d="M 30 85 A 45 45 0 1 1 85 70 L 65 70 A 25 25 0 1 0 30 85 Z"
-        fill="currentColor"
-      />
+  <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <defs>
+      <filter id="glow-effect" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="4" result="blur"/>
+        <feFlood floodColor="#E6F0FF" floodOpacity="0.8" result="glowColor"/>
+        <feComposite in="glowColor" in2="blur" operator="in" result="coloredGlow"/>
+        <feMerge>
+          <feMergeNode in="coloredGlow"/>
+          <feMergeNode in="SourceGraphic"/>
+        </feMerge>
+      </filter>
+    </defs>
+    <g filter="url(#glow-effect)" transform="translate(100,100) scale(0.9)">
+      <path d="M0,-95 A95,95 0 0 1 0,95 A95,95 0 0 1 0,-95 M0,-85 A85,85 0 0 0 0,85 A85,85 0 0 0 0,-85" fill="#FFF"/>
+      <path d="M-85,0 A85,85 0 0 1 0,-85 L0,0 Z" fill="#E4001A"/>
+      <path d="M0,0 L0,-85 A85,85 0 0 1 85,0 Z" fill="#FFF"/>
       
-      {/* Green: The member's growth, emerging from the cooperative's support */}
-      <path
-        d="M 50 65 A 20 20 0 1 1 70 45 L 50 25 Z"
-        className="text-secondary"
-        fill="currentColor"
-      />
+      {/* Gear */}
+      <path d="M-42.5,-75.5 a5,5 0 0 1 5,0 l3,3 a5,5 0 0 0 5,0 l3-3 a5,5 0 0 1 5,0 l3,3 a5,5 0 0 0 5,0 l3-3 a5,5 0 0 1 5,0 l3,3 a5,5 0 0 0 5,0 l3-3 a5,5 0 0 1 5,0 l3,3 a5,5 0 0 0 5,0 l3-3 a5,5 0 0 1 5,0l0,5 a5,5 0 0,1 0,5 l-3,3 a5,5 0 0,0 0,5 l3,3 a5,5 0 0,1 0,5" fill="none" stroke="#FDE047" strokeWidth="4" transform="rotate(-45)"/>
+
+      {/* Chain */}
+      <g fill="none" stroke="#FDE047" strokeWidth="4">
+        <circle cx="-68" cy="-52" r="8"/>
+        <circle cx="-78" cy="-34" r="8"/>
+        <circle cx="-81" cy="-14" r="8"/>
+        <circle cx="-77" cy="6" r="8"/>
+        <circle cx="-67" cy="25" r="8"/>
+        <circle cx="-53" cy="42" r="8"/>
+      </g>
+
+      {/* Cotton and Rice */}
+      <g stroke="#000" strokeWidth="0.5" fill="#FFF" strokeLinejoin="round" strokeLinecap="round">
+        <path d="M50,20 Q60,0 75,-20"/>
+        <path d="M55,10 Q65,-10 80,-30"/>
+        <path d="M60,0 Q70,-20 85,-40"/>
+        <path d="M65,-10 Q75,-30 85,-50"/>
+        <path d="M70,-20 Q80,-40 90,-60"/>
+        <circle cx="75" cy="-20" r="4"/> <circle cx="80" cy="-30" r="4"/> <circle cx="85" cy="-40" r="4"/> <circle cx="85" cy="-50" r="4"/> <circle cx="90" cy="-60" r="4"/>
+      </g>
+
+      {/* Banyan Tree */}
+      <path d="M0,60 Q-20,60 -30,40 Q-40,20 -25,0 Q-10,-15 0,-15 Q10,-15 25,0 Q40,20 30,40 Q20,60 0,60 Z M-20,0 Q-35,-10 -40,-25 Q-30,-45 -10,-40 Q0,-55 10,-40 Q30,-45 40,-25 Q35,-10 20,0 Q10,10 0,15 Q-10,10 -20,0 Z M-30,40 Q-50,30 -55,10 M30,40 Q50,30 55,10 M-10,60 Q-25,70 -30,80 M10,60 Q25,70 30,80" fill="#10B981"/>
+
+      {/* Scales */}
+      <g stroke="#000" strokeWidth="2">
+        <path d="M-40,-30 H -10 V -35 H -40 Z" fill="#000"/>
+        <path d="M-25,-30 V-50" />
+        <path d="M40,-30 H 10 V -35 H 40 Z" fill="#FFF"/>
+        <path d="M25,-30 V-50" />
+        <path d="M-50,-20 L -35,-30 L-20,-20 Z" fill="#000"/>
+        <path d="M50,-20 L 35,-30 L 20,-20 Z" fill="#FFF"/>
+      </g>
+
+      {/* Shield */}
+      <path d="M0,-65 L-20,-50 V-20 H 20 V-50 Z" fill="#000"/>
+      <polygon points="0,-48 -4,-38 6,-38 0,-48 -6,-38 4,-38" fill="#FFF" transform="translate(0, 5)"/>
+      
+      {/* Banner */}
+      <path d="M-60,70 Q0,60 60,70 L 55,85 Q0,75 -55,85 Z" fill="#FFF" stroke="#000" strokeWidth="1"/>
+      <text x="0" y="81" fontFamily="sans-serif" fontSize="9" textAnchor="middle" fontWeight="bold">KOPERASI INDONESIA</text>
     </g>
   </svg>
 );

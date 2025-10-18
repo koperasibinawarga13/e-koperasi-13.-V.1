@@ -146,10 +146,10 @@ const LoginPage: React.FC = () => {
   );
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center font-sans overflow-hidden">
-        <header className="relative w-full bg-primary text-white p-6 pt-10 pb-16 z-10 text-center flex flex-col items-center">
+    <div className="min-h-screen bg-background flex flex-col items-center font-sans">
+        <header className="relative w-full bg-primary text-white p-6 pt-10 pb-16 z-20 text-center flex flex-col items-center overflow-visible">
              <div className="absolute -bottom-10 w-20 h-20 bg-white rounded-full p-1.5 shadow-lg flex items-center justify-center z-30">
-                <LogoKoperasi className="w-full h-full text-primary" />
+                <LogoKoperasi className="w-full h-full" />
             </div>
             <div className="relative z-20 w-full max-w-md">
                 <h1 className="text-3xl sm:text-4xl font-bold">e-Koperasi</h1>
