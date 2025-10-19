@@ -1,4 +1,4 @@
-const CACHE_NAME = 'e-koperasi-cache-v5'; // Incremented version for PWA update
+const CACHE_NAME = 'e-koperasi-cache-v6'; // Incremented version for PWA update
 const urlsToCache = [
   // App Shell
   '/',
@@ -50,11 +50,10 @@ self.addEventListener('fetch', event => {
   // Handle navigation requests (e.g., loading a page) for our SPA.
   if (event.request.mode === 'navigate') {
     event.respondWith(
-      // Try the network first to get the latest version.
       fetch(event.request).catch(() => {
-        // If the network fails (offline), serve the cached index.html.
-        // This is the core of the "App Shell" model.
-        return caches.match('/index.html');
+        // If the network fails (offline) or returns an error (like a 404 for an SPA route),
+        // serve the main app shell from the cache.
+        return caches.match('/');
       })
     );
     return;
