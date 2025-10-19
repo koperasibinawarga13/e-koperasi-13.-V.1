@@ -1,12 +1,9 @@
-
-
 // FIX: Implemented full content for LoginPage.tsx to provide a functional login screen.
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { DownloadIcon, EyeIcon, EyeSlashIcon } from '../components/icons/Icons';
 import { registerAnggota, getAnggotaByNo } from '../services/anggotaService';
 import { LogoKoperasi } from '../components/icons/LogoKoperasi';
-import { LoginIllustration } from '../components/icons/LoginIllustration';
 
 const LoginPage: React.FC = () => {
   const [view, setView] = useState<'login' | 'register'>('login');
@@ -146,9 +143,9 @@ const LoginPage: React.FC = () => {
   );
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center font-sans">
-        <header className="relative w-full bg-primary text-white p-6 pt-10 pb-16 z-20 text-center flex flex-col items-center overflow-visible">
-             <div className="absolute -bottom-10 w-20 h-20 bg-white rounded-full p-1.5 shadow-lg flex items-center justify-center z-30">
+    <div className="min-h-screen bg-primary-light flex flex-col items-center font-sans">
+        <header className="relative w-full bg-primary text-white p-6 pt-8 pb-20 z-20 text-center flex flex-col items-center">
+             <div className="w-20 h-20 bg-white rounded-full p-1.5 shadow-lg flex items-center justify-center z-30 mb-4">
                 <LogoKoperasi className="w-full h-full" />
             </div>
             <div className="relative z-20 w-full max-w-md">
@@ -160,14 +157,13 @@ const LoginPage: React.FC = () => {
                     </p>
                 </div>
             </div>
-             <div className="absolute bottom-0 left-0 w-full h-12 bg-background rounded-t-3xl z-10"></div>
+             <div className="absolute bottom-0 left-0 w-full h-12 bg-primary-light rounded-t-3xl z-10"></div>
         </header>
 
-        <main className="relative w-full flex-grow bg-background z-10 p-4 sm:p-8 flex flex-col items-center">
-           <LoginIllustration className="absolute bottom-0 right-0 w-48 h-auto z-0 opacity-80" />
-           <div className="w-full max-w-md z-10 pt-8 pb-12">
-                <h2 className="text-xl sm:text-2xl font-bold text-dark mb-1">{view === 'login' ? 'Masuk ke Akun Anda' : 'Buat Akun Baru'}</h2>
-                <p className="text-sm text-gray-500 mb-6">{view === 'login' ? 'Silakan masukkan kredensial Anda.' : 'Lengkapi data untuk mendaftar.'}</p>
+        <main className="relative w-full flex-grow bg-primary-light z-10 p-4 sm:p-8 flex flex-col items-center -mt-10">
+           <div className="w-full max-w-md z-10 bg-white shadow-xl rounded-2xl p-6 sm:p-8">
+                <h2 className="text-xl sm:text-2xl font-bold text-dark mb-1 text-center">{view === 'login' ? 'Masuk ke Akun Anda' : 'Buat Akun Baru'}</h2>
+                <p className="text-sm text-gray-500 mb-6 text-center">{view === 'login' ? 'Silakan masukkan kredensial Anda.' : 'Lengkapi data untuk mendaftar.'}</p>
                 
                 {error && <p className="text-sm text-red-600 text-center font-semibold bg-red-50 p-3 rounded-md mb-4">{error}</p>}
                 {success && <p className="text-sm text-green-600 text-center font-semibold bg-green-50 p-3 rounded-md mb-4">{success}</p>}
@@ -268,7 +264,7 @@ const LoginPage: React.FC = () => {
            </div>
 
            {installPrompt && (
-                <div className="w-full max-w-md md:fixed md:bottom-4 md:right-4 md:max-w-sm md:w-auto z-50">
+                <div className="w-full max-w-md md:fixed md:bottom-4 md:right-4 md:max-w-sm md:w-auto z-50 mt-8">
                     <InstallBanner />
                 </div>
             )}
