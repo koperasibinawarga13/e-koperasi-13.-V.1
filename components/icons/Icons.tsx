@@ -135,3 +135,43 @@ export const MegaphoneIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) =>
         <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9 9 0 110-18 9 9 0 010 18z" />
     </IconWrapper>
 );
+
+// Icons for Rich Text Editor
+const IconWrapperSmall: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} {...props}>
+    {props.children}
+  </svg>
+);
+
+export const BoldIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+    <IconWrapperSmall {...props} strokeWidth={2.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M8 4h5a4 4 0 014 4 4 4 0 01-4 4H8V4zm0 8h6a4 4 0 014 4 4 4 0 01-4 4H8v-8z" />
+    </IconWrapperSmall>
+);
+
+export const ItalicIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+    <IconWrapperSmall {...props} strokeWidth={2.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M10 4h6m-6 16h6M12 4L8 20" />
+    </IconWrapperSmall>
+);
+
+export const UnderlineIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+    <IconWrapperSmall {...props} strokeWidth={2.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M6 4v7a6 6 0 006 6 6 6 0 006-6V4M4 20h16" />
+    </IconWrapperSmall>
+);
+
+export const ListBulletIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+    <IconWrapperSmall {...props}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M2 6h.01M2 12h.01M2 18h.01" />
+    </IconWrapperSmall>
+);
+
+export const ListOrderedIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+    <IconWrapperSmall {...props}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M8 6h12M8 12h12M8 18h12" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h.01M4 12h.01M4 18h.01" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 6V5m0 7v-1m-1 7V17.5" />
+    </IconWrapperSmall>
+);

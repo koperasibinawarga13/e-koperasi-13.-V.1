@@ -5,6 +5,7 @@ import { PlusIcon, PencilIcon, TrashIcon } from '../../components/icons/Icons';
 import Modal from '../../components/Modal';
 import { getPengumuman, addPengumuman, updatePengumuman, deletePengumuman } from '../../services/pengumumanService';
 import { useAuth } from '../../context/AuthContext';
+import RichTextEditor from '../../components/RichTextEditor';
 
 const AdminPengumuman: React.FC = () => {
     const { user } = useAuth();
@@ -41,7 +42,10 @@ const AdminPengumuman: React.FC = () => {
 
     const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!user) return;
+        if (!user || !formData.judul || !formData.isi) {
+            alert('Judul dan Isi tidak boleh kosong.');
+            return;
+        };
 
         const dataToSave = {
             ...formData,
@@ -71,12 +75,12 @@ const AdminPengumuman: React.FC = () => {
 
     return (
         <div>
-            <Header title="Kelola Pengumuman" />
+            <Header title="Kelola Pengumuman & Berita Produk" />
             <div className="bg-white p-6 rounded-xl border border-gray-200">
                 <div className="flex justify-end mb-6">
                     <button onClick={() => openModal()} className="bg-primary text-white px-4 py-2 rounded-lg font-semibold hover:bg-primary-dark transition-colors flex items-center gap-2">
                         <PlusIcon className="w-5 h-5" />
-                        Buat Pengumuman Baru
+                        Buat Konten Baru
                     </button>
                 </div>
                 <div className="overflow-x-auto">
@@ -108,7 +112,7 @@ const AdminPengumuman: React.FC = () => {
                 </div>
             </div>
 
-            <Modal isOpen={isModalOpen} onClose={closeModal} title={selectedPengumuman ? 'Edit Pengumuman' : 'Buat Pengumuman Baru'}>
+            <Modal isOpen={isModalOpen} onClose={closeModal} title={selectedPengumuman ? 'Edit Konten' : 'Buat Konten Baru'}>
                 <form onSubmit={handleSave} className="space-y-4">
                     <div>
                         <label htmlFor="judul" className="block text-sm font-medium text-gray-700">Judul</label>
@@ -122,14 +126,10 @@ const AdminPengumuman: React.FC = () => {
                         />
                     </div>
                     <div>
-                        <label htmlFor="isi" className="block text-sm font-medium text-gray-700">Isi Pengumuman</label>
-                        <textarea
-                            id="isi"
+                        <label htmlFor="isi" className="block text-sm font-medium text-gray-700">Isi Konten</label>
+                        <RichTextEditor
                             value={formData.isi}
-                            onChange={(e) => setFormData({ ...formData, isi: e.target.value })}
-                            required
-                            rows={8}
-                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3"
+                            onChange={(html) => setFormData({ ...formData, isi: html })}
                         />
                     </div>
                     <div className="flex justify-end gap-4 pt-4">

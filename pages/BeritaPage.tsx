@@ -59,7 +59,10 @@ const BeritaPage: React.FC = () => {
                                         <span className="mx-2">&bull;</span>
                                         <span>{formatDate(item.tanggal)}</span>
                                     </div>
-                                    <p className="text-gray-700 whitespace-pre-wrap leading-relaxed">{item.isi}</p>
+                                    <div 
+                                        className="prose max-w-none text-gray-700 leading-relaxed"
+                                        dangerouslySetInnerHTML={{ __html: item.isi }}
+                                    />
                                 </div>
                             </div>
                         ))}
@@ -71,6 +74,11 @@ const BeritaPage: React.FC = () => {
                     </div>
                 )}
             </main>
+             <style>{`
+                .prose ul { list-style-type: disc; margin-left: 1.5rem; }
+                .prose ol { list-style-type: decimal; margin-left: 1.5rem; }
+                .prose li { margin-bottom: 0.25rem; }
+            `}</style>
         </div>
     );
 };
