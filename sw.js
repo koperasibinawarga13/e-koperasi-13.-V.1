@@ -1,8 +1,9 @@
-const CACHE_NAME = 'e-koperasi-cache-v4'; // Incremented version for cache busting
+const CACHE_NAME = 'e-koperasi-cache-v5'; // Incremented version for PWA update
 const urlsToCache = [
   // App Shell
   '/',
   '/index.html',
+  '/index.tsx', // Crucial: Cache the main application script
   '/manifest.json',
   '/vite.svg',
   '/icon-192x192.png',
