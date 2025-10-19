@@ -5,6 +5,26 @@ import { UserCircleIcon } from '../../components/icons/Icons';
 import { Anggota } from '../../types';
 import { getAnggotaById, updateAnggota } from '../../services/anggotaService';
 
+// Moved EditableField outside the AnggotaProfil component to prevent re-mounting on every render.
+const EditableField: React.FC<{
+    label: string;
+    name: string;
+    value: string;
+    onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+    type?: string;
+    isTextarea?: boolean;
+    fullWidth?: boolean;
+}> = ({ label, name, value, onChange, type = 'text', isTextarea = false, fullWidth = false }) => (
+    <div className={`py-2 ${fullWidth ? 'sm:col-span-2' : 'sm:col-span-1'}`}>
+        <label htmlFor={name} className="block text-sm font-medium text-gray-700">{label}</label>
+        {isTextarea ? (
+            <textarea id={name} name={name} value={value} onChange={onChange} rows={3} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm" />
+        ) : (
+            <input type={type} id={name} name={name} value={value} onChange={onChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm" />
+        )}
+    </div>
+);
+
 const AnggotaProfil: React.FC = () => {
   const { user } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
@@ -56,17 +76,6 @@ const AnggotaProfil: React.FC = () => {
         <dd className="mt-1 text-md text-dark sm:mt-0 sm:col-span-2">{value || '-'}</dd>
     </div>
   );
-  
-  const EditableField: React.FC<{label: string, name: keyof typeof editableData, value: string, type?: string, isTextarea?: boolean, fullWidth?: boolean}> = ({label, name, value, type='text', isTextarea=false, fullWidth = false}) => (
-      <div className={`py-2 ${fullWidth ? 'sm:col-span-2' : 'sm:col-span-1'}`}>
-          <label htmlFor={name} className="block text-sm font-medium text-gray-700">{label}</label>
-          {isTextarea ? (
-              <textarea id={name} name={name} value={value} onChange={handleInputChange} rows={3} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm" />
-          ) : (
-              <input type={type} id={name} name={name} value={value} onChange={handleInputChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm" />
-          )}
-      </div>
-  );
 
   if (isLoading) {
       return <div>Loading profile...</div>;
@@ -90,9 +99,9 @@ const AnggotaProfil: React.FC = () => {
         
         {isEditing ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6">
-                <EditableField label="Email" name="email" value={editableData.email} type="email" />
-                <EditableField label="No. Telepon" name="no_telepon" value={editableData.no_telepon} type="tel" />
-                <EditableField label="Alamat" name="alamat" value={editableData.alamat} isTextarea={true} fullWidth={true} />
+                <EditableField label="Email" name="email" value={editableData.email} onChange={handleInputChange} type="email" />
+                <EditableField label="No. Telepon" name="no_telepon" value={editableData.no_telepon} onChange={handleInputChange} type="tel" />
+                <EditableField label="Alamat" name="alamat" value={editableData.alamat} onChange={handleInputChange} isTextarea={true} fullWidth={true} />
             </div>
         ) : (
             <dl className="divide-y divide-gray-200">
