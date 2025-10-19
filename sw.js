@@ -1,4 +1,4 @@
-const CACHE_NAME = 'e-koperasi-cache-v7'; // Incremented version to ensure PWA update
+const CACHE_NAME = 'e-koperasi-cache-v8'; // Incremented version to ensure PWA update
 const urlsToCache = [
   // App Shell
   '/',
@@ -6,9 +6,6 @@ const urlsToCache = [
   '/index.tsx', // Crucial: Cache the main application script
   '/manifest.json',
   '/vite.svg',
-  // Note: Icon PNGs are not cached as they were not provided,
-  // which likely caused the service worker installation to fail.
-  // The browser will fetch them via network when needed based on the manifest.
 ];
 
 // Install the service worker and cache all critical assets
@@ -49,12 +46,13 @@ self.addEventListener('fetch', event => {
   }
 
   // Handle navigation requests (e.g., loading a page) for our SPA.
+  // Use a network-first, falling back to cache strategy.
   if (event.request.mode === 'navigate') {
     event.respondWith(
       fetch(event.request).catch(() => {
-        // If the network fails (offline) or returns an error (like a 404 for an SPA route),
-        // serve the main app shell from the cache.
-        return caches.match('/');
+        // If the network fails (offline), serve the main app shell from the cache.
+        // Explicitly return index.html for any navigation route.
+        return caches.match('/index.html');
       })
     );
     return;
