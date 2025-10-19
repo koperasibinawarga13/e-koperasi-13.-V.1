@@ -1,4 +1,4 @@
-const CACHE_NAME = 'e-koperasi-cache-v6'; // Incremented version for PWA update
+const CACHE_NAME = 'e-koperasi-cache-v7'; // Incremented version to ensure PWA update
 const urlsToCache = [
   // App Shell
   '/',
@@ -6,8 +6,9 @@ const urlsToCache = [
   '/index.tsx', // Crucial: Cache the main application script
   '/manifest.json',
   '/vite.svg',
-  '/icon-192x192.png',
-  '/icon-512x512.png',
+  // Note: Icon PNGs are not cached as they were not provided,
+  // which likely caused the service worker installation to fail.
+  // The browser will fetch them via network when needed based on the manifest.
 ];
 
 // Install the service worker and cache all critical assets
