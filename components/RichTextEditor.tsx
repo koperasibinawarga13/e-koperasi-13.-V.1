@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { BoldIcon, ItalicIcon, UnderlineIcon, ListBulletIcon, ListOrderedIcon } from './icons/Icons';
 
 interface RichTextEditorProps {
@@ -7,7 +7,16 @@ interface RichTextEditorProps {
 }
 
 const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange }) => {
-    const editorRef = React.useRef<HTMLDivElement>(null);
+    const editorRef = useRef<HTMLDivElement>(null);
+
+    // Sync editor content with the `value` prop, but only when the prop
+    // changes from an external source. This prevents re-renders and cursor
+    // jumps during user input.
+    useEffect(() => {
+        if (editorRef.current && value !== editorRef.current.innerHTML) {
+            editorRef.current.innerHTML = value;
+        }
+    }, [value]);
 
     const handleInput = (e: React.FormEvent<HTMLDivElement>) => {
         onChange(e.currentTarget.innerHTML);
@@ -62,7 +71,6 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange }) => {
                 ref={editorRef}
                 contentEditable
                 onInput={handleInput}
-                dangerouslySetInnerHTML={{ __html: value }}
                 className="prose min-h-[200px] w-full max-w-none p-3 focus:outline-none"
             />
         </div>
