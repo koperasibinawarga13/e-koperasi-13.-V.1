@@ -1,5 +1,6 @@
 // FIX: Implemented full content for LoginPage.tsx to provide a functional login screen.
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { DownloadIcon, EyeIcon, EyeSlashIcon } from '../components/icons/Icons';
 import { registerAnggota, getAnggotaByNo } from '../services/anggotaService';
@@ -261,6 +262,11 @@ const LoginPage: React.FC = () => {
                     </p>
                 </form>
                 )}
+                <div className="mt-6 text-center border-t pt-4">
+                  <Link to="/berita" className="text-sm font-medium text-primary hover:underline">
+                    Lihat Pengumuman Koperasi &rarr;
+                  </Link>
+                </div>
            </div>
 
            {installPrompt && (

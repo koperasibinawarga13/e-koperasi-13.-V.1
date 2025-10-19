@@ -112,3 +112,11 @@ export interface PengajuanPinjaman {
   jenis_pinjaman: 'Berjangka' | 'Khusus';
   keterangan?: string;
 }
+
+export interface Pengumuman {
+  id?: string;
+  judul: string;
+  isi: string;
+  tanggal: string; // ISO String
+  penulis: string;
+}

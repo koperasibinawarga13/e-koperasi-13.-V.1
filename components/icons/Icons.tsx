@@ -126,3 +126,12 @@ export const EyeSlashIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => 
     <path strokeLinecap="round" strokeLinejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.243 4.243L6.228 6.228" />
   </IconWrapper>
 );
+
+export const MegaphoneIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+    <IconWrapper {...props}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M10.34 3.94a1 1 0 01.7.7l.2 1.34a1 1 0 00.7 1.34l1.34.2a1 1 0 01.7.7l-.2 1.34a1 1 0 00-.7 1.34l-1.34.2a1 1 0 01-.7.7l.2-1.34a1 1 0 00-.7-1.34l-1.34-.2a1 1 0 01-.7-.7l-.2-1.34a1 1 0 00.7-1.34l1.34-.2a1 1 0 01.7-.7zM19.07 4.93a1 1 0 01.7.7l.2 1.34a1 1 0 00.7 1.34l1.34.2a1 1 0 01.7.7l-.2 1.34a1 1 0 00-.7 1.34l-1.34.2a1 1 0 01-.7.7l.2-1.34a1 1 0 00-.7-1.34l-1.34-.2a1 1 0 01-.7-.7l-.2-1.34a1 1 0 00.7-1.34l1.34-.2a1 1 0 01.7-.7z" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M13 10a3 3 0 11-6 0 3 3 0 016 0z" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M14 10a4 4 0 11-8 0 4 4 0 018 0z" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9 9 0 110-18 9 9 0 010 18z" />
+    </IconWrapper>
+);

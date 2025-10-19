@@ -17,6 +17,8 @@ import SlipRincian from './pages/anggota/SlipRincian';
 import AnggotaPinjaman from './pages/anggota/AnggotaPinjaman';
 import AdminPinjaman from './pages/admin/AdminPinjaman';
 import AdminPinjamanDetail from './pages/admin/AdminPinjamanDetail';
+import BeritaPage from './pages/BeritaPage';
+import AdminPengumuman from './pages/admin/AdminPengumuman';
 
 const App: React.FC = () => {
   return (
@@ -34,6 +36,7 @@ const AppRoutes: React.FC = () => {
   return (
     <Routes>
       <Route path="/login" element={!user ? <LoginPage /> : <Navigate to={user.role === UserRole.ADMIN ? '/admin/dashboard' : '/anggota/dashboard'} />} />
+      <Route path="/berita" element={<BeritaPage />} />
 
       {/* Admin Routes */}
       <Route
@@ -47,6 +50,7 @@ const AppRoutes: React.FC = () => {
         <Route path="pinjaman" element={<AdminPinjaman />} />
         <Route path="pinjaman/:id" element={<AdminPinjamanDetail />} />
         <Route path="keuangan/:no_anggota" element={<AdminKeuanganDetail />} />
+        <Route path="pengumuman" element={<AdminPengumuman />} />
         <Route index element={<Navigate to="dashboard" />} />
       </Route>
 
@@ -63,7 +67,7 @@ const AppRoutes: React.FC = () => {
         <Route index element={<Navigate to="dashboard" />} />
       </Route>
 
-      <Route path="*" element={<Navigate to="/login" />} />
+      <Route path="*" element={<Navigate to="/berita" />} />
     </Routes>
   );
 };
