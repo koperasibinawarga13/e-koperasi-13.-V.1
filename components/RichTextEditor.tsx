@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { BoldIcon, ItalicIcon, UnderlineIcon, ListBulletIcon, ListOrderedIcon } from './icons/Icons';
+import { BoldIcon, ItalicIcon, UnderlineIcon, ListBulletIcon, ListOrderedIcon, ImageIcon } from './icons/Icons';
 
 interface RichTextEditorProps {
     value: string;
@@ -8,10 +8,8 @@ interface RichTextEditorProps {
 
 const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange }) => {
     const editorRef = useRef<HTMLDivElement>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
-    // Sync editor content with the `value` prop, but only when the prop
-    // changes from an external source. This prevents re-renders and cursor
-    // jumps during user input.
     useEffect(() => {
         if (editorRef.current && value !== editorRef.current.innerHTML) {
             editorRef.current.innerHTML = value;
@@ -22,13 +20,37 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange }) => {
         onChange(e.currentTarget.innerHTML);
     };
     
-    // Use onMouseDown to prevent the editor from losing focus when a button is clicked
     const handleFormat = (e: React.MouseEvent<HTMLButtonElement>, command: string) => {
         e.preventDefault();
         document.execCommand(command, false);
         if (editorRef.current) {
             onChange(editorRef.current.innerHTML);
             editorRef.current.focus();
+        }
+    };
+
+    const handleImageButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.preventDefault();
+        fileInputRef.current?.click();
+    };
+
+    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file && file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = (readerEvent) => {
+                const base64Image = readerEvent.target?.result;
+                if (base64Image && editorRef.current) {
+                    editorRef.current.focus();
+                    const imgHtml = `<img src="${base64Image}" style="max-width: 100%; height: auto; border-radius: 8px; margin: 8px 0;" />`;
+                    document.execCommand('insertHTML', false, imgHtml);
+                    onChange(editorRef.current.innerHTML);
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+        if (e.target) {
+            e.target.value = '';
         }
     };
     
@@ -49,7 +71,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange }) => {
 
     return (
         <div className="border border-gray-300 rounded-md shadow-sm">
-            <div className="flex items-center gap-1 p-2 border-b bg-gray-50 rounded-t-md">
+            <div className="flex items-center flex-wrap gap-1 p-2 border-b bg-gray-50 rounded-t-md">
                 <ToolbarButton onClick={(e) => handleFormat(e, 'bold')} title="Bold">
                     <BoldIcon />
                 </ToolbarButton>
@@ -66,12 +88,23 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange }) => {
                 <ToolbarButton onClick={(e) => handleFormat(e, 'insertOrderedList')} title="Numbered List">
                     <ListOrderedIcon />
                 </ToolbarButton>
+                <div className="w-px h-6 bg-gray-300 mx-2"></div>
+                <ToolbarButton onClick={handleImageButtonClick} title="Sisipkan Gambar">
+                    <ImageIcon />
+                </ToolbarButton>
             </div>
             <div
                 ref={editorRef}
                 contentEditable
                 onInput={handleInput}
                 className="prose min-h-[200px] w-full max-w-none p-3 focus:outline-none"
+            />
+            <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleImageUpload}
+                accept="image/png, image/jpeg, image/gif"
+                style={{ display: 'none' }}
             />
         </div>
     );

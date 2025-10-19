@@ -78,6 +78,13 @@ const BeritaPage: React.FC = () => {
                 .prose ul { list-style-type: disc; margin-left: 1.5rem; }
                 .prose ol { list-style-type: decimal; margin-left: 1.5rem; }
                 .prose li { margin-bottom: 0.25rem; }
+                .prose img { 
+                    border-radius: 0.5rem; 
+                    margin-top: 1em; 
+                    margin-bottom: 1em;
+                    max-width: 100%;
+                    height: auto;
+                }
             `}</style>
         </div>
     );
