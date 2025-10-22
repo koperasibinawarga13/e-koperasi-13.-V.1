@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { DownloadIcon, EyeIcon, EyeSlashIcon } from '../components/icons/Icons';
 import { registerAnggota, getAnggotaByNo, generateNewAnggotaNo, registerNewAnggota } from '../services/anggotaService';
-import { LogoKoperasi } from '../components/icons/LogoKoperasi';
+import { LogoBinaWarga } from '../components/icons/LogoBinaWarga';
 
 type ViewState = 'login' | 'activate' | 'register-new';
 
@@ -213,17 +213,15 @@ const LoginPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col items-center font-sans">
         <header 
-          className="relative w-full text-white p-6 pt-8 pb-20 z-20 text-center flex flex-col items-center"
-          style={{background: 'linear-gradient(135deg, #3730A3, #4338CA)'}}
+          className="relative w-full bg-surface text-dark p-6 pt-8 pb-20 z-20 text-center flex flex-col items-center"
         >
-             <div className="w-20 h-20 bg-white rounded-full p-1.5 shadow-lg flex items-center justify-center z-30 mb-4">
-                <LogoKoperasi className="w-full h-full" />
+             <div className="w-48 z-30 mb-2">
+                <LogoBinaWarga />
             </div>
             <div className="relative z-20 w-full max-w-md">
-                <h1 className="text-3xl sm:text-4xl font-bold">e-Koperasi</h1>
-                <p className="text-base sm:text-lg opacity-90 mt-1">Bina warga SMP Negeri 13 Tasikmalaya</p>
+                <p className="text-base sm:text-lg text-gray-text -mt-2">Sistem Informasi Koperasi Karyawan SMPN 13 Tasikmalaya</p>
                 <div className="mt-4 transition-all duration-300 min-h-[28px] flex items-center justify-center">
-                    <p className="text-base sm:text-lg font-bold bg-black/10 px-4 py-1 rounded-full">
+                    <p className="text-base sm:text-lg font-bold bg-slate-200 text-dark px-4 py-1 rounded-full">
                       {getHeaderName() || 'Selamat Datang'}
                     </p>
                 </div>

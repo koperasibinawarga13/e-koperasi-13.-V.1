@@ -3,6 +3,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { UserRole } from '../types';
 import { DashboardIcon, UsersIcon, UploadIcon, ChartBarIcon, LogoutIcon, UserCircleIcon, CreditCardIcon, BuildingOfficeIcon, ChevronLeftIcon, CalculatorIcon, MegaphoneIcon } from './icons/Icons';
+import { LogoBinaWarga } from './icons/LogoBinaWarga';
 
 interface NavItem {
   to: string;
@@ -77,12 +78,10 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar, isMobileO
           <ChevronLeftIcon className={`w-4 h-4 transition-transform duration-300 ${isCollapsed ? 'rotate-180' : ''}`} />
         </button>
 
-        <div className={`flex items-center mb-10 ${isCollapsed ? 'justify-center h-12' : 'px-2 h-12'}`}>
-          <BuildingOfficeIcon className="w-8 h-8 flex-shrink-0 text-primary-light" />
-          <div className={`ml-3 whitespace-nowrap overflow-hidden transition-all duration-300 ${isCollapsed ? 'w-0 opacity-0' : 'w-auto opacity-100'}`}>
-              <h1 className="text-xl font-bold leading-tight">e-Koperasi 13</h1>
-              <p className="text-xs text-blue-200 leading-tight">Bina Warga</p>
-          </div>
+        <div className={`flex items-center justify-center mb-10 transition-all duration-300 ${isCollapsed ? 'h-12' : 'h-16 px-2'}`}>
+            <div className={`w-full transition-all duration-300 ${isCollapsed ? 'max-w-[40px]' : 'max-w-[160px]'}`}>
+                <LogoBinaWarga className="text-white"/>
+            </div>
         </div>
 
         <nav className="flex-grow">
