@@ -155,10 +155,8 @@ export const deleteAnggota = async (id: string): Promise<void> => {
     }
 };
 
-export const migrateAnggotaStatus = async (anggota: Anggota): Promise<void> => {
+export const migrateAnggotaStatus = async (anggota: Anggota, newNoAnggota: string): Promise<void> => {
     const oldNoAnggota = anggota.no_anggota;
-    const newPrefix = oldNoAnggota.startsWith('AK-') ? 'PB-' : 'AK-';
-    const newNoAnggota = newPrefix + oldNoAnggota.substring(3);
 
     try {
         const batch = writeBatch(db);

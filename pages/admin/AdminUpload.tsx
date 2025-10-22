@@ -8,7 +8,7 @@ import ProgressBar from '../../components/ProgressBar';
 import Modal from '../../components/Modal';
 import { UploadIcon, TrashIcon, DownloadIcon } from '../../components/icons/Icons';
 import { batchAddAnggota } from '../../services/anggotaService';
-import { batchUpsertKeuangan, batchProcessTransaksiBulanan, getUploadedMonths, deleteMonthlyReport, rebuildUploadHistory } from '../../services/keuanganService';
+import { batchUpsertKeuangan, batchProcessTransaksiBulanan, getUploadedMonths, deleteMonthlyReport, rebuildUploadHistory, getKeuangan } from '../../services/keuanganService';
 import { Anggota, Keuangan, TransaksiBulanan } from '../../types';
 
 type UploadStatus = 'idle' | 'processing' | 'success' | 'error';
@@ -33,8 +33,8 @@ const UploadSection: React.FC<{
     onFileUpload: (file: File) => Promise<UploadResult | void>;
     disabled: boolean;
     hideTitle?: boolean;
-    templateType?: 'anggota' | 'keuanganAwal' | 'transaksiBulanan';
-    onDownloadTemplate: (type: 'anggota' | 'keuanganAwal' | 'transaksiBulanan') => void;
+    templateType?: 'anggota';
+    onDownloadTemplate?: (type: 'anggota') => void;
 }> = ({ title, instructions, onFileUpload, disabled, hideTitle = false, templateType, onDownloadTemplate }) => {
     const [file, setFile] = useState<File | null>(null);
     const [status, setStatus] = useState<UploadStatus>('idle');
@@ -85,7 +85,7 @@ const UploadSection: React.FC<{
             {!hideTitle && (
                 <div className="flex flex-wrap justify-between items-center gap-2 mb-4">
                     <h2 className="text-lg md:text-xl font-bold text-dark">{title}</h2>
-                    {templateType && (
+                    {templateType && onDownloadTemplate && (
                         <button 
                             onClick={() => onDownloadTemplate(templateType)}
                             className="flex items-center gap-2 bg-green-100 text-green-700 px-3 py-1.5 rounded-lg text-sm font-semibold hover:bg-green-200 transition-colors"
@@ -162,7 +162,8 @@ const AdminUpload: React.FC = () => {
     const [isHistoryLoading, setIsHistoryLoading] = useState(true);
     const [isDeleting, setIsDeleting] = useState<string | null>(null);
     const [isRebuilding, setIsRebuilding] = useState(false);
-    
+    const [isDownloading, setIsDownloading] = useState(false);
+
     // State for delete confirmation modal
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [monthToDelete, setMonthToDelete] = useState<string | null>(null);
@@ -362,11 +363,50 @@ const AdminUpload: React.FC = () => {
         }
     };
 
+    const handleDownloadReport = async () => {
+        setIsDownloading(true);
+        try {
+            const keuanganList = await getKeuangan();
+            if (keuanganList.length === 0) {
+                alert('Tidak ada data keuangan untuk diunduh.');
+                return;
+            }
+            keuanganList.sort((a, b) => a.no_anggota.localeCompare(b.no_anggota));
+
+             const dataToExport = keuanganList.map(k => ({
+                'No Anggota': k.no_anggota,
+                'Nama': k.nama_angota,
+                'Periode Laporan Terakhir': k.periode || '',
+                'Akhir Simpanan Pokok': k.akhir_simpanan_pokok,
+                'Akhir Simpanan Wajib': k.akhir_simpanan_wajib,
+                'Akhir Simpanan Sukarela': k.akhir_simpanan_sukarela,
+                'Akhir Simpanan Wisata': k.akhir_simpanan_wisata,
+                'Total Simpanan': k.jumlah_total_simpanan,
+                'Akhir Pinjaman Berjangka': k.akhir_pinjaman_berjangka,
+                'Akhir Pinjaman Khusus': k.akhir_pinjaman_khusus,
+                'Total Pinjaman': k.jumlah_total_pinjaman,
+            }));
+            
+            const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Laporan Keuangan");
+
+            const today = new Date().toISOString().split('T')[0];
+            XLSX.writeFile(workbook, `Laporan_Keuangan_Koperasi_${today}.xlsx`);
+
+        } catch (error) {
+            console.error("Gagal mengunduh laporan:", error);
+            alert("Terjadi kesalahan saat menyiapkan file unduhan.");
+        } finally {
+            setIsDownloading(false);
+        }
+    };
+
     const anggotaInstructions = `kode_anggota, nama_anggota, no_hp`;
     const keuanganAwalInstructions = `no, no_anggota, nama_angota, awal_simpanan_pokok, awal_simpanan_wajib, sukarela, awal_simpanan_wisata, awal_pinjaman_berjangka, awal_pinjaman_khusus, transaksi_simpanan_pokok, transaksi_simpanan_wajib, transaksi_simpanan_sukarela, transaksi_simpanan_wisata, transaksi_pinjaman_berjangka, transaksi_pinjaman_khusus, transaksi_simpanan_jasa, transaksi_niaga, transaksi_dana_perlaya, transaksi_dana_katineng, Jumlah_setoran, transaksi_pengambilan_simpanan_pokok, transaksi_pengambilan_simpanan_wajib, transaksi_pengambilan_simpanan_sukarela, transaksi_pengambilan_simpanan_wisata, transaksi_penambahan_pinjaman_berjangka, transaksi_penambahan_pinjaman_khusus, transaksi_penambahan_pinjaman_niaga, akhir_simpanan_pokok, akhir_simpanan_wajib, akhir_simpanan_sukarela, akhir_simpanan_wisata, akhir_pinjaman_berjangka, akhir_pinjaman_khusus, jumlah_total_simpanan, jumlah_total_pinjaman`;
     const transaksiBulananInstructions = `no_anggota, nama_angota, transaksi_simpanan_pokok, transaksi_simpanan_wajib, transaksi_simpanan_sukarela, transaksi_simpanan_wisata, transaksi_pinjaman_berjangka, transaksi_pinjaman_khusus, transaksi_simpanan_jasa, transaksi_niaga, transaksi_dana_perlaya, transaksi_dana_katineng, Jumlah_setoran, transaksi_pengambilan_simpanan_pokok, transaksi_pengambilan_simpanan_wajib, transaksi_pengambilan_simpanan_sukarela, transaksi_pengambilan_simpanan_wisata, transaksi_penambahan_pinjaman_berjangka, transaksi_penambahan_pinjaman_khusus, transaksi_penambahan_pinjaman_niaga`;
     
-    const handleDownloadTemplate = (type: 'anggota' | 'keuanganAwal' | 'transaksiBulanan') => {
+    const handleDownloadTemplate = (type: 'anggota') => {
         let headers: string[] = [];
         let filename = '';
         
@@ -375,20 +415,11 @@ const AdminUpload: React.FC = () => {
                 headers = anggotaInstructions.split(', ');
                 filename = 'Template_Data_Anggota.xlsx';
                 break;
-            case 'keuanganAwal':
-                headers = keuanganAwalInstructions.split(', ');
-                filename = 'Template_Keuangan_Awal.xlsx';
-                break;
-            case 'transaksiBulanan':
-                 headers = transaksiBulananInstructions.split(', ');
-                filename = 'Template_Transaksi_Bulanan.xlsx';
-                break;
         }
 
         const ws = XLSX.utils.aoa_to_sheet([headers]);
         const wb = XLSX.utils.book_new();
-        const sheetName = type === 'transaksiBulanan' ? '2024 01' : 'Sheet1';
-        XLSX.utils.book_append_sheet(wb, ws, sheetName);
+        XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
         XLSX.writeFile(wb, filename);
     };
 
@@ -408,8 +439,6 @@ const AdminUpload: React.FC = () => {
                 instructions={keuanganAwalInstructions}
                 onFileUpload={handleKeuanganAwalUpload}
                 disabled={isUploading}
-                templateType="keuanganAwal"
-                onDownloadTemplate={handleDownloadTemplate}
             />
              <div>
                 <div className="bg-white p-6 rounded-t-xl shadow-md border-b flex flex-wrap justify-between items-center gap-2">
@@ -419,12 +448,13 @@ const AdminUpload: React.FC = () => {
                             Pastikan nama sheet pertama berformat <code className="bg-gray-200 px-1 rounded">YYYY MM</code> (contoh: <code className="bg-gray-200 px-1 rounded">2024 07</code>).
                         </p>
                     </div>
-                     <button 
-                        onClick={() => handleDownloadTemplate('transaksiBulanan')}
-                        className="flex-shrink-0 flex items-center gap-2 bg-green-100 text-green-700 px-3 py-1.5 rounded-lg text-sm font-semibold hover:bg-green-200 transition-colors"
+                     <button
+                        onClick={handleDownloadReport}
+                        disabled={isDownloading}
+                        className="flex-shrink-0 flex items-center gap-2 bg-green-600 text-white px-3 py-1.5 rounded-lg text-sm font-semibold hover:bg-green-700 transition-colors disabled:bg-gray-400"
                     >
                         <DownloadIcon className="w-4 h-4" />
-                        <span>Download Template</span>
+                        <span>{isDownloading ? 'Menyiapkan...' : 'Download Laporan Lengkap'}</span>
                     </button>
                 </div>
                 <UploadSection
@@ -433,7 +463,6 @@ const AdminUpload: React.FC = () => {
                     instructions={transaksiBulananInstructions}
                     onFileUpload={handleTransaksiBulananUpload}
                     disabled={isUploading || !!isDeleting}
-                    onDownloadTemplate={handleDownloadTemplate}
                 />
             </div>
              <div className="mt-8 bg-white p-6 rounded-xl shadow-md">

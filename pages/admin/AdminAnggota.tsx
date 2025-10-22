@@ -7,6 +7,8 @@ import Modal from '../../components/Modal';
 import AnggotaForm from '../../components/AnggotaForm';
 import { getAnggota, addAnggota, updateAnggota, deleteAnggota, migrateAnggotaStatus } from '../../services/anggotaService';
 
+const STATUS_PREFIXES = ['AK', 'PB', 'WL', 'TT'];
+
 const AdminAnggota: React.FC = () => {
     const [anggotaList, setAnggotaList] = useState<Anggota[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
@@ -20,6 +22,8 @@ const AdminAnggota: React.FC = () => {
     const [selectedAnggotaForStatusChange, setSelectedAnggotaForStatusChange] = useState<Anggota | null>(null);
     const [confirmationInput, setConfirmationInput] = useState('');
     const [isMigrating, setIsMigrating] = useState(false);
+    const [newStatusPrefix, setNewStatusPrefix] = useState<string>('');
+
 
     useEffect(() => {
         const fetchAnggota = async () => {
@@ -65,15 +69,24 @@ const AdminAnggota: React.FC = () => {
     
      const handleStatusChangeClick = (anggota: Anggota) => {
         setSelectedAnggotaForStatusChange(anggota);
+        const oldPrefix = anggota.no_anggota.split('-')[0];
+        const newPrefixOptions = STATUS_PREFIXES.filter(p => p !== oldPrefix);
+        if (newPrefixOptions.length > 0) {
+            setNewStatusPrefix(newPrefixOptions[0]);
+        } else {
+            setNewStatusPrefix('');
+        }
         setIsStatusModalOpen(true);
     };
 
     const handleConfirmStatusChange = async () => {
-        if (!selectedAnggotaForStatusChange) return;
+        if (!selectedAnggotaForStatusChange || !newStatusPrefix) return;
 
         const oldNoAnggota = selectedAnggotaForStatusChange.no_anggota;
-        const newPrefix = oldNoAnggota.startsWith('AK-') ? 'PB-' : 'AK-';
-        const newNoAnggota = newPrefix + oldNoAnggota.substring(3);
+        const oldPrefix = oldNoAnggota.split('-')[0];
+        const numberPart = oldNoAnggota.substring(oldPrefix.length + 1);
+        const newNoAnggota = `${newStatusPrefix}-${numberPart}`;
+
 
         if (confirmationInput !== newNoAnggota) {
             alert("Kode konfirmasi tidak sesuai. Mohon ketik kode baru dengan benar.");
@@ -82,7 +95,7 @@ const AdminAnggota: React.FC = () => {
 
         setIsMigrating(true);
         try {
-            await migrateAnggotaStatus(selectedAnggotaForStatusChange);
+            await migrateAnggotaStatus(selectedAnggotaForStatusChange, newNoAnggota);
             setAnggotaList(prev => prev.map(a => a.id === selectedAnggotaForStatusChange.id ? {...a, no_anggota: newNoAnggota} : a));
             handleCloseStatusModal();
             alert("Status anggota berhasil diubah dan semua data terkait telah dimigrasikan.");
@@ -97,6 +110,7 @@ const AdminAnggota: React.FC = () => {
         setIsStatusModalOpen(false);
         setSelectedAnggotaForStatusChange(null);
         setConfirmationInput('');
+        setNewStatusPrefix('');
     };
     
     const filteredAnggota = useMemo(() => 
@@ -110,26 +124,57 @@ const AdminAnggota: React.FC = () => {
     
     const renderStatusChangeModal = () => {
         if (!selectedAnggotaForStatusChange) return null;
+
         const oldNoAnggota = selectedAnggotaForStatusChange.no_anggota;
-        const newPrefix = oldNoAnggota.startsWith('AK-') ? 'PB-' : 'AK-';
-        const newNoAnggota = newPrefix + oldNoAnggota.substring(3);
+        const oldPrefix = oldNoAnggota.split('-')[0];
+        const numberPart = oldNoAnggota.substring(oldPrefix.length + 1);
+        const newNoAnggota = newStatusPrefix ? `${newStatusPrefix}-${numberPart}` : '';
         
+        const statusOptions = STATUS_PREFIXES.filter(p => p !== oldPrefix);
+
+        const getPrefixDescription = (prefix: string) => {
+            switch (prefix) {
+                case 'AK': return 'AK - Pegawai Aktif';
+                case 'PB': return 'PB - Purna Bakti';
+                case 'WL': return 'WL - Warga Luar';
+                case 'TT': return 'TT - Titipan';
+                default: return prefix;
+            }
+        };
+
         return (
           <Modal isOpen={isStatusModalOpen} onClose={handleCloseStatusModal} title="Konfirmasi Perubahan Status">
             <div>
               <p className="mb-4">Anda akan mengubah status kepegawaian untuk anggota:</p>
               <p className="font-bold text-lg mb-4 text-center">{selectedAnggotaForStatusChange.nama}</p>
               <div className="flex justify-around items-center my-4">
-                <div>
+                <div className="text-center">
                   <p className="text-sm text-gray-500">Kode Lama</p>
                   <p className="font-bold text-red-600 text-xl">{oldNoAnggota}</p>
                 </div>
                 <p className="text-2xl font-bold">&rarr;</p>
-                <div>
+                <div className="text-center">
                   <p className="text-sm text-gray-500">Kode Baru</p>
-                  <p className="font-bold text-green-600 text-xl">{newNoAnggota}</p>
+                  <p className="font-bold text-green-600 text-xl">{newNoAnggota || 'Pilih status...'}</p>
                 </div>
               </div>
+
+               <div className="mt-4">
+                <label htmlFor="newStatus" className="block text-sm font-medium text-gray-700">
+                  Pilih Status Kepegawaian Baru:
+                </label>
+                <select
+                  id="newStatus"
+                  value={newStatusPrefix}
+                  onChange={(e) => setNewStatusPrefix(e.target.value)}
+                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary bg-white"
+                >
+                  {statusOptions.map(prefix => (
+                    <option key={prefix} value={prefix}>{getPrefixDescription(prefix)}</option>
+                  ))}
+                </select>
+              </div>
+
               <div className="bg-yellow-50 text-yellow-800 p-3 rounded-lg text-sm mt-4">
                 <strong>Peringatan:</strong> Tindakan ini akan memigrasikan semua data terkait (keuangan, riwayat transaksi, dan pinjaman) ke kode anggota yang baru. Proses ini tidak dapat dibatalkan.
               </div>
@@ -154,7 +199,7 @@ const AdminAnggota: React.FC = () => {
                 </button>
                 <button
                   onClick={handleConfirmStatusChange}
-                  disabled={isMigrating || confirmationInput !== newNoAnggota}
+                  disabled={isMigrating || confirmationInput !== newNoAnggota || !newNoAnggota}
                   className="bg-primary text-white px-4 py-2 rounded-lg font-semibold hover:bg-primary-dark transition-colors disabled:bg-gray-400"
                 >
                   {isMigrating ? 'Memigrasikan...' : 'Konfirmasi & Ubah Status'}

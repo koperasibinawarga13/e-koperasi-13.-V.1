@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import * as XLSX from 'xlsx';
 import Header from '../../components/Header';
 import StatCard from '../../components/StatCard';
-import { CreditCardIcon, ChartBarIcon } from '../../components/icons/Icons';
+import { CreditCardIcon, ChartBarIcon, DownloadIcon } from '../../components/icons/Icons';
 import { getKeuangan } from '../../services/keuanganService';
 import { Keuangan } from '../../types';
 
@@ -10,6 +11,7 @@ const AdminLaporan: React.FC = () => {
     const [keuanganList, setKeuanganList] = useState<Keuangan[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
+    const [isDownloading, setIsDownloading] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -25,6 +27,67 @@ const AdminLaporan: React.FC = () => {
 
     const formatCurrency = (amount: number) => {
         return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(amount);
+    };
+    
+    const handleDownload = async () => {
+        setIsDownloading(true);
+        try {
+            if (keuanganList.length === 0) {
+                alert('Tidak ada data untuk diunduh.');
+                return;
+            }
+
+            const dataToExport = keuanganList.map(k => ({
+                'No Anggota': k.no_anggota,
+                'Nama': k.nama_angota,
+                'Periode Laporan Terakhir': k.periode || '',
+                'Akhir Simpanan Pokok': k.akhir_simpanan_pokok,
+                'Akhir Simpanan Wajib': k.akhir_simpanan_wajib,
+                'Akhir Simpanan Sukarela': k.akhir_simpanan_sukarela,
+                'Akhir Simpanan Wisata': k.akhir_simpanan_wisata,
+                'Total Simpanan': k.jumlah_total_simpanan,
+                'Akhir Pinjaman Berjangka': k.akhir_pinjaman_berjangka,
+                'Akhir Pinjaman Khusus': k.akhir_pinjaman_khusus,
+                'Total Pinjaman': k.jumlah_total_pinjaman,
+                'Transaksi Simpanan Pokok': k.transaksi_simpanan_pokok,
+                'Transaksi Simpanan Wajib': k.transaksi_simpanan_wajib,
+                'Transaksi Simpanan Sukarela': k.transaksi_simpanan_sukarela,
+                'Transaksi Simpanan Wisata': k.transaksi_simpanan_wisata,
+                'Transaksi Pinjaman Berjangka': k.transaksi_pinjaman_berjangka,
+                'Transaksi Pinjaman Khusus': k.transaksi_pinjaman_khusus,
+                'Transaksi Simpanan Jasa': k.transaksi_simpanan_jasa,
+                'Transaksi Niaga': k.transaksi_niaga,
+                'Transaksi Dana Perlaya': k.transaksi_dana_perlaya,
+                'Transaksi Dana Katineng': k.transaksi_dana_katineng,
+                'Jumlah Setoran': k.Jumlah_setoran,
+                'Pengambilan Simpanan Pokok': k.transaksi_pengambilan_simpanan_pokok,
+                'Pengambilan Simpanan Wajib': k.transaksi_pengambilan_simpanan_wajib,
+                'Pengambilan Simpanan Sukarela': k.transaksi_pengambilan_simpanan_sukarela,
+                'Pengambilan Simpanan Wisata': k.transaksi_pengambilan_simpanan_wisata,
+                'Penambahan Pinjaman Berjangka': k.transaksi_penambahan_pinjaman_berjangka,
+                'Penambahan Pinjaman Khusus': k.transaksi_penambahan_pinjaman_khusus,
+                'Penambahan Pinjaman Niaga': k.transaksi_penambahan_pinjaman_niaga,
+                'Awal Simpanan Pokok': k.awal_simpanan_pokok,
+                'Awal Simpanan Wajib': k.awal_simpanan_wajib,
+                'Awal Simpanan Sukarela': k.sukarela,
+                'Awal Simpanan Wisata': k.awal_simpanan_wisata,
+                'Awal Pinjaman Berjangka': k.awal_pinjaman_berjangka,
+                'Awal Pinjaman Khusus': k.awal_pinjaman_khusus,
+            }));
+            
+            const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Laporan Keuangan");
+
+            const today = new Date().toISOString().split('T')[0];
+            XLSX.writeFile(workbook, `Laporan_Keuangan_Koperasi_${today}.xlsx`);
+
+        } catch (error) {
+            console.error("Gagal mengunduh laporan:", error);
+            alert("Terjadi kesalahan saat menyiapkan file unduhan.");
+        } finally {
+            setIsDownloading(false);
+        }
     };
 
     const summaryData = useMemo(() => {
@@ -58,13 +121,23 @@ const AdminLaporan: React.FC = () => {
             <div className="bg-white p-6 rounded-xl border border-gray-200">
                 <div className="flex flex-wrap justify-between items-center mb-6 gap-4">
                     <h2 className="text-lg md:text-xl font-bold text-dark">Rincian Keuangan Anggota</h2>
-                     <input
-                        type="text"
-                        placeholder="Cari (nama, no. anggota)..."
-                        className="border border-gray-300 rounded-lg px-4 py-2 w-full sm:w-1/3 focus:ring-1 focus:ring-primary focus:border-primary"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
+                    <div className="flex items-center gap-4">
+                        <input
+                            type="text"
+                            placeholder="Cari (nama, no. anggota)..."
+                            className="border border-gray-300 rounded-lg px-4 py-2 w-full sm:w-auto focus:ring-1 focus:ring-primary focus:border-primary"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                         <button
+                            onClick={handleDownload}
+                            disabled={isDownloading || isLoading}
+                            className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+                        >
+                            <DownloadIcon className="w-5 h-5" />
+                            {isDownloading ? 'Menyiapkan...' : 'Download Laporan'}
+                        </button>
+                    </div>
                 </div>
                 <div className="overflow-x-auto">
                     {isLoading ? <p>Memuat data laporan...</p> : (
