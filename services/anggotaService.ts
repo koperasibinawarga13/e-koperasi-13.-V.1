@@ -1,7 +1,7 @@
 // FIX: Implemented full content for anggotaService.ts to handle Firestore operations.
-import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, where, writeBatch, getDoc } from 'firebase/firestore';
+import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, where, writeBatch, getDoc, orderBy, limit, setDoc } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
-import { Anggota } from '../types';
+import { Anggota, Keuangan } from '../types';
 
 const anggotaCollectionRef = collection(db, 'anggota');
 
@@ -151,6 +151,142 @@ export const deleteAnggota = async (id: string): Promise<void> => {
         await deleteDoc(anggotaDoc);
     } catch (error) {
         console.error("Error deleting anggota: ", error);
+        throw error;
+    }
+};
+
+export const migrateAnggotaStatus = async (anggota: Anggota): Promise<void> => {
+    const oldNoAnggota = anggota.no_anggota;
+    const newPrefix = oldNoAnggota.startsWith('AK-') ? 'PB-' : 'AK-';
+    const newNoAnggota = newPrefix + oldNoAnggota.substring(3);
+
+    try {
+        const batch = writeBatch(db);
+
+        // 1. Update Anggota Document
+        const anggotaDocRef = doc(db, 'anggota', anggota.id);
+        batch.update(anggotaDocRef, { no_anggota: newNoAnggota });
+
+        // 2. Migrate Keuangan Main Document
+        const oldKeuanganDocRef = doc(db, 'keuangan', oldNoAnggota);
+        const oldKeuanganDocSnap = await getDoc(oldKeuanganDocRef);
+        if (oldKeuanganDocSnap.exists()) {
+            const keuanganData = oldKeuanganDocSnap.data();
+            keuanganData.no_anggota = newNoAnggota;
+            keuanganData.nama_angota = anggota.nama; // Ensure name is up-to-date
+            const newKeuanganDocRef = doc(db, 'keuangan', newNoAnggota);
+            batch.set(newKeuanganDocRef, keuanganData);
+            batch.delete(oldKeuanganDocRef);
+        }
+
+        // 3. Migrate Keuangan History Subcollection
+        const oldHistoryCollectionRef = collection(db, 'keuangan', oldNoAnggota, 'history');
+        const historySnapshot = await getDocs(oldHistoryCollectionRef);
+        if (!historySnapshot.empty) {
+            historySnapshot.forEach(historyDoc => {
+                const historyData = historyDoc.data();
+                historyData.no_anggota = newNoAnggota;
+                const newHistoryDocRef = doc(db, 'keuangan', newNoAnggota, 'history', historyDoc.id);
+                batch.set(newHistoryDocRef, historyData);
+                batch.delete(historyDoc.ref);
+            });
+        }
+        
+        // 4. Update Pengajuan Pinjaman Documents
+        const pinjamanQuery = query(collection(db, 'pengajuan_pinjaman'), where("no_anggota", "==", oldNoAnggota));
+        const pinjamanSnapshot = await getDocs(pinjamanQuery);
+        if (!pinjamanSnapshot.empty) {
+            pinjamanSnapshot.forEach(pinjamanDoc => {
+                batch.update(pinjamanDoc.ref, { no_anggota: newNoAnggota });
+            });
+        }
+
+        // Commit all changes at once
+        await batch.commit();
+
+    } catch (error) {
+        console.error("Error migrating anggota status:", error);
+        throw new Error("Gagal memigrasikan data anggota. Silakan coba lagi.");
+    }
+};
+
+
+export const generateNewAnggotaNo = async (prefix: 'AK' | 'PB' | 'WL'): Promise<string> => {
+    try {
+        // Query for the last member with the given prefix, sorted by no_anggota descending.
+        // This relies on Firestore's lexicographical sorting. 'WL-99' comes after 'WL-100' so we must handle this on client.
+        const q = query(anggotaCollectionRef, where('no_anggota', '>=', `${prefix}-`), where('no_anggota', '<', `${prefix}-~`));
+        const snapshot = await getDocs(q);
+
+        if (snapshot.empty) {
+            return `${prefix}-101`; // Start numbering from 101 if no members exist
+        }
+
+        const numbers = snapshot.docs
+            .map(doc => parseInt(doc.data().no_anggota.split('-')[1], 10))
+            .filter(n => !isNaN(n));
+
+        const maxNumber = numbers.length > 0 ? Math.max(...numbers) : 100;
+        return `${prefix}-${maxNumber + 1}`;
+
+    } catch (error) {
+        console.error("Error generating new member number: ", error);
+        throw new Error("Gagal membuat nomor anggota baru.");
+    }
+};
+
+interface NewMemberRegistrationData {
+    nama: string;
+    alamat: string;
+    no_anggota: string;
+    password: string;
+}
+
+export const registerNewAnggota = async (data: NewMemberRegistrationData): Promise<void> => {
+    try {
+        // Ensure the generated no_anggota is not already taken
+        const existingAnggota = await getAnggotaByNo(data.no_anggota);
+        if (existingAnggota) {
+            throw new Error(`Nomor anggota ${data.no_anggota} sudah digunakan. Mohon coba lagi.`);
+        }
+
+        const batch = writeBatch(db);
+
+        // 1. Create Anggota document
+        const newAnggotaDocRef = doc(anggotaCollectionRef);
+        const newAnggota: Omit<Anggota, 'id'> = {
+            no_anggota: data.no_anggota,
+            nama: data.nama,
+            alamat: data.alamat,
+            password: data.password,
+            status: 'Aktif',
+            tanggal_bergabung: new Date().toISOString().split('T')[0],
+            email: '',
+            nik: '',
+            no_telepon: ''
+        };
+        batch.set(newAnggotaDocRef, newAnggota);
+
+        // 2. Create initial Keuangan document with zeroed values
+        const newKeuanganDocRef = doc(db, 'keuangan', data.no_anggota);
+        const initialKeuangan: Omit<Keuangan, 'id'> = {
+            no: 0,
+            no_anggota: data.no_anggota,
+            nama_angota: data.nama,
+            awal_simpanan_pokok: 0, awal_simpanan_wajib: 0, sukarela: 0, awal_simpanan_wisata: 0, awal_pinjaman_berjangka: 0, awal_pinjaman_khusus: 0,
+            transaksi_simpanan_pokok: 0, transaksi_simpanan_wajib: 0, transaksi_simpanan_sukarela: 0, transaksi_simpanan_wisata: 0, transaksi_pinjaman_berjangka: 0, transaksi_pinjaman_khusus: 0,
+            transaksi_simpanan_jasa: 0, transaksi_niaga: 0, transaksi_dana_perlaya: 0, transaksi_dana_katineng: 0, Jumlah_setoran: 0,
+            transaksi_pengambilan_simpanan_pokok: 0, transaksi_pengambilan_simpanan_wajib: 0, transaksi_pengambilan_simpanan_sukarela: 0, transaksi_pengambilan_simpanan_wisata: 0,
+            transaksi_penambahan_pinjaman_berjangka: 0, transaksi_penambahan_pinjaman_khusus: 0, transaksi_penambahan_pinjaman_niaga: 0,
+            akhir_simpanan_pokok: 0, akhir_simpanan_wajib: 0, akhir_simpanan_sukarela: 0, akhir_simpanan_wisata: 0, akhir_pinjaman_berjangka: 0, akhir_pinjaman_khusus: 0,
+            jumlah_total_simpanan: 0, jumlah_total_pinjaman: 0,
+        };
+        batch.set(newKeuanganDocRef, initialKeuangan);
+
+        await batch.commit();
+
+    } catch (error) {
+        console.error("Error during new member registration:", error);
         throw error;
     }
 };

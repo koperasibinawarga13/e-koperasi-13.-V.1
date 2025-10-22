@@ -2,10 +2,10 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../../components/Header';
 import { Anggota } from '../../types';
-import { PlusIcon, PencilIcon, TrashIcon, UploadIcon } from '../../components/icons/Icons';
+import { PlusIcon, PencilIcon, TrashIcon, UploadIcon, SwitchHorizontalIcon } from '../../components/icons/Icons';
 import Modal from '../../components/Modal';
 import AnggotaForm from '../../components/AnggotaForm';
-import { getAnggota, addAnggota, updateAnggota, deleteAnggota } from '../../services/anggotaService';
+import { getAnggota, addAnggota, updateAnggota, deleteAnggota, migrateAnggotaStatus } from '../../services/anggotaService';
 
 const AdminAnggota: React.FC = () => {
     const [anggotaList, setAnggotaList] = useState<Anggota[]>([]);
@@ -14,6 +14,12 @@ const AdminAnggota: React.FC = () => {
     const [selectedAnggota, setSelectedAnggota] = useState<Anggota | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const navigate = useNavigate();
+    
+    // State for status change modal
+    const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
+    const [selectedAnggotaForStatusChange, setSelectedAnggotaForStatusChange] = useState<Anggota | null>(null);
+    const [confirmationInput, setConfirmationInput] = useState('');
+    const [isMigrating, setIsMigrating] = useState(false);
 
     useEffect(() => {
         const fetchAnggota = async () => {
@@ -57,6 +63,42 @@ const AdminAnggota: React.FC = () => {
         setSelectedAnggota(null);
     };
     
+     const handleStatusChangeClick = (anggota: Anggota) => {
+        setSelectedAnggotaForStatusChange(anggota);
+        setIsStatusModalOpen(true);
+    };
+
+    const handleConfirmStatusChange = async () => {
+        if (!selectedAnggotaForStatusChange) return;
+
+        const oldNoAnggota = selectedAnggotaForStatusChange.no_anggota;
+        const newPrefix = oldNoAnggota.startsWith('AK-') ? 'PB-' : 'AK-';
+        const newNoAnggota = newPrefix + oldNoAnggota.substring(3);
+
+        if (confirmationInput !== newNoAnggota) {
+            alert("Kode konfirmasi tidak sesuai. Mohon ketik kode baru dengan benar.");
+            return;
+        }
+
+        setIsMigrating(true);
+        try {
+            await migrateAnggotaStatus(selectedAnggotaForStatusChange);
+            setAnggotaList(prev => prev.map(a => a.id === selectedAnggotaForStatusChange.id ? {...a, no_anggota: newNoAnggota} : a));
+            handleCloseStatusModal();
+            alert("Status anggota berhasil diubah dan semua data terkait telah dimigrasikan.");
+        } catch(error: any) {
+            alert(error.message);
+        } finally {
+            setIsMigrating(false);
+        }
+    };
+
+    const handleCloseStatusModal = () => {
+        setIsStatusModalOpen(false);
+        setSelectedAnggotaForStatusChange(null);
+        setConfirmationInput('');
+    };
+    
     const filteredAnggota = useMemo(() => 
         anggotaList.filter(a =>
             a.nama.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -65,6 +107,63 @@ const AdminAnggota: React.FC = () => {
         ),
         [anggotaList, searchTerm]
     );
+    
+    const renderStatusChangeModal = () => {
+        if (!selectedAnggotaForStatusChange) return null;
+        const oldNoAnggota = selectedAnggotaForStatusChange.no_anggota;
+        const newPrefix = oldNoAnggota.startsWith('AK-') ? 'PB-' : 'AK-';
+        const newNoAnggota = newPrefix + oldNoAnggota.substring(3);
+        
+        return (
+          <Modal isOpen={isStatusModalOpen} onClose={handleCloseStatusModal} title="Konfirmasi Perubahan Status">
+            <div>
+              <p className="mb-4">Anda akan mengubah status kepegawaian untuk anggota:</p>
+              <p className="font-bold text-lg mb-4 text-center">{selectedAnggotaForStatusChange.nama}</p>
+              <div className="flex justify-around items-center my-4">
+                <div>
+                  <p className="text-sm text-gray-500">Kode Lama</p>
+                  <p className="font-bold text-red-600 text-xl">{oldNoAnggota}</p>
+                </div>
+                <p className="text-2xl font-bold">&rarr;</p>
+                <div>
+                  <p className="text-sm text-gray-500">Kode Baru</p>
+                  <p className="font-bold text-green-600 text-xl">{newNoAnggota}</p>
+                </div>
+              </div>
+              <div className="bg-yellow-50 text-yellow-800 p-3 rounded-lg text-sm mt-4">
+                <strong>Peringatan:</strong> Tindakan ini akan memigrasikan semua data terkait (keuangan, riwayat transaksi, dan pinjaman) ke kode anggota yang baru. Proses ini tidak dapat dibatalkan.
+              </div>
+              <div className="mt-6">
+                <label htmlFor="confirmation" className="block text-sm font-medium text-gray-700">
+                  Ketik kode baru (<span className="font-bold">{newNoAnggota}</span>) untuk konfirmasi:
+                </label>
+                <input
+                  type="text"
+                  id="confirmation"
+                  value={confirmationInput}
+                  onChange={(e) => setConfirmationInput(e.target.value)}
+                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary"
+                />
+              </div>
+              <div className="flex justify-end gap-4 mt-6">
+                <button
+                  onClick={handleCloseStatusModal}
+                  className="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
+                >
+                  Batal
+                </button>
+                <button
+                  onClick={handleConfirmStatusChange}
+                  disabled={isMigrating || confirmationInput !== newNoAnggota}
+                  className="bg-primary text-white px-4 py-2 rounded-lg font-semibold hover:bg-primary-dark transition-colors disabled:bg-gray-400"
+                >
+                  {isMigrating ? 'Memigrasikan...' : 'Konfirmasi & Ubah Status'}
+                </button>
+              </div>
+            </div>
+          </Modal>
+        );
+    };
 
   return (
     <div>
@@ -79,13 +178,6 @@ const AdminAnggota: React.FC = () => {
                 onChange={(e) => setSearchTerm(e.target.value)}
             />
             <div className="flex items-center gap-2">
-                <button 
-                    onClick={() => navigate('/admin/upload')} 
-                    className="bg-secondary text-white px-4 py-2 rounded-lg font-semibold hover:bg-emerald-600 transition-all transform hover:scale-105"
-                >
-                    <UploadIcon className="w-5 h-5" />
-                    Upload Excel
-                </button>
                 <button onClick={handleAdd} className="bg-primary text-white px-4 py-2 rounded-lg font-semibold hover:bg-primary-dark transition-all transform hover:scale-105 flex items-center gap-2">
                     <PlusIcon className="w-5 h-5" />
                     Tambah Anggota
@@ -137,9 +229,10 @@ const AdminAnggota: React.FC = () => {
                                     }
                                 })()}
                             </td>
-                            <td className="px-4 py-4 sm:px-6 flex gap-2">
-                                <button onClick={() => handleEdit(anggota)} className="text-blue-600 hover:text-blue-800"><PencilIcon className="w-5 h-5"/></button>
-                                <button onClick={() => handleDelete(anggota.id)} className="text-red-600 hover:text-red-800"><TrashIcon className="w-5 h-5"/></button>
+                            <td className="px-4 py-4 sm:px-6 flex gap-3">
+                                <button onClick={() => handleEdit(anggota)} className="text-blue-600 hover:text-blue-800" title="Edit Anggota"><PencilIcon className="w-5 h-5"/></button>
+                                <button onClick={() => handleStatusChangeClick(anggota)} className="text-gray-600 hover:text-gray-800" title="Ubah Status Kepegawaian"><SwitchHorizontalIcon className="w-5 h-5"/></button>
+                                <button onClick={() => handleDelete(anggota.id)} className="text-red-600 hover:text-red-800" title="Hapus Anggota"><TrashIcon className="w-5 h-5"/></button>
                             </td>
                         </tr>
                     ))}
@@ -152,6 +245,7 @@ const AdminAnggota: React.FC = () => {
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={selectedAnggota ? 'Edit Anggota' : 'Tambah Anggota'}>
         <AnggotaForm onSave={handleSave} initialData={selectedAnggota} />
       </Modal>
+      {renderStatusChangeModal()}
     </div>
   );
 };

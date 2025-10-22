@@ -76,6 +76,7 @@ export interface Keuangan {
 
 export interface TransaksiBulanan {
   no_anggota: string;
+  nama_angota?: string;
   transaksi_simpanan_pokok: number;
   transaksi_simpanan_wajib: number;
   transaksi_simpanan_sukarela: number;

@@ -87,6 +87,15 @@ export const batchProcessTransaksiBulanan = async (transaksiList: TransaksiBulan
         errors.push({ no_anggota: 'SYSTEM', error: 'Format bulan tidak valid. Gunakan YYYY-MM.' });
         return { successCount: 0, errorCount: transaksiList.length, errors };
     }
+    
+    // Pre-fetch all member names to avoid reads inside the transaction loop
+    const anggotaCollectionRef = collection(db, 'anggota');
+    const allAnggotaSnapshot = await getDocs(anggotaCollectionRef);
+    const anggotaMap = new Map<string, string>();
+    allAnggotaSnapshot.forEach(doc => {
+        const anggotaData = doc.data();
+        anggotaMap.set(anggotaData.no_anggota, anggotaData.nama);
+    });
 
     for (const tx of transaksiList) {
         if (!tx.no_anggota) {
@@ -102,12 +111,53 @@ export const batchProcessTransaksiBulanan = async (transaksiList: TransaksiBulan
         try {
             await runTransaction(db, async (transaction) => {
                 const docSnap = await transaction.get(mainDocRef);
+                let prevMonthData: Keuangan;
 
-                if (!docSnap.exists()) {
-                    throw new Error(`Data keuangan untuk anggota ${tx.no_anggota} tidak ditemukan. Mohon unggah data awal terlebih dahulu.`);
+                if (docSnap.exists()) {
+                    prevMonthData = docSnap.data() as Keuangan;
+                } else {
+                    // If member has no financial data, create a new record for them with zeroed balances.
+                    // Name is sourced from: 1. transaction file, 2. master member list, 3. fallback text.
+                    const namaAnggota = tx.nama_angota || anggotaMap.get(tx.no_anggota) || 'Anggota Baru';
+                    prevMonthData = {
+                        no: 0, // Placeholder
+                        no_anggota: tx.no_anggota,
+                        nama_angota: namaAnggota,
+                        awal_simpanan_pokok: 0,
+                        awal_simpanan_wajib: 0,
+                        sukarela: 0,
+                        awal_simpanan_wisata: 0,
+                        awal_pinjaman_berjangka: 0,
+                        awal_pinjaman_khusus: 0,
+                        transaksi_simpanan_pokok: 0,
+                        transaksi_simpanan_wajib: 0,
+                        transaksi_simpanan_sukarela: 0,
+                        transaksi_simpanan_wisata: 0,
+                        transaksi_pinjaman_berjangka: 0,
+                        transaksi_pinjaman_khusus: 0,
+                        transaksi_simpanan_jasa: 0,
+                        transaksi_niaga: 0,
+                        transaksi_dana_perlaya: 0,
+                        transaksi_dana_katineng: 0,
+                        Jumlah_setoran: 0,
+                        transaksi_pengambilan_simpanan_pokok: 0,
+                        transaksi_pengambilan_simpanan_wajib: 0,
+                        transaksi_pengambilan_simpanan_sukarela: 0,
+                        transaksi_pengambilan_simpanan_wisata: 0,
+                        transaksi_penambahan_pinjaman_berjangka: 0,
+                        transaksi_penambahan_pinjaman_khusus: 0,
+                        transaksi_penambahan_pinjaman_niaga: 0,
+                        akhir_simpanan_pokok: 0,
+                        akhir_simpanan_wajib: 0,
+                        akhir_simpanan_sukarela: 0,
+                        akhir_simpanan_wisata: 0,
+                        akhir_pinjaman_berjangka: 0,
+                        akhir_pinjaman_khusus: 0,
+                        jumlah_total_simpanan: 0,
+                        jumlah_total_pinjaman: 0,
+                    };
                 }
-
-                const prevMonthData = docSnap.data() as Keuangan;
+                
                 const newReport: Keuangan = { ...prevMonthData, ...tx, periode: month };
 
                 // Set new "awal" values from previous "akhir"

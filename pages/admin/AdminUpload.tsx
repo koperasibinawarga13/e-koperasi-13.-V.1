@@ -6,7 +6,7 @@ import * as XLSX from 'xlsx';
 import Header from '../../components/Header';
 import ProgressBar from '../../components/ProgressBar';
 import Modal from '../../components/Modal';
-import { UploadIcon, TrashIcon } from '../../components/icons/Icons';
+import { UploadIcon, TrashIcon, DownloadIcon } from '../../components/icons/Icons';
 import { batchAddAnggota } from '../../services/anggotaService';
 import { batchUpsertKeuangan, batchProcessTransaksiBulanan, getUploadedMonths, deleteMonthlyReport, rebuildUploadHistory } from '../../services/keuanganService';
 import { Anggota, Keuangan, TransaksiBulanan } from '../../types';
@@ -33,7 +33,9 @@ const UploadSection: React.FC<{
     onFileUpload: (file: File) => Promise<UploadResult | void>;
     disabled: boolean;
     hideTitle?: boolean;
-}> = ({ title, instructions, onFileUpload, disabled, hideTitle = false }) => {
+    templateType?: 'anggota' | 'keuanganAwal' | 'transaksiBulanan';
+    onDownloadTemplate: (type: 'anggota' | 'keuanganAwal' | 'transaksiBulanan') => void;
+}> = ({ title, instructions, onFileUpload, disabled, hideTitle = false, templateType, onDownloadTemplate }) => {
     const [file, setFile] = useState<File | null>(null);
     const [status, setStatus] = useState<UploadStatus>('idle');
     const [progress, setProgress] = useState(0);
@@ -80,7 +82,20 @@ const UploadSection: React.FC<{
 
     return (
         <div className={`bg-white p-6 ${hideTitle ? 'pt-0 rounded-b-xl' : 'rounded-xl'} shadow-md mb-8`}>
-            {!hideTitle && <h2 className="text-lg md:text-xl font-bold text-dark mb-4">{title}</h2>}
+            {!hideTitle && (
+                <div className="flex flex-wrap justify-between items-center gap-2 mb-4">
+                    <h2 className="text-lg md:text-xl font-bold text-dark">{title}</h2>
+                    {templateType && (
+                        <button 
+                            onClick={() => onDownloadTemplate(templateType)}
+                            className="flex items-center gap-2 bg-green-100 text-green-700 px-3 py-1.5 rounded-lg text-sm font-semibold hover:bg-green-200 transition-colors"
+                        >
+                            <DownloadIcon className="w-4 h-4" />
+                            <span>Download Template</span>
+                        </button>
+                    )}
+                </div>
+            )}
             <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                 <h3 className="font-bold text-blue-800">Struktur File Excel (.xlsx)</h3>
                 <p className="text-sm text-blue-700 mt-2">Pastikan file Anda memiliki kolom header berikut (urutan dan nama harus sesuai):</p>
@@ -190,8 +205,8 @@ const AdminUpload: React.FC = () => {
         try {
             const { json } = await readFile(file);
             const anggotaList = json.map(row => ({
-                no_anggota: String(row.kode_anggota || ''),
-                nama: String(row.nama_anggota || ''),
+                no_anggota: String(row.kode_anggota || '').trim(),
+                nama: String(row.nama_anggota || '').trim(),
                 no_telepon: String(row.no_hp || ''),
             })).filter(a => a.no_anggota && a.nama);
 
@@ -211,8 +226,8 @@ const AdminUpload: React.FC = () => {
             const { json } = await readFile(file);
             const keuanganList: Keuangan[] = json.map(row => ({
                 no: parseNumber(row.no),
-                no_anggota: String(row.no_anggota || ''),
-                nama_angota: String(row.nama_angota || ''),
+                no_anggota: String(row.no_anggota || '').trim(),
+                nama_angota: String(row.nama_angota || '').trim(),
                 awal_simpanan_pokok: parseNumber(row.awal_simpanan_pokok),
                 awal_simpanan_wajib: parseNumber(row.awal_simpanan_wajib),
                 sukarela: parseNumber(row.sukarela),
@@ -269,7 +284,8 @@ const AdminUpload: React.FC = () => {
             const uploadMonth = `${match[1]}-${match[2]}`;
 
             const transaksiList: TransaksiBulanan[] = json.map(row => ({
-                 no_anggota: String(row.no_anggota || ''),
+                 no_anggota: String(row.no_anggota || '').trim(),
+                 nama_angota: String(row.nama_angota || '').trim(),
                  transaksi_simpanan_pokok: parseNumber(row.transaksi_simpanan_pokok),
                  transaksi_simpanan_wajib: parseNumber(row.transaksi_simpanan_wajib),
                  transaksi_simpanan_sukarela: parseNumber(row.transaksi_simpanan_sukarela),
@@ -348,7 +364,33 @@ const AdminUpload: React.FC = () => {
 
     const anggotaInstructions = `kode_anggota, nama_anggota, no_hp`;
     const keuanganAwalInstructions = `no, no_anggota, nama_angota, awal_simpanan_pokok, awal_simpanan_wajib, sukarela, awal_simpanan_wisata, awal_pinjaman_berjangka, awal_pinjaman_khusus, transaksi_simpanan_pokok, transaksi_simpanan_wajib, transaksi_simpanan_sukarela, transaksi_simpanan_wisata, transaksi_pinjaman_berjangka, transaksi_pinjaman_khusus, transaksi_simpanan_jasa, transaksi_niaga, transaksi_dana_perlaya, transaksi_dana_katineng, Jumlah_setoran, transaksi_pengambilan_simpanan_pokok, transaksi_pengambilan_simpanan_wajib, transaksi_pengambilan_simpanan_sukarela, transaksi_pengambilan_simpanan_wisata, transaksi_penambahan_pinjaman_berjangka, transaksi_penambahan_pinjaman_khusus, transaksi_penambahan_pinjaman_niaga, akhir_simpanan_pokok, akhir_simpanan_wajib, akhir_simpanan_sukarela, akhir_simpanan_wisata, akhir_pinjaman_berjangka, akhir_pinjaman_khusus, jumlah_total_simpanan, jumlah_total_pinjaman`;
-    const transaksiBulananInstructions = `no_anggota, transaksi_simpanan_pokok, transaksi_simpanan_wajib, transaksi_simpanan_sukarela, transaksi_simpanan_wisata, transaksi_pinjaman_berjangka, transaksi_pinjaman_khusus, transaksi_simpanan_jasa, transaksi_niaga, transaksi_dana_perlaya, transaksi_dana_katineng, Jumlah_setoran, transaksi_pengambilan_simpanan_pokok, transaksi_pengambilan_simpanan_wajib, transaksi_pengambilan_simpanan_sukarela, transaksi_pengambilan_simpanan_wisata, transaksi_penambahan_pinjaman_berjangka, transaksi_penambahan_pinjaman_khusus, transaksi_penambahan_pinjaman_niaga`;
+    const transaksiBulananInstructions = `no_anggota, nama_angota, transaksi_simpanan_pokok, transaksi_simpanan_wajib, transaksi_simpanan_sukarela, transaksi_simpanan_wisata, transaksi_pinjaman_berjangka, transaksi_pinjaman_khusus, transaksi_simpanan_jasa, transaksi_niaga, transaksi_dana_perlaya, transaksi_dana_katineng, Jumlah_setoran, transaksi_pengambilan_simpanan_pokok, transaksi_pengambilan_simpanan_wajib, transaksi_pengambilan_simpanan_sukarela, transaksi_pengambilan_simpanan_wisata, transaksi_penambahan_pinjaman_berjangka, transaksi_penambahan_pinjaman_khusus, transaksi_penambahan_pinjaman_niaga`;
+    
+    const handleDownloadTemplate = (type: 'anggota' | 'keuanganAwal' | 'transaksiBulanan') => {
+        let headers: string[] = [];
+        let filename = '';
+        
+        switch (type) {
+            case 'anggota':
+                headers = anggotaInstructions.split(', ');
+                filename = 'Template_Data_Anggota.xlsx';
+                break;
+            case 'keuanganAwal':
+                headers = keuanganAwalInstructions.split(', ');
+                filename = 'Template_Keuangan_Awal.xlsx';
+                break;
+            case 'transaksiBulanan':
+                 headers = transaksiBulananInstructions.split(', ');
+                filename = 'Template_Transaksi_Bulanan.xlsx';
+                break;
+        }
+
+        const ws = XLSX.utils.aoa_to_sheet([headers]);
+        const wb = XLSX.utils.book_new();
+        const sheetName = type === 'transaksiBulanan' ? '2024 01' : 'Sheet1';
+        XLSX.utils.book_append_sheet(wb, ws, sheetName);
+        XLSX.writeFile(wb, filename);
+    };
 
     return (
         <div>
@@ -358,19 +400,32 @@ const AdminUpload: React.FC = () => {
                 instructions={anggotaInstructions}
                 onFileUpload={handleAnggotaUpload}
                 disabled={isUploading}
+                templateType="anggota"
+                onDownloadTemplate={handleDownloadTemplate}
             />
             <UploadSection 
                 title="2. Upload Data Awal Keuangan"
                 instructions={keuanganAwalInstructions}
                 onFileUpload={handleKeuanganAwalUpload}
                 disabled={isUploading}
+                templateType="keuanganAwal"
+                onDownloadTemplate={handleDownloadTemplate}
             />
              <div>
-                <div className="bg-white p-6 rounded-t-xl shadow-md border-b">
-                    <h2 className="text-lg md:text-xl font-bold text-dark">3. Upload Data Transaksi Bulanan</h2>
-                     <p className="text-sm text-gray-500 mt-1">
-                        Sistem akan secara otomatis mendeteksi bulan laporan dari nama <span className="font-semibold">sheet pertama</span> di file Excel Anda. Pastikan nama sheet berformat <code className="bg-gray-200 px-1 rounded">YYYY MM</code>, contoh: <code className="bg-gray-200 px-1 rounded">2024 07</code>.
-                    </p>
+                <div className="bg-white p-6 rounded-t-xl shadow-md border-b flex flex-wrap justify-between items-center gap-2">
+                    <div>
+                        <h2 className="text-lg md:text-xl font-bold text-dark">3. Upload Data Transaksi Bulanan</h2>
+                         <p className="text-sm text-gray-500 mt-1">
+                            Pastikan nama sheet pertama berformat <code className="bg-gray-200 px-1 rounded">YYYY MM</code> (contoh: <code className="bg-gray-200 px-1 rounded">2024 07</code>).
+                        </p>
+                    </div>
+                     <button 
+                        onClick={() => handleDownloadTemplate('transaksiBulanan')}
+                        className="flex-shrink-0 flex items-center gap-2 bg-green-100 text-green-700 px-3 py-1.5 rounded-lg text-sm font-semibold hover:bg-green-200 transition-colors"
+                    >
+                        <DownloadIcon className="w-4 h-4" />
+                        <span>Download Template</span>
+                    </button>
                 </div>
                 <UploadSection
                     title=""
@@ -378,6 +433,7 @@ const AdminUpload: React.FC = () => {
                     instructions={transaksiBulananInstructions}
                     onFileUpload={handleTransaksiBulananUpload}
                     disabled={isUploading || !!isDeleting}
+                    onDownloadTemplate={handleDownloadTemplate}
                 />
             </div>
              <div className="mt-8 bg-white p-6 rounded-xl shadow-md">
