@@ -167,7 +167,7 @@ const AdminAnggota: React.FC = () => {
                   id="newStatus"
                   value={newStatusPrefix}
                   onChange={(e) => setNewStatusPrefix(e.target.value)}
-                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary bg-white"
+                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary bg-surface"
                 >
                   {statusOptions.map(prefix => (
                     <option key={prefix} value={prefix}>{getPrefixDescription(prefix)}</option>
@@ -261,13 +261,13 @@ const AdminAnggota: React.FC = () => {
 
                                     if (hasRegistered) {
                                         return (
-                                            <span className="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                                            <span className="px-2 py-1 text-xs font-semibold rounded-full bg-secondary-light text-secondary-dark">
                                                 Aktif
                                             </span>
                                         );
                                     } else {
                                         return (
-                                            <span className="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                            <span className="px-2 py-1 text-xs font-semibold rounded-full bg-amber-100 text-amber-800">
                                                 Belum Registrasi
                                             </span>
                                         );

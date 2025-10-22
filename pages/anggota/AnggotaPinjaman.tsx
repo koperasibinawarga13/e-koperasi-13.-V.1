@@ -191,8 +191,8 @@ const AnggotaPinjaman: React.FC = () => {
         const baseClasses = 'px-2 py-1 text-xs font-semibold rounded-full';
         let colorClasses = '';
         switch (status) {
-            case 'Menunggu Persetujuan': colorClasses = 'bg-yellow-100 text-yellow-800'; break;
-            case 'Disetujui': colorClasses = 'bg-green-100 text-green-800'; break;
+            case 'Menunggu Persetujuan': colorClasses = 'bg-amber-100 text-amber-800'; break;
+            case 'Disetujui': colorClasses = 'bg-secondary-light text-secondary-dark'; break;
             case 'Ditolak': colorClasses = 'bg-red-100 text-red-800'; break;
         }
         return <span className={`${baseClasses} ${colorClasses}`}>{status}</span>;
@@ -244,7 +244,7 @@ const AnggotaPinjaman: React.FC = () => {
                                 <input type="number" step="0.1" id="bunga" value={sukuBunga} onChange={e => setSukuBunga(Number(e.target.value))} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3" />
                             </div>
                             <div>
-                                <button type="submit" className="w-full bg-primary text-white py-2 px-4 rounded-lg font-semibold hover:bg-blue-800">Hitung Simulasi</button>
+                                <button type="submit" className="w-full bg-primary text-white py-2 px-4 rounded-lg font-semibold hover:bg-primary-dark">Hitung Simulasi</button>
                             </div>
                              <div className="md:col-span-2 lg:col-span-4">
                                 <label htmlFor="tanggal" className="block text-sm font-medium text-gray-700">Tanggal Mulai</label>
@@ -253,7 +253,7 @@ const AnggotaPinjaman: React.FC = () => {
                         </form>
                         {simulasi && (
                         <div className="mt-8 text-center border-t pt-6">
-                            <button onClick={handleAjukanPinjamanBerjangka} disabled={isSubmitting} className="bg-secondary text-white py-3 px-8 rounded-lg font-bold text-base md:text-lg hover:bg-emerald-600 disabled:bg-gray-400">
+                            <button onClick={handleAjukanPinjamanBerjangka} disabled={isSubmitting} className="bg-secondary text-white py-3 px-8 rounded-lg font-bold text-base md:text-lg hover:bg-secondary-dark disabled:bg-gray-400">
                                 {isSubmitting ? 'Mengirim...' : 'Yakin & Ajukan Pinjaman Ini'}
                             </button>
                         </div>
@@ -271,7 +271,7 @@ const AnggotaPinjaman: React.FC = () => {
                                 <textarea id="keterangan" value={keteranganKhusus} onChange={e => setKeteranganKhusus(e.target.value)} rows={3} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3" required></textarea>
                             </div>
                              <div className="text-center pt-2">
-                                 <button type="submit" disabled={isSubmitting} className="bg-secondary text-white py-2 px-6 rounded-lg font-semibold hover:bg-emerald-600 disabled:bg-gray-400">
+                                 <button type="submit" disabled={isSubmitting} className="bg-secondary text-white py-2 px-6 rounded-lg font-semibold hover:bg-secondary-dark disabled:bg-gray-400">
                                      {isSubmitting ? 'Mengirim...' : 'Ajukan Pinjaman Khusus'}
                                  </button>
                              </div>

@@ -9,8 +9,8 @@ interface StatCardProps {
 
 const StatCard: React.FC<StatCardProps> = ({ title, value, icon, color }) => {
   return (
-    <div className="bg-white p-4 sm:p-6 rounded-xl border border-gray-200 flex items-center space-x-4 transition-all duration-300 hover:border-primary">
-      <div className={`p-3 rounded-lg ${color}`}>
+    <div className="bg-surface p-4 sm:p-6 rounded-xl shadow-md flex items-center space-x-4 transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
+      <div className={`p-3 rounded-lg text-white shadow-lg ${color}`}>
         {icon}
       </div>
       <div>

@@ -7,7 +7,7 @@
     <title>e-Koperasi 13</title>
     
     <!-- PWA -->
-    <meta name="theme-color" content="#0052FF"/>
+    <meta name="theme-color" content="#4338CA"/>
     <link rel="manifest" href="/manifest.json" />
     <link rel="apple-touch-icon" href="/icon-192x192.png" />
 
@@ -25,14 +25,24 @@
               sans: ['Poppins', 'sans-serif'],
             },
             colors: {
-              'primary': '#0052FF',
-              'primary-dark': '#0033A1',
-              'primary-light': '#E6F0FF',
-              'secondary': '#10B981',
-              'accent': '#FBBF24', // Amber 400
-              'background': '#F7F8FC',
-              'dark': '#1A202C',
-              'gray-text': '#5A677D',
+              'primary': {
+                'DEFAULT': '#4338CA', // Indigo 700
+                'light': '#E0E7FF', // Indigo 100
+                'dark': '#3730A3', // Indigo 800
+              },
+              'secondary': {
+                'DEFAULT': '#10B981', // Emerald 500
+                'light': '#D1FAE5', // Emerald 100
+                'dark': '#059669', // Emerald 600
+              },
+              'accent': {
+                'DEFAULT': '#FBBF24', // Amber 400
+                'dark': '#F59E0B', // Amber 500
+              },
+              'background': '#F1F5F9', // Slate 100
+              'surface': '#FFFFFF',
+              'dark': '#1E293B',    // Slate 800
+              'gray-text': '#64748B', // Slate 500
             },
           },
         },

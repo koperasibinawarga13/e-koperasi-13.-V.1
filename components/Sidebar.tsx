@@ -45,10 +45,10 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar, isMobileO
   const navItems = user?.role === UserRole.ADMIN ? adminNavItems : anggotaNavItems;
 
   const NavLinkClasses = ({ isActive }: { isActive: boolean }) =>
-    `flex items-center w-full text-gray-300 hover:bg-white/10 rounded-lg transition-colors duration-200 relative ${
+    `flex items-center w-full text-gray-300 hover:bg-primary/40 rounded-lg transition-colors duration-200 relative ${
       isCollapsed ? 'p-3 justify-center' : 'px-4 py-3'
     } ${
-      isActive ? 'bg-white/10 font-semibold text-white' : ''
+      isActive ? 'bg-primary font-semibold text-white' : ''
     }`;
 
   return (
@@ -63,7 +63,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar, isMobileO
       ></div>
       
       <div 
-        className={`bg-[#0A2540] text-white flex flex-col h-screen fixed z-40 transform transition-transform duration-300 ease-in-out md:translate-x-0 ${
+        className={`bg-dark text-white flex flex-col h-screen fixed z-40 transform transition-transform duration-300 ease-in-out md:translate-x-0 ${
           isCollapsed ? 'w-20 p-2' : 'w-64 p-4'
         } ${
           isMobileOpen ? 'translate-x-0' : '-translate-x-full'
@@ -90,13 +90,10 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar, isMobileO
             {navItems.map((item) => (
               <li key={item.to} className="mb-2 group relative">
                 <NavLink to={item.to} className={NavLinkClasses} onClick={onMobileClose}>
-                  {({isActive}) => (
                     <>
-                      {isActive && <div className="absolute left-0 top-0 h-full w-1 bg-primary rounded-r-full"></div>}
                       <div className="flex-shrink-0">{item.icon}</div>
                       <span className={`ml-4 whitespace-nowrap overflow-hidden transition-all duration-300 ${isCollapsed ? 'w-0 opacity-0' : 'w-auto opacity-100'}`}>{item.label}</span>
                     </>
-                  )}
                 </NavLink>
                 {isCollapsed && (
                   <div className="absolute left-full top-1/2 -translate-y-1/2 ml-4 px-2 py-1 bg-dark text-white text-xs rounded-md shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap z-20">
@@ -111,7 +108,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar, isMobileO
         <div className="group relative border-t border-white/10 pt-2">
           <button
             onClick={handleLogout}
-            className={`flex items-center w-full text-gray-300 hover:bg-white/10 rounded-lg transition-colors duration-200 ${isCollapsed ? 'p-3 justify-center' : 'px-4 py-3'}`}
+            className={`flex items-center w-full text-gray-300 hover:bg-primary/40 rounded-lg transition-colors duration-200 ${isCollapsed ? 'p-3 justify-center' : 'px-4 py-3'}`}
           >
             <div className="flex-shrink-0"><LogoutIcon /></div>
             <span className={`ml-4 whitespace-nowrap overflow-hidden transition-all duration-300 ${isCollapsed ? 'w-0 opacity-0' : 'w-auto opacity-100'}`}>Logout</span>

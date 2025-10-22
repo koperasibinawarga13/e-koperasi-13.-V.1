@@ -57,10 +57,10 @@ const AdminPinjaman: React.FC = () => {
         let colorClasses = '';
         switch (status) {
             case 'Menunggu Persetujuan':
-                colorClasses = 'bg-yellow-100 text-yellow-800';
+                colorClasses = 'bg-amber-100 text-amber-800';
                 break;
             case 'Disetujui':
-                colorClasses = 'bg-green-100 text-green-800';
+                colorClasses = 'bg-secondary-light text-secondary-dark';
                 break;
             case 'Ditolak':
                 colorClasses = 'bg-red-100 text-red-800';

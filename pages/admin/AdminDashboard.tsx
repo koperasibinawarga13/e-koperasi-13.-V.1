@@ -112,10 +112,10 @@ const AdminDashboard: React.FC = () => {
         <div>
             <Header title="Dashboard Admin" />
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <StatCard title="Total Anggota" value={stats.totalAnggota.toLocaleString('id-ID')} icon={<UsersIcon className="w-6 h-6 text-white" />} color="bg-blue-500" />
-                <StatCard title="Total Simpanan" value={formatCurrency(stats.totalSimpanan)} icon={<CreditCardIcon className="w-6 h-6 text-white" />} color="bg-green-500" />
-                <StatCard title="Total Pinjaman" value={formatCurrency(stats.totalPinjaman)} icon={<ChartBarIcon className="w-6 h-6 text-white" />} color="bg-yellow-500" />
-                <StatCard title="Saldo Kas" value={formatCurrency(stats.saldoKas)} icon={<BuildingOfficeIcon className="w-6 h-6 text-white" />} color="bg-red-500" />
+                <StatCard title="Total Anggota" value={stats.totalAnggota.toLocaleString('id-ID')} icon={<UsersIcon className="w-6 h-6" />} color="bg-gradient-to-br from-indigo-500 to-blue-600" />
+                <StatCard title="Total Simpanan" value={formatCurrency(stats.totalSimpanan)} icon={<CreditCardIcon className="w-6 h-6" />} color="bg-gradient-to-br from-emerald-500 to-green-600" />
+                <StatCard title="Total Pinjaman" value={formatCurrency(stats.totalPinjaman)} icon={<ChartBarIcon className="w-6 h-6" />} color="bg-gradient-to-br from-amber-400 to-yellow-500" />
+                <StatCard title="Saldo Kas" value={formatCurrency(stats.saldoKas)} icon={<BuildingOfficeIcon className="w-6 h-6" />} color="bg-gradient-to-br from-rose-400 to-red-500" />
             </div>
             <div className="bg-white p-6 rounded-xl border border-gray-200">
                 <h2 className="text-lg md:text-xl font-bold text-dark mb-4">Ringkasan Saldo Akhir</h2>
@@ -128,7 +128,7 @@ const AdminDashboard: React.FC = () => {
                                 <YAxis tickFormatter={(tick) => `${(tick / 1000000).toLocaleString('id-ID')} Jt`} />
                                 <Tooltip formatter={(value: number) => formatCurrency(value)} />
                                 <Legend />
-                                <Bar dataKey="total" name="Total Saldo Akhir" fill="#0052FF" />
+                                <Bar dataKey="total" name="Total Saldo Akhir" fill="#4338CA" />
                             </BarChart>
                         </ResponsiveContainer>
                     </div>
