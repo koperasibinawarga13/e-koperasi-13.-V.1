@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import Header from '../../components/Header';
 import { TransaksiLog } from '../../types';
-import { getLogsByAnggota } from '../../services/transaksiLogService';
+import { getLogsByAnggota, synchronizeMissingLogs } from '../../services/transaksiLogService';
 import { PencilIcon } from '../../components/icons/Icons';
 import { useAuth } from '../../context/AuthContext';
 
@@ -11,8 +11,10 @@ const AdminRiwayatTransaksi: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [searchResult, setSearchResult] = useState<TransaksiLog[]>([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [isSyncing, setIsSyncing] = useState(false);
     const [searched, setSearched] = useState(false);
     const [selectedLog, setSelectedLog] = useState<TransaksiLog | null>(null);
+    const [syncMessage, setSyncMessage] = useState<string | null>(null);
 
     const handleSearch = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -25,6 +27,28 @@ const AdminRiwayatTransaksi: React.FC = () => {
         setIsLoading(false);
     };
     
+    const handleSync = async () => {
+        setIsSyncing(true);
+        setSyncMessage(null);
+        try {
+            const { created } = await synchronizeMissingLogs();
+            if (created > 0) {
+                setSyncMessage(`Sinkronisasi berhasil! ${created} riwayat transaksi yang hilang berhasil dibuat.`);
+                // Refresh search if a member is already being viewed
+                if (searched && searchTerm) {
+                    handleSearch(new Event('submit') as any);
+                }
+            } else {
+                setSyncMessage('Tidak ada riwayat transaksi yang hilang. Data Anda sudah sinkron.');
+            }
+        } catch (error) {
+            console.error(error);
+            setSyncMessage('Terjadi kesalahan saat sinkronisasi.');
+        } finally {
+            setIsSyncing(false);
+        }
+    };
+
     const formatCurrency = (amount: number | undefined) => {
         if (typeof amount !== 'number') return 'Rp 0';
         return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(amount);
@@ -71,18 +95,37 @@ const AdminRiwayatTransaksi: React.FC = () => {
         <div>
             <Header title="Riwayat Transaksi Manual" />
             <div className="bg-white p-6 rounded-xl shadow-md">
-                <form onSubmit={handleSearch} className="flex gap-4 mb-6">
-                    <input
-                        type="text"
-                        placeholder="Masukkan Nomor Anggota (e.g., AK-101)"
-                        className="flex-grow border border-gray-300 rounded-lg px-4 py-2 focus:ring-1 focus:ring-primary focus:border-primary"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                    <button type="submit" disabled={isLoading} className="bg-primary text-white px-6 py-2 rounded-lg font-semibold hover:bg-primary-dark disabled:bg-gray-400">
-                        {isLoading ? 'Mencari...' : 'Cari'}
-                    </button>
-                </form>
+                <div className="flex flex-wrap gap-4 justify-between items-start mb-6">
+                    <form onSubmit={handleSearch} className="flex gap-4 flex-grow">
+                        <input
+                            type="text"
+                            placeholder="Masukkan Nomor Anggota (e.g., AK-101)"
+                            className="flex-grow border border-gray-300 rounded-lg px-4 py-2 focus:ring-1 focus:ring-primary focus:border-primary"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                        <button type="submit" disabled={isLoading} className="bg-primary text-white px-6 py-2 rounded-lg font-semibold hover:bg-primary-dark disabled:bg-gray-400">
+                            {isLoading ? 'Mencari...' : 'Cari'}
+                        </button>
+                    </form>
+                    <div className="flex-shrink-0">
+                        <button 
+                            onClick={handleSync} 
+                            disabled={isSyncing} 
+                            className="bg-secondary text-white px-4 py-2 rounded-lg font-semibold hover:bg-secondary-dark disabled:bg-gray-400"
+                            title="Pindai dan buat log untuk transaksi manual yang tidak tercatat di riwayat."
+                        >
+                            {isSyncing ? 'Menyinkronkan...' : 'Sinkronisasi Riwayat'}
+                        </button>
+                    </div>
+                </div>
+                
+                {syncMessage && (
+                    <div className="mb-4 p-3 rounded-md text-sm bg-blue-100 text-blue-800 text-center">
+                        {syncMessage}
+                    </div>
+                )}
+
 
                 <div className="overflow-x-auto">
                     {isLoading ? <p className="text-center py-4">Memuat riwayat...</p> : (
