@@ -12,8 +12,18 @@ export interface User {
   anggotaId?: string; // To link session with Anggota document
 }
 
-export interface Anggota {
+export interface AdminUser {
   id: string;
+  nama: string;
+  email: string;
+  password?: string;
+  role: 'admin';
+  no_telepon?: string;
+  alamat?: string;
+}
+
+export interface Anggota {
+  id:string;
   no_anggota: string;
   password?: string;
   nama: string;
@@ -40,6 +50,8 @@ export interface Keuangan {
   no_anggota: string;
   nama_angota: string;
   periode?: string; // YYYY-MM
+  tanggal_transaksi?: string; // YYYY-MM-DD
+  admin_nama?: string;
   awal_simpanan_pokok: number;
   awal_simpanan_wajib: number;
   sukarela: number;
@@ -77,6 +89,8 @@ export interface Keuangan {
 export interface TransaksiBulanan {
   no_anggota: string;
   nama_angota?: string;
+  tanggal_transaksi?: string; // YYYY-MM-DD
+  admin_nama?: string;
   transaksi_simpanan_pokok: number;
   transaksi_simpanan_wajib: number;
   transaksi_simpanan_sukarela: number;

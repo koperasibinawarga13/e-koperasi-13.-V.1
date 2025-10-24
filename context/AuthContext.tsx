@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User, UserRole, Anggota } from '../types';
 import { findAnggotaByCredentials, getAnggotaById } from '../services/anggotaService';
+import { findAdminByCredentials } from '../services/adminService';
 
 interface AuthContextType {
   user: User | null;
@@ -31,27 +32,28 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }, []);
 
   const login = async (username: string, password: string) => {
-    // Admin login (hardcoded)
-    if (username === 'admin@koperasi13.com' && password === 'admin123') {
-      const adminUser: User = {
-        id: 'admin01',
-        name: 'Admin Koperasi',
-        email: 'admin@koperasi13.com',
-        role: UserRole.ADMIN,
-      };
-      localStorage.setItem('user', JSON.stringify(adminUser));
-      setUser(adminUser);
-      return;
+    // 1. Try to log in as an Admin first
+    const admin = await findAdminByCredentials(username, password);
+    if (admin) {
+        const adminUser: User = {
+            id: admin.id,
+            name: admin.nama,
+            email: admin.email,
+            role: UserRole.ADMIN,
+        };
+        localStorage.setItem('user', JSON.stringify(adminUser));
+        setUser(adminUser);
+        return;
     }
     
-    // Anggota login (Firestore)
+    // 2. If not an admin, try to log in as an Anggota
     const anggota = await findAnggotaByCredentials(username, password);
     if (anggota) {
         const anggotaUser: User = {
             id: anggota.id,
             anggotaId: anggota.id,
             name: anggota.nama,
-            email: anggota.email,
+            email: anggota.email || '',
             role: UserRole.ANGGOTA
         };
         localStorage.setItem('user', JSON.stringify(anggotaUser));
@@ -59,6 +61,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         return;
     }
 
+    // 3. If neither, throw error
     throw new Error('Username atau password salah.');
   };
 

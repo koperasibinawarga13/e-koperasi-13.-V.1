@@ -2,7 +2,7 @@ import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { UserRole } from '../types';
-import { DashboardIcon, UsersIcon, UploadIcon, ChartBarIcon, LogoutIcon, UserCircleIcon, CreditCardIcon, BuildingOfficeIcon, ChevronLeftIcon, CalculatorIcon, MegaphoneIcon } from './icons/Icons';
+import { DashboardIcon, UsersIcon, UploadIcon, ChartBarIcon, LogoutIcon, UserCircleIcon, CreditCardIcon, BuildingOfficeIcon, ChevronLeftIcon, CalculatorIcon, MegaphoneIcon, CashIcon, CogIcon } from './icons/Icons';
 import { LogoBinaWarga } from './icons/LogoBinaWarga';
 
 interface NavItem {
@@ -11,10 +11,12 @@ interface NavItem {
   icon: React.ReactNode;
 }
 
-const adminNavItems: NavItem[] = [
+const baseAdminNavItems: NavItem[] = [
   { to: '/admin/dashboard', label: 'Dashboard', icon: <DashboardIcon /> },
+  { to: '/admin/profil', label: 'Profil Admin', icon: <UserCircleIcon /> },
   { to: '/admin/anggota', label: 'Data Anggota', icon: <UsersIcon /> },
   { to: '/admin/upload', label: 'Upload Data', icon: <UploadIcon /> },
+  { to: '/admin/transaksi', label: 'Input Transaksi', icon: <CashIcon /> },
   { to: '/admin/laporan', label: 'Laporan', icon: <ChartBarIcon /> },
   { to: '/admin/pinjaman', label: 'Pengajuan Pinjaman', icon: <CreditCardIcon /> },
   { to: '/admin/pengumuman', label: 'Pengumuman', icon: <MegaphoneIcon /> },
@@ -43,7 +45,18 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar, isMobileO
     navigate('/login');
   };
 
-  const navItems = user?.role === UserRole.ADMIN ? adminNavItems : anggotaNavItems;
+  const getNavItems = () => {
+    if (user?.role === UserRole.ADMIN) {
+        let adminNavs = [...baseAdminNavItems];
+        if (user.email === 'admin@koperasi13.com') {
+            adminNavs.push({ to: '/admin/pengaturan-admin', label: 'Pengaturan Admin', icon: <CogIcon /> });
+        }
+        return adminNavs;
+    }
+    return anggotaNavItems;
+  };
+
+  const navItems = getNavItems();
 
   const NavLinkClasses = ({ isActive }: { isActive: boolean }) =>
     `flex items-center w-full text-gray-300 hover:bg-primary/40 rounded-lg transition-colors duration-200 relative ${

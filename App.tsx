@@ -19,6 +19,9 @@ import AdminPinjaman from './pages/admin/AdminPinjaman';
 import AdminPinjamanDetail from './pages/admin/AdminPinjamanDetail';
 import BeritaPage from './pages/BeritaPage';
 import AdminPengumuman from './pages/admin/AdminPengumuman';
+import AdminTransaksi from './pages/admin/AdminTransaksi';
+import AdminPengaturan from './pages/admin/AdminPengaturan';
+import AdminProfil from './pages/admin/AdminProfil';
 
 const App: React.FC = () => {
   return (
@@ -44,13 +47,19 @@ const AppRoutes: React.FC = () => {
         element={user?.role === UserRole.ADMIN ? <AdminLayout /> : <Navigate to="/login" />}
       >
         <Route path="dashboard" element={<AdminDashboard />} />
+        <Route path="profil" element={<AdminProfil />} />
         <Route path="anggota" element={<AdminAnggota />} />
         <Route path="upload" element={<AdminUpload />} />
+        <Route path="transaksi" element={<AdminTransaksi />} />
         <Route path="laporan" element={<AdminLaporan />} />
         <Route path="pinjaman" element={<AdminPinjaman />} />
         <Route path="pinjaman/:id" element={<AdminPinjamanDetail />} />
         <Route path="keuangan/:no_anggota" element={<AdminKeuanganDetail />} />
         <Route path="pengumuman" element={<AdminPengumuman />} />
+        <Route 
+          path="pengaturan-admin" 
+          element={user?.email === 'admin@koperasi13.com' ? <AdminPengaturan /> : <Navigate to="/admin/dashboard" />} 
+        />
         <Route index element={<Navigate to="dashboard" />} />
       </Route>
 
