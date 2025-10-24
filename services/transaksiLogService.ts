@@ -45,6 +45,15 @@ export const getLogById = async (id: string): Promise<TransaksiLog | null> => {
     }
 };
 
+const transactionFieldsForSync: (keyof Keuangan)[] = [
+    'transaksi_simpanan_pokok', 'transaksi_simpanan_wajib', 'transaksi_simpanan_sukarela', 'transaksi_simpanan_wisata',
+    'transaksi_pinjaman_berjangka', 'transaksi_pinjaman_khusus', 'transaksi_simpanan_jasa', 'transaksi_niaga',
+    'transaksi_dana_perlaya', 'transaksi_dana_katineng', 'Jumlah_setoran', 'transaksi_pengambilan_simpanan_pokok',
+    'transaksi_pengambilan_simpanan_wajib', 'transaksi_pengambilan_simpanan_sukarela', 'transaksi_pengambilan_simpanan_wisata',
+    'transaksi_penambahan_pinjaman_berjangka', 'transaksi_penambahan_pinjaman_khusus', 'transaksi_penambahan_pinjaman_niaga'
+];
+
+
 // New function to find and create missing logs
 export const synchronizeMissingLogs = async (): Promise<{ created: number }> => {
     let createdCount = 0;
@@ -61,11 +70,14 @@ export const synchronizeMissingLogs = async (): Promise<{ created: number }> => 
         const historySnap = await getDocs(historyCollectionRef);
 
         for (const historyDoc of historySnap.docs) {
-            const periode = historyDoc.id; // YYYY-MM
             const historyData = historyDoc.data() as Keuangan;
             
-            // 3. Check if this transaction was a manual one (has admin_nama)
-            if (historyData.admin_nama && historyData.tanggal_transaksi) {
+            // 3. New Robust Check: Does this report have any transaction values?
+            const hasTransactions = transactionFieldsForSync.some(field => (historyData as any)[field] > 0);
+
+            if (hasTransactions) {
+                const periode = historyDoc.id; // YYYY-MM
+                
                 // 4. Check if a log already exists for this member in this period
                 const logQuery = query(
                     logCollectionRef,
@@ -74,14 +86,28 @@ export const synchronizeMissingLogs = async (): Promise<{ created: number }> => 
                 );
                 const logSnap = await getDocs(logQuery);
 
-                // 5. If no log exists, create one from the history data
+                // 5. If there are transactions BUT no log exists, create one.
                 if (logSnap.empty) {
-                    const { id, no, awal_simpanan_pokok, awal_simpanan_wajib, sukarela, awal_simpanan_wisata, awal_pinjaman_berjangka, awal_pinjaman_khusus, akhir_simpanan_pokok, akhir_simpanan_wajib, akhir_simpanan_sukarela, akhir_simpanan_wisata, akhir_pinjaman_berjangka, akhir_pinjaman_khusus, jumlah_total_simpanan, jumlah_total_pinjaman, ...transaksiFields } = historyData;
+                    const { 
+                        id, no, awal_simpanan_pokok, awal_simpanan_wajib, sukarela, awal_simpanan_wisata, 
+                        awal_pinjaman_berjangka, awal_pinjaman_khusus, akhir_simpanan_pokok, akhir_simpanan_wajib, 
+                        akhir_simpanan_sukarela, akhir_simpanan_wisata, akhir_pinjaman_berjangka, akhir_pinjaman_khusus, 
+                        jumlah_total_simpanan, jumlah_total_pinjaman, 
+                        ...transaksiFields 
+                    } = historyData;
 
-                    await createLog({
-                        ...(transaksiFields as any),
+                    const logTimestamp = historyData.tanggal_transaksi 
+                        ? new Date(historyData.tanggal_transaksi).toISOString() 
+                        : new Date(`${periode}-01T12:00:00Z`).toISOString();
+
+                    await addDoc(logCollectionRef, {
+                        ...transaksiFields,
+                        no_anggota: historyData.no_anggota,
+                        nama_angota: historyData.nama_angota,
+                        admin_nama: historyData.admin_nama || "Sistem (Sinkronisasi)",
+                        periode: periode,
                         type: 'INPUT BARU',
-                        log_time: new Date(historyData.tanggal_transaksi).toISOString(),
+                        log_time: logTimestamp,
                     });
                     createdCount++;
                 }
