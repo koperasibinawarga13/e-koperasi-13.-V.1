@@ -1,11 +1,19 @@
-const CACHE_NAME = 'e-koperasi-cache-v8'; // Incremented version to ensure PWA update
+const CACHE_NAME = 'e-koperasi-cache-v9'; // Incremented version to ensure PWA update
 const urlsToCache = [
   // App Shell
   '/',
   '/index.html',
-  '/index.tsx', // Crucial: Cache the main application script
+  '/index.tsx', 
   '/manifest.json',
   '/vite.svg',
+  // Core CDN Scripts for offline functionality
+  'https://cdn.tailwindcss.com',
+  'https://unpkg.com/react@18/umd/react.production.min.js',
+  'https://unpkg.com/react-dom@18/umd/react-dom.production.min.js',
+  'https://unpkg.com/react-router-dom@6/umd/react-router-dom.production.min.js',
+  'https://unpkg.com/recharts@2/umd/Recharts.min.js',
+  'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js',
+  'https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap'
 ];
 
 // Install the service worker and cache all critical assets
