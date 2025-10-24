@@ -2,7 +2,7 @@ import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { UserRole } from '../types';
-import { DashboardIcon, UsersIcon, UploadIcon, ChartBarIcon, LogoutIcon, UserCircleIcon, CreditCardIcon, BuildingOfficeIcon, ChevronLeftIcon, CalculatorIcon, MegaphoneIcon, CashIcon, CogIcon } from './icons/Icons';
+import { DashboardIcon, UsersIcon, UploadIcon, ChartBarIcon, LogoutIcon, UserCircleIcon, CreditCardIcon, BuildingOfficeIcon, ChevronLeftIcon, CalculatorIcon, MegaphoneIcon, CashIcon, CogIcon, ClockIcon } from './icons/Icons';
 import { LogoBinaWarga } from './icons/LogoBinaWarga';
 
 interface NavItem {
@@ -20,6 +20,7 @@ const baseAdminNavItems: NavItem[] = [
   { to: '/admin/laporan', label: 'Laporan', icon: <ChartBarIcon /> },
   { to: '/admin/pinjaman', label: 'Pengajuan Pinjaman', icon: <CreditCardIcon /> },
   { to: '/admin/pengumuman', label: 'Pengumuman', icon: <MegaphoneIcon /> },
+  { to: '/admin/riwayat-transaksi', label: 'Riwayat Transaksi', icon: <ClockIcon /> },
 ];
 
 const anggotaNavItems: NavItem[] = [

@@ -1,6 +1,8 @@
 import { collection, doc, writeBatch, runTransaction, getDocs, getDoc, updateDoc, arrayRemove, deleteDoc, query, orderBy, limit, setDoc } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
-import { Keuangan, TransaksiBulanan } from '../types';
+import { Keuangan, TransaksiBulanan, TransaksiLog } from '../types';
+import { getLogById } from './transaksiLogService';
+
 
 const keuanganCollectionRef = collection(db, 'keuangan');
 
@@ -353,4 +355,107 @@ export const rebuildUploadHistory = async (): Promise<string[]> => {
         console.error("Error rebuilding upload history:", error);
         throw error;
     }
+};
+
+const calculateEndBalances = (report: Keuangan): Keuangan => {
+    const updatedReport = { ...report };
+    updatedReport.akhir_simpanan_pokok = updatedReport.awal_simpanan_pokok + (updatedReport.transaksi_simpanan_pokok || 0) - (updatedReport.transaksi_pengambilan_simpanan_pokok || 0);
+    updatedReport.akhir_simpanan_wajib = updatedReport.awal_simpanan_wajib + (updatedReport.transaksi_simpanan_wajib || 0) - (updatedReport.transaksi_pengambilan_simpanan_wajib || 0);
+    updatedReport.akhir_simpanan_sukarela = updatedReport.sukarela + (updatedReport.transaksi_simpanan_sukarela || 0) - (updatedReport.transaksi_pengambilan_simpanan_sukarela || 0);
+    updatedReport.akhir_simpanan_wisata = updatedReport.awal_simpanan_wisata + (updatedReport.transaksi_simpanan_wisata || 0) - (updatedReport.transaksi_pengambilan_simpanan_wisata || 0);
+    updatedReport.akhir_pinjaman_berjangka = updatedReport.awal_pinjaman_berjangka - (updatedReport.transaksi_pinjaman_berjangka || 0) + (updatedReport.transaksi_penambahan_pinjaman_berjangka || 0);
+    updatedReport.akhir_pinjaman_khusus = updatedReport.awal_pinjaman_khusus - (updatedReport.transaksi_pinjaman_khusus || 0) + (updatedReport.transaksi_penambahan_pinjaman_khusus || 0);
+    updatedReport.jumlah_total_simpanan = updatedReport.akhir_simpanan_pokok + updatedReport.akhir_simpanan_wajib + updatedReport.akhir_simpanan_sukarela + updatedReport.akhir_simpanan_wisata;
+    updatedReport.jumlah_total_pinjaman = updatedReport.akhir_pinjaman_berjangka + updatedReport.akhir_pinjaman_khusus;
+    return updatedReport;
+};
+
+
+export const correctPastTransaction = async (logId: string, updatedTxData: TransaksiBulanan, editorName: string): Promise<void> => {
+    const originalLog = await getLogById(logId);
+    if (!originalLog) {
+        throw new Error("Log transaksi asli tidak ditemukan.");
+    }
+
+    const { no_anggota, periode } = originalLog;
+
+    await runTransaction(db, async (transaction) => {
+        // 1. Calculate deltas (new - old)
+        const deltas: { [key: string]: number } = {};
+        transactionFields.forEach(field => {
+            const oldValue = (originalLog as any)[field] || 0;
+            const newValue = (updatedTxData as any)[field] || 0;
+            if (oldValue !== newValue) {
+                deltas[field] = newValue - oldValue;
+            }
+        });
+
+        if (Object.keys(deltas).length === 0) {
+            // No changes, but we still update the log metadata
+            const logDocRef = doc(db, 'transaksi_logs', logId);
+            transaction.update(logDocRef, {
+                ...updatedTxData,
+                editedAt: new Date().toISOString(),
+                editedBy: editorName,
+            });
+            return;
+        }
+
+        // 2. Fetch all subsequent history reports for this member
+        const allMonths = await getAvailableLaporanMonths(no_anggota);
+        const subsequentMonths = allMonths.filter(m => m >= periode).sort((a, b) => a.localeCompare(b));
+
+        let previousMonthEndBalances: Partial<Keuangan> | null = null;
+
+        // 3. Recalculate each month sequentially
+        for (const month of subsequentMonths) {
+            const historyDocRef = doc(db, 'keuangan', no_anggota, 'history', month);
+            const historySnap = await transaction.get(historyDocRef);
+            
+            if (!historySnap.exists()) continue; // Should not happen in a consistent dataset
+
+            let currentMonthReport = historySnap.data() as Keuangan;
+
+            // Apply deltas to the target month
+            if (month === periode) {
+                Object.entries(deltas).forEach(([field, delta]) => {
+                    (currentMonthReport as any)[field] = ((currentMonthReport as any)[field] || 0) + delta;
+                });
+            }
+
+            // Update starting balances from previous month's recalculated end balances
+            if (previousMonthEndBalances) {
+                currentMonthReport.awal_simpanan_pokok = previousMonthEndBalances.akhir_simpanan_pokok || 0;
+                currentMonthReport.awal_simpanan_wajib = previousMonthEndBalances.akhir_simpanan_wajib || 0;
+                currentMonthReport.sukarela = previousMonthEndBalances.akhir_simpanan_sukarela || 0;
+                currentMonthReport.awal_simpanan_wisata = previousMonthEndBalances.akhir_simpanan_wisata || 0;
+                currentMonthReport.awal_pinjaman_berjangka = previousMonthEndBalances.akhir_pinjaman_berjangka || 0;
+                currentMonthReport.awal_pinjaman_khusus = previousMonthEndBalances.akhir_pinjaman_khusus || 0;
+            }
+            
+            // Recalculate end balances for the current month
+            const recalculatedReport = calculateEndBalances(currentMonthReport);
+            
+            // Save the updated report for this month
+            transaction.set(historyDocRef, recalculatedReport);
+
+            // Store its end balances for the next iteration
+            previousMonthEndBalances = recalculatedReport;
+        }
+
+        // 4. Update the main 'keuangan' document if we processed any month
+        if (previousMonthEndBalances) {
+            const mainDocRef = doc(db, 'keuangan', no_anggota);
+            transaction.set(mainDocRef, previousMonthEndBalances);
+        }
+
+        // 5. Update the transaction log itself
+        const logDocRef = doc(db, 'transaksi_logs', logId);
+        transaction.update(logDocRef, {
+            ...updatedTxData,
+            type: 'EDIT',
+            editedAt: new Date().toISOString(),
+            editedBy: editorName,
+        });
+    });
 };

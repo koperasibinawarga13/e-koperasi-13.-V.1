@@ -111,6 +111,16 @@ export interface TransaksiBulanan {
   transaksi_penambahan_pinjaman_niaga: number;
 }
 
+export interface TransaksiLog extends TransaksiBulanan {
+  id: string;
+  log_time: string; // ISO String
+  periode: string; // YYYY-MM
+  type: 'INPUT BARU' | 'EDIT';
+  editedAt?: string; // ISO String
+  editedBy?: string;
+}
+
+
 export interface PengajuanPinjaman {
   id?: string;
   no_anggota: string;
