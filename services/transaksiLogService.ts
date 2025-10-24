@@ -56,6 +56,41 @@ export const getLogsByAnggota = async (no_anggota: string): Promise<TransaksiLog
     }
 };
 
+export const getLogsByAdminAndPeriod = async (adminName: string, period: string): Promise<TransaksiLog[]> => {
+    try {
+        const q = query(
+            logCollectionRef, 
+            where('admin_nama', '==', adminName), 
+            where('periode', '==', period),
+            orderBy('log_time', 'asc')
+        );
+        const data = await getDocs(q);
+        return data.docs.map(doc => ({...doc.data(), id: doc.id} as TransaksiLog));
+    } catch (error) {
+        console.error("Error fetching logs by admin and period:", error);
+        return [];
+    }
+};
+
+
+export const getAvailableLogPeriods = async (): Promise<string[]> => {
+    try {
+        const snapshot = await getDocs(logCollectionRef);
+        const periods = new Set<string>();
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            if (data.periode) {
+                periods.add(data.periode);
+            }
+        });
+        return Array.from(periods).sort((a, b) => b.localeCompare(a)); // Sort descending
+    } catch (error) {
+        console.error("Error fetching available log periods:", error);
+        return [];
+    }
+};
+
+
 export const getLogsByPeriod = async (periode: string): Promise<TransaksiLog[]> => {
     try {
         const q = query(logCollectionRef, where('periode', '==', periode));
