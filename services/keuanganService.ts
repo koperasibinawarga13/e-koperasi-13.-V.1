@@ -10,11 +10,14 @@ import {
   query,
   where,
   arrayUnion,
-  arrayRemove
+  arrayRemove,
+  collectionGroup,
+  // FIX: Import 'orderBy' to enable sorting in Firestore queries.
+  orderBy
 } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 import { Keuangan, TransaksiBulanan, TransaksiLog } from '../types';
-import { deleteLogsByPeriod, getLogsByPeriod, updateLog } from './transaksiLogService';
+import { deleteLogsByPeriod, getLogsByPeriod, getLogById as getLogByIdService } from './transaksiLogService';
 
 const keuanganCollectionRef = collection(db, 'keuangan');
 const metadataCollectionRef = collection(db, 'metadata');
@@ -22,12 +25,19 @@ const UPLOAD_HISTORY_DOC_ID = '_upload_history';
 
 // Helper function to calculate final balances
 const calculateAkhir = (awal: Partial<Keuangan>, tx: Partial<TransaksiBulanan>): { [key: string]: number } => {
-    const akhir_simpanan_pokok = (awal.awal_simpanan_pokok ?? awal.akhir_simpanan_pokok ?? 0) + (tx.transaksi_simpanan_pokok ?? 0) - (tx.transaksi_pengambilan_simpanan_pokok ?? 0);
-    const akhir_simpanan_wajib = (awal.awal_simpanan_wajib ?? awal.akhir_simpanan_wajib ?? 0) + (tx.transaksi_simpanan_wajib ?? 0) - (tx.transaksi_pengambilan_simpanan_wajib ?? 0);
-    const akhir_simpanan_sukarela = (awal.sukarela ?? awal.akhir_simpanan_sukarela ?? 0) + (tx.transaksi_simpanan_sukarela ?? 0) - (tx.transaksi_pengambilan_simpanan_sukarela ?? 0);
-    const akhir_simpanan_wisata = (awal.awal_simpanan_wisata ?? awal.akhir_simpanan_wisata ?? 0) + (tx.transaksi_simpanan_wisata ?? 0) - (tx.transaksi_pengambilan_simpanan_wisata ?? 0);
-    const akhir_pinjaman_berjangka = (awal.awal_pinjaman_berjangka ?? awal.akhir_pinjaman_berjangka ?? 0) - (tx.transaksi_pinjaman_berjangka ?? 0) + (tx.transaksi_penambahan_pinjaman_berjangka ?? 0);
-    const akhir_pinjaman_khusus = (awal.awal_pinjaman_khusus ?? awal.akhir_pinjaman_khusus ?? 0) - (tx.transaksi_pinjaman_khusus ?? 0) + (tx.transaksi_penambahan_pinjaman_khusus ?? 0);
+    const awal_sp = awal.awal_simpanan_pokok ?? awal.akhir_simpanan_pokok ?? 0;
+    const awal_sw = awal.awal_simpanan_wajib ?? awal.akhir_simpanan_wajib ?? 0;
+    const awal_ss = awal.sukarela ?? awal.akhir_simpanan_sukarela ?? 0;
+    const awal_swi = awal.awal_simpanan_wisata ?? awal.akhir_simpanan_wisata ?? 0;
+    const awal_pb = awal.awal_pinjaman_berjangka ?? awal.akhir_pinjaman_berjangka ?? 0;
+    const awal_pk = awal.awal_pinjaman_khusus ?? awal.akhir_pinjaman_khusus ?? 0;
+
+    const akhir_simpanan_pokok = awal_sp + (tx.transaksi_simpanan_pokok ?? 0) - (tx.transaksi_pengambilan_simpanan_pokok ?? 0);
+    const akhir_simpanan_wajib = awal_sw + (tx.transaksi_simpanan_wajib ?? 0) - (tx.transaksi_pengambilan_simpanan_wajib ?? 0);
+    const akhir_simpanan_sukarela = awal_ss + (tx.transaksi_simpanan_sukarela ?? 0) - (tx.transaksi_pengambilan_simpanan_sukarela ?? 0);
+    const akhir_simpanan_wisata = awal_swi + (tx.transaksi_simpanan_wisata ?? 0) - (tx.transaksi_pengambilan_simpanan_wisata ?? 0);
+    const akhir_pinjaman_berjangka = awal_pb - (tx.transaksi_pinjaman_berjangka ?? 0) + (tx.transaksi_penambahan_pinjaman_berjangka ?? 0);
+    const akhir_pinjaman_khusus = awal_pk - (tx.transaksi_pinjaman_khusus ?? 0) + (tx.transaksi_penambahan_pinjaman_khusus ?? 0);
     
     return {
         akhir_simpanan_pokok,
@@ -80,55 +90,72 @@ interface UploadResult {
     errors: { no_anggota: string; error: string }[];
 }
 
+export const processSingleTransaksi = async (tx: TransaksiBulanan, periode: string): Promise<UploadResult> => {
+    return batchProcessTransaksiBulanan([tx], periode);
+}
+
 export const batchProcessTransaksiBulanan = async (transaksiList: TransaksiBulanan[], uploadMonth: string): Promise<UploadResult> => {
     const result: UploadResult = { successCount: 0, errorCount: 0, errors: [] };
-    const batch = writeBatch(db);
-
+    
     for (const tx of transaksiList) {
         try {
-            const docRef = doc(db, 'keuangan', tx.no_anggota);
-            const currentDoc = await getDoc(docRef);
-            let currentData: Keuangan;
+            await runTransaction(db, async (transaction) => {
+                const docRef = doc(db, 'keuangan', tx.no_anggota);
+                const currentDoc = await transaction.get(docRef);
+                let currentData: Keuangan;
 
-            if (currentDoc.exists()) {
-                currentData = currentDoc.data() as Keuangan;
-            } else {
-                // If member has no financial record, create a zeroed one
-                currentData = {
-                    no_anggota: tx.no_anggota,
-                    nama_angota: tx.nama_angota || '',
-                    awal_simpanan_pokok: 0, awal_simpanan_wajib: 0, sukarela: 0, awal_simpanan_wisata: 0, awal_pinjaman_berjangka: 0, awal_pinjaman_khusus: 0,
-                    akhir_simpanan_pokok: 0, akhir_simpanan_wajib: 0, akhir_simpanan_sukarela: 0, akhir_simpanan_wisata: 0, akhir_pinjaman_berjangka: 0, akhir_pinjaman_khusus: 0,
-                    jumlah_total_simpanan: 0, jumlah_total_pinjaman: 0,
-                } as Keuangan;
-            }
+                if (currentDoc.exists()) {
+                    currentData = currentDoc.data() as Keuangan;
+                } else {
+                    currentData = {
+                        no: 0,
+                        no_anggota: tx.no_anggota,
+                        nama_angota: tx.nama_angota || '',
+                        awal_simpanan_pokok: 0, awal_simpanan_wajib: 0, sukarela: 0, awal_simpanan_wisata: 0, awal_pinjaman_berjangka: 0, awal_pinjaman_khusus: 0,
+                        akhir_simpanan_pokok: 0, akhir_simpanan_wajib: 0, akhir_simpanan_sukarela: 0, akhir_simpanan_wisata: 0, akhir_pinjaman_berjangka: 0, akhir_pinjaman_khusus: 0,
+                        jumlah_total_simpanan: 0, jumlah_total_pinjaman: 0,
+                    } as Keuangan;
+                }
+                
+                // Save the current state to history for the given period
+                const historyDocRef = doc(db, 'keuangan', tx.no_anggota, 'history', uploadMonth);
+                const historyDoc = await transaction.get(historyDocRef);
+                
+                // Merge data: If there's an existing manual entry for this month, add to it.
+                const existingTx = historyDoc.exists() ? historyDoc.data() as Partial<TransaksiBulanan> : {};
+                const mergedTx: TransaksiBulanan = { ...tx };
+                
+                Object.keys(tx).forEach(key => {
+                    const txKey = key as keyof TransaksiBulanan;
+                    if(typeof tx[txKey] === 'number' && txKey !== 'Jumlah_setoran') {
+                       (mergedTx[txKey] as number) = (tx[txKey] as number) + (Number(existingTx[txKey]) || 0);
+                    }
+                });
 
-            // Save previous state to history
-            const historyDocRef = doc(db, 'keuangan', tx.no_anggota, 'history', currentData.periode || 'awal');
-            batch.set(historyDocRef, currentData);
-
-            const awalData = {
-                awal_simpanan_pokok: currentData.akhir_simpanan_pokok,
-                awal_simpanan_wajib: currentData.akhir_simpanan_wajib,
-                sukarela: currentData.akhir_simpanan_sukarela,
-                awal_simpanan_wisata: currentData.akhir_simpanan_wisata,
-                awal_pinjaman_berjangka: currentData.akhir_pinjaman_berjangka,
-                awal_pinjaman_khusus: currentData.akhir_pinjaman_khusus,
-            };
-
-            const akhirData = calculateAkhir({ ...currentData, ...awalData }, tx);
-            
-            const updatedKeuanganData = {
-                ...currentData,
-                ...tx,
-                ...awalData,
-                ...akhirData,
-                periode: uploadMonth,
-                tanggal_transaksi: tx.tanggal_transaksi || new Date().toISOString().split('T')[0],
-                admin_nama: tx.admin_nama,
-            };
-            
-            batch.set(docRef, updatedKeuanganData);
+                const awalData = {
+                    awal_simpanan_pokok: currentData.akhir_simpanan_pokok,
+                    awal_simpanan_wajib: currentData.akhir_simpanan_wajib,
+                    sukarela: currentData.akhir_simpanan_sukarela,
+                    awal_simpanan_wisata: currentData.akhir_simpanan_wisata,
+                    awal_pinjaman_berjangka: currentData.akhir_pinjaman_berjangka,
+                    awal_pinjaman_khusus: currentData.akhir_pinjaman_khusus,
+                };
+                
+                const akhirData = calculateAkhir({ ...currentData, ...awalData }, mergedTx);
+                
+                const updatedKeuanganData = {
+                    ...currentData,
+                    ...mergedTx,
+                    ...awalData,
+                    ...akhirData,
+                    periode: uploadMonth,
+                    tanggal_transaksi: mergedTx.tanggal_transaksi || new Date().toISOString().split('T')[0],
+                    admin_nama: mergedTx.admin_nama,
+                };
+                
+                transaction.set(historyDocRef, updatedKeuanganData); // Update history for this month
+                transaction.set(docRef, updatedKeuanganData); // Update main document
+            });
             result.successCount++;
         } catch (error: any) {
             result.errorCount++;
@@ -136,11 +163,11 @@ export const batchProcessTransaksiBulanan = async (transaksiList: TransaksiBulan
         }
     }
     
-    // Update upload history metadata
-    const historyMetaDoc = doc(metadataCollectionRef, UPLOAD_HISTORY_DOC_ID);
-    batch.set(historyMetaDoc, { months: arrayUnion(uploadMonth) }, { merge: true });
+    if (result.successCount > 0) {
+        const historyMetaDoc = doc(metadataCollectionRef, UPLOAD_HISTORY_DOC_ID);
+        await setDoc(historyMetaDoc, { months: arrayUnion(uploadMonth) }, { merge: true });
+    }
 
-    await batch.commit();
     return result;
 };
 
@@ -184,7 +211,6 @@ export const deleteMonthlyReport = async (monthToDelete: string): Promise<void> 
         const docRef = doc(db, 'keuangan', no_anggota);
         const historyDocRef = doc(db, 'keuangan', no_anggota, 'history', monthToDelete);
 
-        // Find the state of the month before the one being deleted
         const prevMonth = new Date(new Date(`${monthToDelete}-02`).setMonth(new Date(`${monthToDelete}-02`).getMonth() - 1)).toISOString().slice(0, 7);
         const prevHistoryDocRef = doc(db, 'keuangan', no_anggota, 'history', prevMonth);
         const prevHistoryDoc = await getDoc(prevHistoryDocRef);
@@ -192,20 +218,15 @@ export const deleteMonthlyReport = async (monthToDelete: string): Promise<void> 
         if (prevHistoryDoc.exists()) {
             batch.set(docRef, prevHistoryDoc.data());
         } else {
-            // If there's no previous month, revert to a zeroed state (or delete)
-            // For safety, let's keep the user but zero out their balances. A delete might be too destructive.
             const emptyKeuangan = { no: 0, no_anggota, nama_angota: '', awal_simpanan_pokok: 0, awal_simpanan_wajib: 0, sukarela: 0, awal_simpanan_wisata: 0, awal_pinjaman_berjangka: 0, awal_pinjaman_khusus: 0, transaksi_simpanan_pokok: 0, transaksi_simpanan_wajib: 0, transaksi_simpanan_sukarela: 0, transaksi_simpanan_wisata: 0, transaksi_pinjaman_berjangka: 0, transaksi_pinjaman_khusus: 0, transaksi_simpanan_jasa: 0, transaksi_niaga: 0, transaksi_dana_perlaya: 0, transaksi_dana_katineng: 0, Jumlah_setoran: 0, transaksi_pengambilan_simpanan_pokok: 0, transaksi_pengambilan_simpanan_wajib: 0, transaksi_pengambilan_simpanan_sukarela: 0, transaksi_pengambilan_simpanan_wisata: 0, transaksi_penambahan_pinjaman_berjangka: 0, transaksi_penambahan_pinjaman_khusus: 0, transaksi_penambahan_pinjaman_niaga: 0, akhir_simpanan_pokok: 0, akhir_simpanan_wajib: 0, akhir_simpanan_sukarela: 0, akhir_simpanan_wisata: 0, akhir_pinjaman_berjangka: 0, akhir_pinjaman_khusus: 0, jumlah_total_simpanan: 0, jumlah_total_pinjaman: 0 };
             batch.set(docRef, emptyKeuangan);
         }
         
-        // Delete the history for the specified month
         batch.delete(historyDocRef);
     }
     
-    // Delete the associated transaction logs
     await deleteLogsByPeriod(monthToDelete);
 
-    // Update metadata
     const historyMetaDoc = doc(metadataCollectionRef, UPLOAD_HISTORY_DOC_ID);
     batch.update(historyMetaDoc, { months: arrayRemove(monthToDelete) });
 
@@ -224,6 +245,18 @@ export const getAvailableLaporanMonths = async (no_anggota: string): Promise<str
     }
 };
 
+export const getHistoryByAnggota = async (no_anggota: string): Promise<Keuangan[]> => {
+    try {
+        const historyCollectionRef = collection(db, 'keuangan', no_anggota, 'history');
+        const q = query(historyCollectionRef, orderBy('periode', 'desc'));
+        const snapshot = await getDocs(q);
+        return snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as Keuangan));
+    } catch (error) {
+        console.error("Error fetching member history:", error);
+        return [];
+    }
+};
+
 export const getLaporanBulanan = async (no_anggota: string, month: string): Promise<Keuangan | null> => {
     try {
         const historyDocRef = doc(db, 'keuangan', no_anggota, 'history', month);
@@ -231,7 +264,6 @@ export const getLaporanBulanan = async (no_anggota: string, month: string): Prom
         if (docSnap.exists()) {
             return docSnap.data() as Keuangan;
         }
-        // Fallback for 'awal' state if it exists
         const awalDocRef = doc(db, 'keuangan', no_anggota, 'history', 'awal');
         const awalDocSnap = await getDoc(awalDocRef);
         if (awalDocSnap.exists()) {
@@ -246,32 +278,36 @@ export const getLaporanBulanan = async (no_anggota: string, month: string): Prom
 
 export const correctPastTransaction = async (logId: string, updatedTx: TransaksiBulanan, adminName: string): Promise<void> => {
     await runTransaction(db, async (transaction) => {
-        const logDoc = await getLogById(logId);
-        if (!logDoc) throw new Error("Log transaksi tidak ditemukan.");
+        const logDocRef = doc(db, 'transaksi_logs', logId);
+        const logDocSnap = await transaction.get(logDocRef);
+        if (!logDocSnap.exists()) throw new Error("Log transaksi tidak ditemukan.");
         
+        const logDoc = { ...logDocSnap.data(), id: logDocSnap.id } as TransaksiLog;
         const { no_anggota, periode } = logDoc;
 
-        // Get all logs for this member from the affected period onwards, sorted by period
-        const logsQuery = query(
-            collection(db, 'transaksi_logs'), 
-            where("no_anggota", "==", no_anggota),
-            where("periode", ">=", periode)
-        );
-        const logsSnapshot = await getDocs(logsQuery);
-        const allMemberLogs = logsSnapshot.docs
-            .map(d => ({...d.data(), id: d.id} as TransaksiLog))
-            .sort((a, b) => a.periode.localeCompare(b.periode));
+        const allMemberHistoryQuery = query(collection(db, 'keuangan', no_anggota, 'history'), where('periode', '>=', periode), orderBy('periode', 'asc'));
+        const historySnapshot = await getDocs(allMemberHistoryQuery); // Can't use transaction.get() on queries
+        const affectedHistory = historySnapshot.docs.map(d => d.data() as Keuangan);
 
-        // Find the state before the correction
         const prevPeriod = new Date(new Date(`${periode}-02`).setMonth(new Date(`${periode}-02`).getMonth() - 1)).toISOString().slice(0, 7);
-        letcurrentState = (await getLaporanBulanan(no_anggota, prevPeriod)) || {
-            akhir_simpanan_pokok: 0, akhir_simpanan_wajib: 0, akhir_simpanan_sukarela: 0, akhir_simpanan_wisata: 0,
-            akhir_pinjaman_berjangka: 0, akhir_pinjaman_khusus: 0,
-        } as Partial<Keuangan>;
+        const prevHistoryDocRef = doc(db, 'keuangan', no_anggota, 'history', prevPeriod);
+        const prevHistorySnap = await transaction.get(prevHistoryDocRef);
 
-        // Recalculate each month forward
-        for (const log of allMemberLogs) {
-            const txForThisMonth = log.id === logId ? updatedTx : log;
+        // FIX: Critical bug fix for handling the very first transaction where no previous history exists.
+        // Ensure currentState is a fully-formed, zeroed-out object.
+        let currentState: Keuangan = {
+            no: 0, no_anggota, nama_angota: logDoc.nama_angota || '',
+            awal_simpanan_pokok: 0, awal_simpanan_wajib: 0, sukarela: 0, awal_simpanan_wisata: 0, awal_pinjaman_berjangka: 0, awal_pinjaman_khusus: 0,
+            akhir_simpanan_pokok: 0, akhir_simpanan_wajib: 0, akhir_simpanan_sukarela: 0, akhir_simpanan_wisata: 0, akhir_pinjaman_berjangka: 0, akhir_pinjaman_khusus: 0,
+            jumlah_total_simpanan: 0, jumlah_total_pinjaman: 0,
+        } as Keuangan;
+        
+        if (prevHistorySnap.exists()) {
+            currentState = { ...currentState, ...prevHistorySnap.data() as Keuangan };
+        }
+
+        for (const history of affectedHistory) {
+            const txForThisMonth = history.periode === periode ? updatedTx : history;
             
             const awalData = {
                 awal_simpanan_pokok: currentState.akhir_simpanan_pokok,
@@ -285,26 +321,21 @@ export const correctPastTransaction = async (logId: string, updatedTx: Transaksi
             const akhirData = calculateAkhir({ ...currentState, ...awalData }, txForThisMonth);
 
             const newMonthlyState: Keuangan = {
-                ...(currentState as Keuangan),
+                ...(history as Keuangan), // Preserve any other fields from original history
                 ...txForThisMonth,
                 ...awalData,
                 ...akhirData,
-                periode: log.periode,
             };
             
-            // Update history doc for this month
-            const historyDocRef = doc(db, 'keuangan', no_anggota, 'history', log.periode);
+            const historyDocRef = doc(db, 'keuangan', no_anggota, 'history', history.periode);
             transaction.set(historyDocRef, newMonthlyState);
 
-            currentState = newMonthlyState; // Carry over to next iteration
+            currentState = newMonthlyState;
         }
         
-        // Update the main keuangan document with the final recalculated state
         const mainDocRef = doc(db, 'keuangan', no_anggota);
         transaction.set(mainDocRef, currentState);
 
-        // Update the log entry itself to mark it as edited
-        const logDocRef = doc(db, 'transaksi_logs', logId);
         transaction.update(logDocRef, { 
             ...updatedTx,
             type: 'EDIT',
