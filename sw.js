@@ -1,19 +1,24 @@
-const CACHE_NAME = 'e-koperasi-cache-v9'; // Incremented version to ensure PWA update
+const CACHE_NAME = 'e-koperasi-cache-v10'; // Incremented version
 const urlsToCache = [
   // App Shell
   '/',
   '/index.html',
-  '/index.tsx', 
   '/manifest.json',
   '/vite.svg',
-  // Core CDN Scripts for offline functionality
+  // Main script
+  '/index.tsx',
+  // Styles & Fonts
   'https://cdn.tailwindcss.com',
-  'https://unpkg.com/react@18/umd/react.production.min.js',
-  'https://unpkg.com/react-dom@18/umd/react-dom.production.min.js',
-  'https://unpkg.com/react-router-dom@6/umd/react-router-dom.production.min.js',
-  'https://unpkg.com/recharts@2/umd/Recharts.min.js',
-  'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js',
-  'https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap'
+  'https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap',
+  // JS Dependencies from importmap
+  'https://aistudiocdn.com/react@^19.2.0',
+  'https://aistudiocdn.com/react-dom@^19.2.0/client',
+  'https://aistudiocdn.com/react-router-dom@^7.9.4',
+  'https://aistudiocdn.com/recharts@^3.2.1',
+  'https://aistudiocdn.com/firebase@^12.4.0/app',
+  'https://aistudiocdn.com/firebase@^12.4.0/firestore',
+  'https://aistudiocdn.com/react-dropzone@^14.3.8',
+  'https://aistudiocdn.com/xlsx@^0.18.5'
 ];
 
 // Install the service worker and cache all critical assets
@@ -53,13 +58,11 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // Handle navigation requests (e.g., loading a page) for our SPA.
-  // Use a network-first, falling back to cache strategy.
+  // Handle navigation requests for our SPA using a network-first, falling back to cache strategy.
   if (event.request.mode === 'navigate') {
     event.respondWith(
       fetch(event.request).catch(() => {
         // If the network fails (offline), serve the main app shell from the cache.
-        // Explicitly return index.html for any navigation route.
         return caches.match('/index.html');
       })
     );
@@ -77,17 +80,16 @@ self.addEventListener('fetch', event => {
       
       // If not in cache, fetch from the network.
       return fetch(event.request).then(networkResponse => {
-        // Don't cache opaque responses (from third-party CDNs without CORS) or errors.
-        if (!networkResponse || networkResponse.status !== 200 || networkResponse.type === 'opaque') {
-          return networkResponse;
+        // We only want to cache successful responses.
+        // For 'basic' responses (same-origin), we can check the status.
+        // For 'opaque' responses (cross-origin no-cors), we can't see the status,
+        // but we cache it anyway to enable offline functionality.
+        if (networkResponse && (networkResponse.status === 200 || networkResponse.type === 'opaque')) {
+            const responseToCache = networkResponse.clone();
+            caches.open(CACHE_NAME).then(cache => {
+                cache.put(event.request, responseToCache);
+            });
         }
-
-        // Clone the response and add it to the cache for next time.
-        const responseToCache = networkResponse.clone();
-        caches.open(CACHE_NAME).then(cache => {
-          cache.put(event.request, responseToCache);
-        });
-        
         return networkResponse;
       });
     })
