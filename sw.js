@@ -1,4 +1,4 @@
-const CACHE_NAME = 'e-koperasi-cache-v10'; // Incremented version
+const CACHE_NAME = 'e-koperasi-cache-v11'; // Incremented version
 const urlsToCache = [
   // App Shell
   '/',
