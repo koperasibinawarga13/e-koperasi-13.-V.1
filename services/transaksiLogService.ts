@@ -47,7 +47,7 @@ export const getLogById = async (id: string): Promise<TransaksiLog | null> => {
 
 export const getLogsByAnggota = async (no_anggota: string): Promise<TransaksiLog[]> => {
     try {
-        const q = query(logCollectionRef, where('no_anggota', '==', no_anggota), orderBy('periode', 'desc'));
+        const q = query(logCollectionRef, where('no_anggota', '==', no_anggota), orderBy('log_time', 'desc'));
         const data = await getDocs(q);
         return data.docs.map(doc => ({...doc.data(), id: doc.id} as TransaksiLog));
     } catch (error) {

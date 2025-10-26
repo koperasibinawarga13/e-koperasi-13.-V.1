@@ -1,5 +1,5 @@
-import React, { useEffect, useRef } from 'react';
-import { BoldIcon, ItalicIcon, UnderlineIcon, ListBulletIcon, ListOrderedIcon, ImageIcon } from './icons/Icons';
+import React, { useEffect, useRef, useState } from 'react';
+import { BoldIcon, ItalicIcon, UnderlineIcon, ListBulletIcon, ListOrderedIcon, ImageIcon, AlignLeftIcon, AlignCenterIcon, AlignRightIcon } from './icons/Icons';
 
 interface RichTextEditorProps {
     value: string;
@@ -9,12 +9,36 @@ interface RichTextEditorProps {
 const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange }) => {
     const editorRef = useRef<HTMLDivElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const [selectedImage, setSelectedImage] = useState<HTMLImageElement | null>(null);
 
     useEffect(() => {
         if (editorRef.current && value !== editorRef.current.innerHTML) {
             editorRef.current.innerHTML = value;
         }
     }, [value]);
+    
+    useEffect(() => {
+        const handleSelectionChange = () => {
+            const selection = window.getSelection();
+            if (selection && selection.rangeCount > 0) {
+                const range = selection.getRangeAt(0);
+                const node = range.startContainer.childNodes[range.startOffset] as HTMLElement;
+                if (node && node.tagName === 'IMG') {
+                    setSelectedImage(node as HTMLImageElement);
+                } else if (selection.anchorNode && selection.anchorNode.nodeName === 'IMG') {
+                     setSelectedImage(selection.anchorNode as HTMLImageElement);
+                } else {
+                    setSelectedImage(null);
+                }
+            } else {
+                setSelectedImage(null);
+            }
+        };
+
+        document.addEventListener('selectionchange', handleSelectionChange);
+        return () => document.removeEventListener('selectionchange', handleSelectionChange);
+    }, []);
+
 
     const handleInput = (e: React.FormEvent<HTMLDivElement>) => {
         onChange(e.currentTarget.innerHTML);
@@ -42,7 +66,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange }) => {
                 const base64Image = readerEvent.target?.result;
                 if (base64Image && editorRef.current) {
                     editorRef.current.focus();
-                    const imgHtml = `<img src="${base64Image}" style="max-width: 100%; height: auto; border-radius: 8px; margin: 8px 0;" />`;
+                    const imgHtml = `<img src="${base64Image}" style="max-width: 100%; height: auto; border-radius: 8px; margin: 8px 0; display: block;" />`;
                     document.execCommand('insertHTML', false, imgHtml);
                     onChange(editorRef.current.innerHTML);
                 }
@@ -54,6 +78,34 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange }) => {
         }
     };
     
+    const handleImageStyle = (style: Partial<CSSStyleDeclaration>) => {
+        if (!selectedImage) return;
+
+        // Reset previous alignment styles before applying new ones
+        if (style.float !== undefined || style.display === 'block') {
+             selectedImage.style.float = 'none';
+             selectedImage.style.display = 'block';
+             selectedImage.style.margin = '8px auto';
+        }
+
+        if (style.float === 'left') {
+            selectedImage.style.float = 'left';
+            selectedImage.style.margin = '0 1em 1em 0';
+        } else if (style.float === 'right') {
+            selectedImage.style.float = 'right';
+            selectedImage.style.margin = '0 0 1em 1em';
+        }
+        
+        if (style.width) {
+            selectedImage.style.width = style.width;
+        }
+        
+        if (editorRef.current) {
+            onChange(editorRef.current.innerHTML);
+        }
+    };
+
+    
     const ToolbarButton: React.FC<{
         onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
         children: React.ReactNode;
@@ -61,7 +113,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange }) => {
     }> = ({ onClick, children, title }) => (
         <button
             type="button"
-            onMouseDown={onClick}
+            onMouseDown={onClick} // use onMouseDown to prevent losing focus on editor
             title={title}
             className="p-2 rounded text-gray-600 hover:bg-gray-200 hover:text-dark focus:outline-none focus:ring-2 focus:ring-primary"
         >
@@ -92,11 +144,32 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange }) => {
                 <ToolbarButton onClick={handleImageButtonClick} title="Sisipkan Gambar">
                     <ImageIcon />
                 </ToolbarButton>
+                
+                {selectedImage && (
+                    <>
+                        <div className="w-px h-6 bg-gray-300 mx-2"></div>
+                        <span className="text-xs font-semibold text-gray-500 mr-2">Gambar:</span>
+                        <ToolbarButton onClick={() => handleImageStyle({ float: 'left' })} title="Rata Kiri"><AlignLeftIcon /></ToolbarButton>
+                        <ToolbarButton onClick={() => handleImageStyle({ display: 'block' })} title="Rata Tengah"><AlignCenterIcon /></ToolbarButton>
+                        <ToolbarButton onClick={() => handleImageStyle({ float: 'right' })} title="Rata Kanan"><AlignRightIcon /></ToolbarButton>
+                        <div className="w-px h-6 bg-gray-300 mx-2"></div>
+                         <button onClick={() => handleImageStyle({ width: '25%' })} className="text-xs px-2 py-1 rounded hover:bg-gray-200">25%</button>
+                         <button onClick={() => handleImageStyle({ width: '50%' })} className="text-xs px-2 py-1 rounded hover:bg-gray-200">50%</button>
+                         <button onClick={() => handleImageStyle({ width: '75%' })} className="text-xs px-2 py-1 rounded hover:bg-gray-200">75%</button>
+                         <button onClick={() => handleImageStyle({ width: '100%' })} className="text-xs px-2 py-1 rounded hover:bg-gray-200">100%</button>
+                    </>
+                )}
             </div>
             <div
                 ref={editorRef}
                 contentEditable
                 onInput={handleInput}
+                onClick={() => {
+                     const selection = window.getSelection();
+                     if (selection?.anchorNode?.nodeName === 'IMG') {
+                        setSelectedImage(selection.anchorNode as HTMLImageElement);
+                     }
+                }}
                 className="prose min-h-[200px] w-full max-w-none p-3 focus:outline-none"
             />
             <input

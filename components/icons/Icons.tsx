@@ -181,6 +181,18 @@ export const ClipboardDocumentListIcon: React.FC<React.SVGProps<SVGSVGElement>> 
     </IconWrapper>
 );
 
+export const ArrowUpRightIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+  <IconWrapper {...props}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25" />
+  </IconWrapper>
+);
+
+export const ArrowDownLeftIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+  <IconWrapper {...props}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 4.5l-15 15m0 0h11.25m-11.25 0V8.25" />
+  </IconWrapper>
+);
+
 
 // Icons for Rich Text Editor
 const IconWrapperSmall: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
@@ -225,5 +237,24 @@ export const ListOrderedIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) 
 export const ImageIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
     <IconWrapperSmall {...props}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+    </IconWrapperSmall>
+);
+
+export const AlignLeftIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+    <IconWrapperSmall {...props}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25H12" />
+    </IconWrapperSmall>
+);
+
+export const AlignCenterIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+    <IconWrapperSmall {...props}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+    </IconWrapperSmall>
+);
+
+export const AlignRightIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+    <IconWrapperSmall {...props}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5M12 21.75V2.25" transform="rotate(180 12 12)" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5M12 17.25h8.25" />
     </IconWrapperSmall>
 );

@@ -5,9 +5,12 @@ import { getPengumuman } from '../services/pengumumanService';
 import { ChevronLeftIcon } from '../components/icons/Icons';
 import { Logo } from '../components/icons/Logo';
 
+const TRUNCATE_LENGTH = 500; // Character count threshold
+
 const BeritaPage: React.FC = () => {
     const [pengumumanList, setPengumumanList] = useState<Pengumuman[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 
     useEffect(() => {
         const fetchPengumuman = async () => {
@@ -18,6 +21,10 @@ const BeritaPage: React.FC = () => {
         };
         fetchPengumuman();
     }, []);
+    
+    const toggleExpand = (id: string) => {
+        setExpanded(prev => ({ ...prev, [id]: !prev[id] }));
+    };
 
     const formatDate = (isoString: string) => {
         return new Date(isoString).toLocaleDateString('id-ID', {
@@ -48,22 +55,36 @@ const BeritaPage: React.FC = () => {
                     <p className="text-center text-gray-500 py-10">Memuat pengumuman...</p>
                 ) : pengumumanList.length > 0 ? (
                     <div className="space-y-6">
-                        {pengumumanList.map((item) => (
-                            <div key={item.id} className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden animate-fade-in-up">
-                                <div className="p-6">
-                                    <h2 className="text-xl md:text-2xl font-bold text-dark mb-2">{item.judul}</h2>
-                                    <div className="flex items-center text-xs text-gray-500 mb-4">
-                                        <span>Diterbitkan oleh {item.penulis}</span>
-                                        <span className="mx-2">&bull;</span>
-                                        <span>{formatDate(item.tanggal)}</span>
+                        {pengumumanList.map((item) => {
+                            const isLong = item.isi.length > TRUNCATE_LENGTH;
+                            const isExpanded = !!expanded[item.id];
+
+                            return (
+                                <div key={item.id} className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden animate-fade-in-up">
+                                    <div className="p-6">
+                                        <h2 className="text-xl md:text-2xl font-bold text-dark mb-2">{item.judul}</h2>
+                                        <div className="flex items-center text-xs text-gray-500 mb-4">
+                                            <span>Diterbitkan oleh {item.penulis}</span>
+                                            <span className="mx-2">&bull;</span>
+                                            <span>{formatDate(item.tanggal)}</span>
+                                        </div>
+                                        <div className={`prose max-w-none text-gray-700 leading-relaxed transition-all duration-300 ${isLong && !isExpanded ? 'max-h-48 overflow-hidden relative' : ''}`}>
+                                            <div dangerouslySetInnerHTML={{ __html: item.isi }} />
+                                            {isLong && !isExpanded && (
+                                                <div className="absolute bottom-0 left-0 w-full h-16 bg-gradient-to-t from-white to-transparent"></div>
+                                            )}
+                                        </div>
+                                         {isLong && (
+                                            <div className="mt-4">
+                                                <button onClick={() => toggleExpand(item.id)} className="text-primary font-semibold hover:underline text-sm">
+                                                    {isExpanded ? 'Sembunyikan' : 'Baca Selengkapnya...'}
+                                                </button>
+                                            </div>
+                                        )}
                                     </div>
-                                    <div 
-                                        className="prose max-w-none text-gray-700 leading-relaxed"
-                                        dangerouslySetInnerHTML={{ __html: item.isi }}
-                                    />
                                 </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 ) : (
                     <div className="text-center py-20">
@@ -76,6 +97,7 @@ const BeritaPage: React.FC = () => {
                 .prose ul { list-style-type: disc; margin-left: 1.5rem; }
                 .prose ol { list-style-type: decimal; margin-left: 1.5rem; }
                 .prose li { margin-bottom: 0.25rem; }
+                .prose p { margin-bottom: 1em; margin-top: 1em; }
                 .prose img { 
                     border-radius: 0.5rem; 
                     margin-top: 1em; 
