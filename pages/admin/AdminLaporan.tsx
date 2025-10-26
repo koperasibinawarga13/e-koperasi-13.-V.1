@@ -109,6 +109,16 @@ const AdminLaporan: React.FC = () => {
         [keuanganList, searchTerm]
     );
 
+    const CurrencyCell: React.FC<{ amount: number; defaultColor?: string; className?: string }> = ({ amount, defaultColor = 'text-dark', className = '' }) => {
+        const isNegative = amount < 0;
+        const colorClass = isNegative ? 'text-red-600' : defaultColor;
+        return (
+            <td className={`px-4 py-4 sm:px-6 text-right ${colorClass} ${className}`}>
+                {formatCurrency(amount)}
+            </td>
+        );
+    };
+
     return (
         <div>
             <Header title="Laporan Keuangan" />
@@ -161,10 +171,10 @@ const AdminLaporan: React.FC = () => {
                                             </Link>
                                         </td>
                                         <td className="px-4 py-4 sm:px-6">{item.nama_angota}</td>
-                                        <td className="px-4 py-4 sm:px-6 text-right">{formatCurrency(item.akhir_simpanan_pokok)}</td>
-                                        <td className="px-4 py-4 sm:px-6 text-right">{formatCurrency(item.akhir_simpanan_wajib)}</td>
-                                        <td className="px-4 py-4 sm:px-6 text-right font-semibold text-green-600">{formatCurrency(item.jumlah_total_simpanan)}</td>
-                                        <td className="px-4 py-4 sm:px-6 text-right font-semibold text-yellow-600">{formatCurrency(item.jumlah_total_pinjaman)}</td>
+                                        <CurrencyCell amount={item.akhir_simpanan_pokok} />
+                                        <CurrencyCell amount={item.akhir_simpanan_wajib} />
+                                        <CurrencyCell amount={item.jumlah_total_simpanan} defaultColor="text-green-600" className="font-semibold" />
+                                        <CurrencyCell amount={item.jumlah_total_pinjaman} defaultColor="text-yellow-600" className="font-semibold" />
                                     </tr>
                                 )) : (
                                     <tr>

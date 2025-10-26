@@ -69,25 +69,33 @@ const SlipRincian: React.FC = () => {
         </div>
     );
 
-    const Item: React.FC<{ label: string; value: number | undefined }> = ({ label, value }) => (
-        <div className="flex justify-between items-start text-sm py-1 font-mono">
-            <span className="text-gray-700 mr-2">- {label}</span>
-            <div className="flex items-baseline flex-shrink-0">
-                <span className="text-gray-500 mr-1">Rp</span>
-                <span className="text-right w-24 font-semibold text-dark">{formatCurrency(value)}</span>
+    const Item: React.FC<{ label: string; value: number | undefined }> = ({ label, value }) => {
+        const isNegative = typeof value === 'number' && value < 0;
+        const formattedValue = formatCurrency(value);
+        return (
+            <div className="flex justify-between items-start text-sm py-1 font-mono">
+                <span className="text-gray-700 mr-2">- {label}</span>
+                <div className="flex items-baseline flex-shrink-0">
+                    <span className="text-gray-500 mr-1">Rp</span>
+                    <span className={`text-right w-24 font-semibold ${isNegative ? 'text-red-600' : 'text-dark'}`}>{formattedValue}</span>
+                </div>
             </div>
-        </div>
-    );
-
-    const TotalItem: React.FC<{ label: string; value: number | undefined; color: string }> = ({ label, value, color }) => (
-        <div className={`flex justify-between items-center p-2 rounded-md font-bold text-sm ${color}`}>
-            <span>{label}</span>
-            <div className="flex items-baseline flex-shrink-0 font-mono">
-                <span className="opacity-80 mr-1">Rp</span>
-                <span className="text-right w-24">{formatCurrency(value)}</span>
+        );
+    };
+    
+    const TotalItem: React.FC<{ label: string; value: number | undefined; color: string }> = ({ label, value, color }) => {
+        const isNegative = typeof value === 'number' && value < 0;
+        const containerClass = `flex justify-between items-center p-2 rounded-md font-bold text-sm ${isNegative ? 'bg-red-100 text-red-800' : color}`;
+        return (
+            <div className={containerClass}>
+                <span>{label}</span>
+                <div className="flex items-baseline flex-shrink-0 font-mono">
+                    <span className="opacity-80 mr-1">Rp</span>
+                    <span className="text-right w-24">{formatCurrency(value)}</span>
+                </div>
             </div>
-        </div>
-    );
+        );
+    };
 
 
     return (

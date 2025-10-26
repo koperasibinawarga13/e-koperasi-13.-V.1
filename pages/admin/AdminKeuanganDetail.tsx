@@ -36,12 +36,15 @@ const AdminKeuanganDetail: React.FC = () => {
         </div>
     );
 
-    const InfoItem: React.FC<{ label: string; value: string | number; isCurrency?: boolean }> = ({ label, value, isCurrency = true }) => (
-        <div>
-            <p className="text-sm text-gray-500">{label}</p>
-            <p className="font-semibold text-dark">{isCurrency ? formatCurrency(value as number) : value}</p>
-        </div>
-    );
+    const InfoItem: React.FC<{ label: string; value: string | number; isCurrency?: boolean }> = ({ label, value, isCurrency = true }) => {
+        const isNegative = typeof value === 'number' && value < 0;
+        return (
+            <div>
+                <p className="text-sm text-gray-500">{label}</p>
+                <p className={`font-semibold ${isNegative ? 'text-red-600' : 'text-dark'}`}>{isCurrency ? formatCurrency(value as number) : value}</p>
+            </div>
+        );
+    };
     
     if (isLoading) {
         return <div>Memuat rincian keuangan...</div>;
@@ -79,28 +82,28 @@ const AdminKeuanganDetail: React.FC = () => {
                 <InfoItem label="Pinjaman Khusus" value={data.awal_pinjaman_khusus} />
             </DetailCard>
 
-            <DetailCard title="Transaksi Bulan Ini (Setoran & Penambahan)">
+            <DetailCard title="Transaksi Bulan Ini (Setoran)">
                  <InfoItem label="Simpanan Pokok" value={data.transaksi_simpanan_pokok} />
                  <InfoItem label="Simpanan Wajib" value={data.transaksi_simpanan_wajib} />
                  <InfoItem label="Simpanan Sukarela" value={data.transaksi_simpanan_sukarela} />
                  <InfoItem label="Simpanan Wisata" value={data.transaksi_simpanan_wisata} />
+                 <InfoItem label="Angsuran Pinjaman Berjangka" value={data.transaksi_pinjaman_berjangka} />
+                 <InfoItem label="Angsuran Pinjaman Khusus" value={data.transaksi_pinjaman_khusus} />
                  <InfoItem label="Jasa" value={data.transaksi_simpanan_jasa} />
                  <InfoItem label="Niaga" value={data.transaksi_niaga} />
                  <InfoItem label="Dana Perlaya" value={data.transaksi_dana_perlaya} />
                  <InfoItem label="Dana Katineng" value={data.transaksi_dana_katineng} />
                  <InfoItem label="Jumlah Setoran" value={data.Jumlah_setoran} />
-                 <InfoItem label="Penambahan Pinjaman Berjangka" value={data.transaksi_penambahan_pinjaman_berjangka} />
-                 <InfoItem label="Penambahan Pinjaman Khusus" value={data.transaksi_penambahan_pinjaman_khusus} />
-                 <InfoItem label="Penambahan Pinjaman Niaga" value={data.transaksi_penambahan_pinjaman_niaga} />
             </DetailCard>
             
-            <DetailCard title="Transaksi Bulan Ini (Pengambilan & Angsuran)">
+            <DetailCard title="Transaksi Bulan Ini (Pengambilan & Penambahan)">
                  <InfoItem label="Pengambilan Simpanan Pokok" value={data.transaksi_pengambilan_simpanan_pokok} />
                  <InfoItem label="Pengambilan Simpanan Wajib" value={data.transaksi_pengambilan_simpanan_wajib} />
                  <InfoItem label="Pengambilan Simpanan Sukarela" value={data.transaksi_pengambilan_simpanan_sukarela} />
                  <InfoItem label="Pengambilan Simpanan Wisata" value={data.transaksi_pengambilan_simpanan_wisata} />
-                 <InfoItem label="Angsuran Pinjaman Berjangka" value={data.transaksi_pinjaman_berjangka} />
-                 <InfoItem label="Angsuran Pinjaman Khusus" value={data.transaksi_pinjaman_khusus} />
+                 <InfoItem label="Penambahan Pinjaman Berjangka" value={data.transaksi_penambahan_pinjaman_berjangka} />
+                 <InfoItem label="Penambahan Pinjaman Khusus" value={data.transaksi_penambahan_pinjaman_khusus} />
+                 <InfoItem label="Penambahan Pinjaman Niaga" value={data.transaksi_penambahan_pinjaman_niaga} />
             </DetailCard>
 
             <DetailCard title="Saldo Akhir">
