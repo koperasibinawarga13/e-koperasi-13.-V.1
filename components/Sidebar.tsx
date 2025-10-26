@@ -3,7 +3,7 @@ import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { UserRole } from '../types';
 import { DashboardIcon, UsersIcon, UploadIcon, ChartBarIcon, LogoutIcon, UserCircleIcon, CreditCardIcon, ChevronLeftIcon, CalculatorIcon, MegaphoneIcon, CashIcon, CogIcon, ClockIcon, ClipboardDocumentListIcon, ChevronDownIcon, ReceiptPercentIcon } from './icons/Icons';
-import { LogoBinaWarga } from './icons/LogoBinaWarga';
+import { Logo } from './icons/Logo';
 
 interface NavItem {
   to?: string;
@@ -114,9 +114,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar, isMobileO
         </button>
 
         <div className={`flex items-center justify-center mb-10 transition-all duration-300 ${isCollapsed ? 'h-12' : 'h-16 px-2'}`}>
-            <div className={`w-full transition-all duration-300 ${isCollapsed ? 'max-w-[40px]' : 'max-w-[160px]'}`}>
-                <LogoBinaWarga className="text-white"/>
-            </div>
+            <Logo className="h-full w-auto object-contain" />
         </div>
 
         <nav className="flex-grow">

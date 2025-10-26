@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { DownloadIcon, EyeIcon, EyeSlashIcon } from '../components/icons/Icons';
 import { registerAnggota, getAnggotaByNo, generateNewAnggotaNo, registerNewAnggota } from '../services/anggotaService';
-import { LogoBinaWarga } from '../components/icons/LogoBinaWarga';
+import { Logo } from '../components/icons/Logo';
 
 type ViewState = 'login' | 'activate' | 'register-new';
 
@@ -213,13 +213,13 @@ const LoginPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col items-center font-sans">
         <header 
-          className="relative w-full bg-surface text-dark p-6 pt-8 pb-20 z-20 text-center flex flex-col items-center"
+          className="relative w-full bg-primary text-white p-6 pt-8 pb-20 z-20 text-center flex flex-col items-center"
         >
              <div className="w-48 z-30 mb-2">
-                <LogoBinaWarga />
+                <Logo />
             </div>
             <div className="relative z-20 w-full max-w-md">
-                <p className="text-base sm:text-lg text-gray-text -mt-2">Sistem Informasi Koperasi Karyawan SMPN 13 Tasikmalaya</p>
+                <p className="text-base sm:text-lg text-indigo-200 -mt-2">Sistem Informasi Koperasi Karyawan SMPN 13 Tasikmalaya</p>
                 <div className="mt-4 transition-all duration-300 min-h-[28px] flex items-center justify-center">
                     <p className="text-base sm:text-lg font-bold bg-slate-200 text-dark px-4 py-1 rounded-full">
                       {getHeaderName() || 'Selamat Datang'}

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Pengumuman } from '../types';
 import { getPengumuman } from '../services/pengumumanService';
 import { ChevronLeftIcon } from '../components/icons/Icons';
-import { LogoBinaWarga } from '../components/icons/LogoBinaWarga';
+import { Logo } from '../components/icons/Logo';
 
 const BeritaPage: React.FC = () => {
     const [pengumumanList, setPengumumanList] = useState<Pengumuman[]>([]);
@@ -33,7 +33,7 @@ const BeritaPage: React.FC = () => {
                 <div className="container mx-auto px-4 py-4 flex justify-between items-center">
                     <div className="flex items-center gap-3">
                         <div className="w-32">
-                          <LogoBinaWarga className="text-white"/>
+                          <Logo />
                         </div>
                     </div>
                     <Link to="/login" className="flex items-center gap-2 bg-white/20 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-white/30 transition-colors">
