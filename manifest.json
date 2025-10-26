@@ -1,22 +1,29 @@
 {
-  "name": "e-Koperasi13",
+  "name": "e-Koperasi 13 Bina Warga",
   "short_name": "e-Koperasi13",
-  "start_url": ".",
+  "description": "Aplikasi e-Koperasi 13 Bina Warga untuk anggota dan admin.",
+  "start_url": "/",
   "display": "standalone",
-  "background_color": "#F3F4F6",
+  "background_color": "#E2E8F0",
   "theme_color": "#4338CA",
-  "description": "Sistem Informasi Koperasi Karyawan SMPN 13 Tasikmalaya",
   "icons": [
     {
-      "src": "/icon-192x192.png?v=7",
+      "src": "/vite.svg",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/svg+xml",
+      "purpose": "any"
     },
     {
-      "src": "/icon-512x512.png?v=7",
+      "src": "/vite.svg",
       "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/vite.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
     }
   ]
 }
