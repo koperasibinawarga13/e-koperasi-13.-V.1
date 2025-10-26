@@ -1,10 +1,11 @@
-const CACHE_NAME = 'e-koperasi-cache-v11'; // Incremented version
+const CACHE_NAME = 'e-koperasi-cache-v19'; // Incremented version
 const urlsToCache = [
   // App Shell
   '/',
   '/index.html',
-  '/manifest.json',
-  '/vite.svg',
+  '/manifest.json?v=9',
+  'icon-192x192.png?v=9',
+  'icon-512x512.png?v=9',
   // Main script
   '/index.tsx',
   // Styles & Fonts
