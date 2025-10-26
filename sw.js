@@ -1,10 +1,10 @@
-const CACHE_NAME = 'e-koperasi-cache-v16';
+const CACHE_NAME = 'e-koperasi-cache-v17';
 const cache_files = [
     '/',
-    '/index.html?v=6',
-    '/manifest.json?v=6',
-    '/assets/icon-192x192.png?v=6',
-    '/assets/icon-512x512.png?v=6'
+    '/index.html?v=7',
+    '/manifest.json?v=7',
+    '/icon-192x192.png?v=7',
+    '/icon-512x512.png?v=7'
 ];
 
 self.addEventListener('install', (e) => {
