@@ -1,4 +1,4 @@
-import { collection, addDoc, getDocs, query, where, doc, updateDoc, orderBy, getDoc } from 'firebase/firestore';
+import { collection, addDoc, getDocs, query, where, doc, updateDoc, orderBy, getDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 import { PengajuanPinjaman } from '../types';
 
@@ -74,6 +74,16 @@ export const updatePengajuanStatus = async (id: string, newStatus: 'Disetujui' |
         });
     } catch (error) {
         console.error(`Error updating status for application ${id}: `, error);
+        throw error;
+    }
+};
+
+export const deletePengajuanPinjaman = async (id: string): Promise<void> => {
+    try {
+        const docRef = doc(db, 'pengajuan_pinjaman', id);
+        await deleteDoc(docRef);
+    } catch (error) {
+        console.error(`Error deleting loan application ${id}: `, error);
         throw error;
     }
 };

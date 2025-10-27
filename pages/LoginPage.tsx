@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { DownloadIcon, EyeIcon, EyeSlashIcon } from '../components/icons/Icons';
+import { DownloadIcon, EyeIcon, EyeSlashIcon, ChevronDownIcon } from '../components/icons/Icons';
 import { registerAnggota, getAnggotaByNo, generateNewAnggotaNo, registerNewAnggota } from '../services/anggotaService';
 import { Logo } from '../components/icons/Logo';
 
@@ -34,6 +34,7 @@ const LoginPage: React.FC = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isKewajibanVisible, setIsKewajibanVisible] = useState(false);
   const [isNameLoading, setIsNameLoading] = useState(false);
   const { login } = useAuth();
   
@@ -283,14 +284,24 @@ const LoginPage: React.FC = () => {
                         </div>
                         
                         <div className="bg-blue-50 p-4 rounded-lg text-sm text-blue-800">
-                            <h4 className="font-bold mb-2">Kewajiban Anggota Baru:</h4>
-                            <ul className="list-disc list-inside space-y-1">
-                                <li><strong>Simpanan Pokok:</strong> Rp 25.000 (sekali bayar).</li>
-                                <li><strong>Simpanan Wajib:</strong> Rp 100.000 - Rp 200.000 (per bulan).</li>
-                                <li><strong>Dana Perlaya:</strong> Rp 5.000 (per bulan).</li>
-                                <li><strong>Dana Katineng:</strong> Rp 5.000 (per bulan).</li>
-                            </ul>
-                             <p className="text-xs mt-2 italic">Pembayaran akan diproses oleh Admin pada laporan bulanan.</p>
+                            <button 
+                                type="button"
+                                onClick={() => setIsKewajibanVisible(!isKewajibanVisible)}
+                                className="w-full flex justify-between items-center text-left"
+                                aria-expanded={isKewajibanVisible}
+                            >
+                                <h4 className="font-bold">Kewajiban Anggota Baru:</h4>
+                                <ChevronDownIcon className={`w-5 h-5 transition-transform duration-300 ${isKewajibanVisible ? 'rotate-180' : ''}`} />
+                            </button>
+                            <div className={`overflow-hidden transition-all duration-500 ease-in-out ${isKewajibanVisible ? 'max-h-96 mt-2' : 'max-h-0'}`}>
+                                <ul className="list-disc list-inside space-y-1">
+                                    <li><strong>Simpanan Pokok:</strong> Rp 25.000 (sekali bayar).</li>
+                                    <li><strong>Simpanan Wajib:</strong> Rp 100.000 - Rp 200.000 (per bulan).</li>
+                                    <li><strong>Dana Perlaya:</strong> Rp 5.000 (per bulan).</li>
+                                    <li><strong>Dana Katineng:</strong> Rp 5.000 (per bulan).</li>
+                                </ul>
+                                <p className="text-xs mt-2 italic">Pembayaran akan diproses oleh Admin pada laporan bulanan.</p>
+                            </div>
                         </div>
 
                         <button type="submit" disabled={isLoading} className="w-full py-3 px-4 text-sm font-bold rounded-lg text-white bg-secondary hover:bg-secondary-dark disabled:bg-gray-400">{isLoading ? 'MEMPROSES...' : 'DAFTAR SEBAGAI ANGGOTA BARU'}</button>

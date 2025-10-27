@@ -4,7 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { getKeuanganByNoAnggota } from '../../services/keuanganService';
 import { Keuangan, Anggota, PengajuanPinjaman } from '../../types';
 import { getAnggotaById } from '../../services/anggotaService';
-import { addPengajuanPinjaman, getPengajuanPinjamanByNoAnggota } from '../../services/pinjamanService';
+import { addPengajuanPinjaman, getPengajuanPinjamanByNoAnggota, deletePengajuanPinjaman } from '../../services/pinjamanService';
 
 interface SimulasiResult {
     pokokPinjaman: number;
@@ -47,6 +47,7 @@ const AnggotaPinjaman: React.FC = () => {
     const [activeTab, setActiveTab] = useState<'berjangka' | 'khusus'>('berjangka');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitMessage, setSubmitMessage] = useState({ type: '', text: ''});
+    const [isCancelling, setIsCancelling] = useState<string | null>(null);
 
 
     useEffect(() => {
@@ -173,6 +174,24 @@ const AnggotaPinjaman: React.FC = () => {
             setIsSubmitting(false);
         }
     }
+
+    const handleCancelPengajuan = async (id: string) => {
+        if (!window.confirm("Apakah Anda yakin ingin membatalkan pengajuan pinjaman ini?")) {
+            return;
+        }
+        setIsCancelling(id);
+        setSubmitMessage({ type: '', text: '' });
+        try {
+            await deletePengajuanPinjaman(id);
+            setRiwayat(prev => prev.filter(p => p.id !== id));
+            setSubmitMessage({ type: 'success', text: 'Pengajuan berhasil dibatalkan.' });
+        } catch (error) {
+            console.error("Failed to cancel loan application:", error);
+            setSubmitMessage({ type: 'error', text: 'Gagal membatalkan pengajuan.' });
+        } finally {
+            setIsCancelling(null);
+        }
+    };
     
     const InfoItem: React.FC<{ label: string; value: string; className?: string }> = ({ label, value, className = '' }) => (
         <div className={`flex justify-between items-center py-2 border-b ${className}`}>
@@ -319,6 +338,7 @@ const AnggotaPinjaman: React.FC = () => {
                                     <th className="px-4 py-3 text-right">Jumlah</th>
                                     <th className="px-4 py-3 text-center">Jangka Waktu</th>
                                     <th className="px-4 py-3 text-center">Status</th>
+                                    <th className="px-4 py-3 text-center">Aksi</th>
                                 </tr>
                             </thead>
                              <tbody>
@@ -329,6 +349,19 @@ const AnggotaPinjaman: React.FC = () => {
                                          <td className="px-4 py-3 text-right">{formatCurrency(p.pokok_pinjaman)}</td>
                                          <td className="px-4 py-3 text-center">{p.jangka_waktu ? `${p.jangka_waktu} bulan` : '-'}</td>
                                          <td className="px-4 py-3 text-center"><StatusBadge status={p.status} /></td>
+                                         <td className="px-4 py-3 text-center">
+                                            {p.status === 'Menunggu Persetujuan' ? (
+                                                <button
+                                                    onClick={() => handleCancelPengajuan(p.id!)}
+                                                    disabled={isCancelling === p.id}
+                                                    className="text-red-600 hover:text-red-800 text-xs font-semibold disabled:text-gray-400"
+                                                >
+                                                    {isCancelling === p.id ? 'Membatalkan...' : 'Batalkan'}
+                                                </button>
+                                            ) : (
+                                                <span>-</span>
+                                            )}
+                                         </td>
                                      </tr>
                                  ))}
                              </tbody>
