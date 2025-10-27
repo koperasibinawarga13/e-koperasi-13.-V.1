@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { DownloadIcon, EyeIcon, EyeSlashIcon, ChevronDownIcon } from '../components/icons/Icons';
 import { registerAnggota, getAnggotaByNo, generateNewAnggotaNo, registerNewAnggota } from '../services/anggotaService';
 import { Logo } from '../components/icons/Logo';
+import { getPengaturanKewajiban, PengaturanKewajiban } from '../services/pengaturanService';
 
 type ViewState = 'login' | 'activate' | 'register-new';
 
@@ -29,6 +30,7 @@ const LoginPage: React.FC = () => {
   const [regStatus, setRegStatus] = useState<'AK' | 'PB' | 'WL'>('WL');
   const [regNoAnggota, setRegNoAnggota] = useState('');
   const [regPassword, setRegPassword] = useState('');
+  const [kewajiban, setKewajiban] = useState<PengaturanKewajiban | null>(null);
 
   // General State
   const [error, setError] = useState('');
@@ -59,6 +61,17 @@ const LoginPage: React.FC = () => {
       setInstallPrompt(null);
     });
   };
+
+  // Fetch kewajiban settings
+  useEffect(() => {
+    const fetchSettings = async () => {
+        const data = await getPengaturanKewajiban();
+        if (data) {
+            setKewajiban(data);
+        }
+    };
+    fetchSettings();
+  }, []);
 
   // Name check for Login and Activation forms
   useEffect(() => {
@@ -163,6 +176,8 @@ const LoginPage: React.FC = () => {
     setActivateNoAnggota(''); setActivateNoHp(''); setActivatePassword(''); setActivateAnggotaName(null);
     setRegNama(''); setRegAlamat(''); setRegStatus('WL'); setRegPassword(''); setRegNoAnggota('');
   }
+  
+  const formatCurrency = (amount: number) => `Rp ${new Intl.NumberFormat('id-ID').format(amount)}`;
 
   const InstallBanner = () => (
     <div className="bg-dark text-white p-6 shadow-lg rounded-lg animate-fade-in-up">
@@ -295,10 +310,10 @@ const LoginPage: React.FC = () => {
                             </button>
                             <div className={`overflow-hidden transition-all duration-500 ease-in-out ${isKewajibanVisible ? 'max-h-96 mt-2' : 'max-h-0'}`}>
                                 <ul className="list-disc list-inside space-y-1">
-                                    <li><strong>Simpanan Pokok:</strong> Rp 25.000 (sekali bayar).</li>
-                                    <li><strong>Simpanan Wajib:</strong> Rp 100.000 - Rp 200.000 (per bulan).</li>
-                                    <li><strong>Dana Perlaya:</strong> Rp 5.000 (per bulan).</li>
-                                    <li><strong>Dana Katineng:</strong> Rp 5.000 (per bulan).</li>
+                                    <li><strong>Simpanan Pokok:</strong> {kewajiban ? formatCurrency(kewajiban.simpananPokok) : 'Rp 25.000'} (sekali bayar).</li>
+                                    <li><strong>Simpanan Wajib:</strong> {kewajiban ? `${formatCurrency(kewajiban.simpananWajibMin)} - ${formatCurrency(kewajiban.simpananWajibMax)}` : 'Rp 100.000 - Rp 200.000'} (per bulan).</li>
+                                    <li><strong>Dana Perlaya:</strong> {kewajiban ? formatCurrency(kewajiban.danaPerlaya) : 'Rp 5.000'} (per bulan).</li>
+                                    <li><strong>Dana Katineng:</strong> {kewajiban ? formatCurrency(kewajiban.danaKatineng) : 'Rp 5.000'} (per bulan).</li>
                                 </ul>
                                 <p className="text-xs mt-2 italic">Pembayaran akan diproses oleh Admin pada laporan bulanan.</p>
                             </div>

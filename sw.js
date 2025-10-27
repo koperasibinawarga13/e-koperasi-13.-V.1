@@ -1,11 +1,11 @@
-const CACHE_NAME = 'e-koperasi-cache-v22'; // Incremented version
+const CACHE_NAME = 'e-koperasi-cache-v24'; // Incremented version
 const urlsToCache = [
   // App Shell
   '/',
   '/index.html',
-  '/manifest.json?v=12',
-  '/icon-192x192.png?v=12',
-  '/icon-512x512.png?v=12',
+  '/manifest.json?v=14',
+  '/icon-192x192.png?v=14',
+  '/icon-512x512.png?v=14',
   // Main script
   '/index.tsx',
   // Styles & Fonts
@@ -30,9 +30,16 @@ self.addEventListener('install', event => {
         console.log('Service Worker: Caching app shell');
         return cache.addAll(urlsToCache);
       })
-      .then(() => self.skipWaiting())
   );
 });
+
+// Listen for message from client to skip waiting
+self.addEventListener('message', event => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+});
+
 
 // Clean up old caches on activation
 self.addEventListener('activate', event => {

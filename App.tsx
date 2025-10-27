@@ -24,6 +24,7 @@ import AdminPengaturan from './pages/admin/AdminPengaturan';
 import AdminProfil from './pages/admin/AdminProfil';
 import AdminRiwayatTransaksi from './pages/admin/AdminRiwayatTransaksi';
 import AdminRekapTransaksiManual from './pages/admin/AdminRekapSetoran';
+import AdminPengaturanKewajiban from './pages/admin/AdminPengaturanKewajiban';
 
 const App: React.FC = () => {
   return (
@@ -63,6 +64,10 @@ const AppRoutes: React.FC = () => {
         <Route 
           path="pengaturan-admin" 
           element={user?.email === 'admin@koperasi13.com' ? <AdminPengaturan /> : <Navigate to="/admin/dashboard" />} 
+        />
+         <Route 
+          path="pengaturan-kewajiban" 
+          element={user?.email === 'admin@koperasi13.com' ? <AdminPengaturanKewajiban /> : <Navigate to="/admin/dashboard" />} 
         />
         <Route index element={<Navigate to="dashboard" />} />
       </Route>

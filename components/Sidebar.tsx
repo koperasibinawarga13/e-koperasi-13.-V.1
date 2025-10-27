@@ -70,7 +70,14 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar, isMobileO
     if (user?.role === UserRole.ADMIN) {
         let adminNavs = [...baseAdminNavItems];
         if (user.email === 'admin@koperasi13.com') {
-            adminNavs.push({ to: '/admin/pengaturan-admin', label: 'Pengaturan Admin', icon: <CogIcon /> });
+            adminNavs.push({ 
+              label: 'Pengaturan', 
+              icon: <CogIcon />,
+              children: [
+                { to: '/admin/pengaturan-admin', label: 'Akun Admin', icon: <UsersIcon className="w-5 h-5"/> },
+                { to: '/admin/pengaturan-kewajiban', label: 'Kewajiban Anggota', icon: <CreditCardIcon className="w-5 h-5"/> }
+              ]
+            });
         }
         return adminNavs;
     }
