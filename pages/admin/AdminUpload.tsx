@@ -10,6 +10,7 @@ import { UploadIcon, TrashIcon, DownloadIcon } from '../../components/icons/Icon
 import { batchAddAnggota } from '../../services/anggotaService';
 import { batchUpsertKeuangan, batchProcessTransaksiBulanan, getUploadedMonths, deleteMonthlyReport, rebuildUploadHistory, getKeuangan } from '../../services/keuanganService';
 import { Anggota, Keuangan, TransaksiBulanan } from '../../types';
+import { useAuth } from '../../context/AuthContext';
 
 type UploadStatus = 'idle' | 'processing' | 'success' | 'error';
 
@@ -157,6 +158,7 @@ const UploadSection: React.FC<{
 
 
 const AdminUpload: React.FC = () => {
+    const { user } = useAuth();
     const [isUploading, setIsUploading] = useState(false);
     const [uploadHistory, setUploadHistory] = useState<string[]>([]);
     const [isHistoryLoading, setIsHistoryLoading] = useState(true);
@@ -309,7 +311,7 @@ const AdminUpload: React.FC = () => {
             
             if (transaksiList.length === 0) throw new Error("File tidak berisi data transaksi yang valid.");
 
-            const result = await batchProcessTransaksiBulanan(transaksiList, uploadMonth);
+            const result = await batchProcessTransaksiBulanan(transaksiList, uploadMonth, user?.name);
             if (result.successCount > 0) {
                 setUploadHistory(await getUploadedMonths());
             }

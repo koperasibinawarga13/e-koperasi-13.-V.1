@@ -90,11 +90,11 @@ interface UploadResult {
     errors: { no_anggota: string; error: string }[];
 }
 
-export const processSingleTransaksi = async (tx: TransaksiBulanan, periode: string): Promise<UploadResult> => {
-    return batchProcessTransaksiBulanan([tx], periode);
+export const processSingleTransaksi = async (tx: TransaksiBulanan, periode: string, adminName?: string): Promise<UploadResult> => {
+    return batchProcessTransaksiBulanan([tx], periode, adminName);
 }
 
-export const batchProcessTransaksiBulanan = async (transaksiList: TransaksiBulanan[], uploadMonth: string): Promise<UploadResult> => {
+export const batchProcessTransaksiBulanan = async (transaksiList: TransaksiBulanan[], uploadMonth: string, adminName?: string): Promise<UploadResult> => {
     const result: UploadResult = { successCount: 0, errorCount: 0, errors: [] };
     
     for (const tx of transaksiList) {
@@ -150,7 +150,7 @@ export const batchProcessTransaksiBulanan = async (transaksiList: TransaksiBulan
                     ...akhirData,
                     periode: uploadMonth,
                     tanggal_transaksi: mergedTx.tanggal_transaksi || new Date().toISOString().split('T')[0],
-                    admin_nama: mergedTx.admin_nama,
+                    admin_nama: adminName || mergedTx.admin_nama || 'Sistem',
                 };
                 
                 transaction.set(historyDocRef, updatedKeuanganData); // Update history for this month
