@@ -75,27 +75,42 @@ export const addAnggota = async (newAnggota: NewAnggotaData): Promise<Anggota> =
     }
 };
 
-export const batchAddAnggota = async (anggotaList: NewAnggotaFromUpload[]): Promise<void> => {
+export const batchUpsertAnggota = async (anggotaList: NewAnggotaFromUpload[]): Promise<void> => {
     try {
+        const allAnggota = await getAnggota();
+        const anggotaMap = new Map(allAnggota.map(a => [a.no_anggota, a]));
+        
         const batch = writeBatch(db);
-        anggotaList.forEach((anggota) => {
-            const docRef = doc(anggotaCollectionRef); // Automatically generate unique ID
-            const fullAnggotaData: Omit<Anggota, 'id'> = {
-                no_anggota: anggota.no_anggota,
-                nama: anggota.nama,
-                no_telepon: anggota.no_telepon,
-                password: '', // Password is empty string initially, to be set by user later
-                nik: '',
-                alamat: '',
-                email: '',
-                tanggal_bergabung: new Date().toISOString().split('T')[0],
-                status: 'Aktif',
-            };
-            batch.set(docRef, fullAnggotaData);
+
+        anggotaList.forEach((newAnggota) => {
+            const existingAnggota = anggotaMap.get(newAnggota.no_anggota);
+            
+            if (existingAnggota) {
+                // Update existing member
+                const docRef = doc(db, 'anggota', existingAnggota.id);
+                batch.update(docRef, {
+                    nama: newAnggota.nama,
+                    no_telepon: newAnggota.no_telepon
+                });
+            } else {
+                // Add new member
+                const docRef = doc(anggotaCollectionRef); // Auto-generate ID
+                const fullAnggotaData: Omit<Anggota, 'id'> = {
+                    ...newAnggota,
+                    password: '',
+                    nik: '',
+                    alamat: '',
+                    email: '',
+                    tanggal_bergabung: new Date().toISOString().split('T')[0],
+                    status: 'Aktif',
+                };
+                batch.set(docRef, fullAnggotaData);
+            }
         });
+
         await batch.commit();
     } catch (error) {
-        console.error("Error adding anggota in batch: ", error);
+        console.error("Error in batch upsert for anggota: ", error);
         throw error;
     }
 }

@@ -7,7 +7,7 @@ import Header from '../../components/Header';
 import ProgressBar from '../../components/ProgressBar';
 import Modal from '../../components/Modal';
 import { UploadIcon, TrashIcon, DownloadIcon, ChevronDownIcon } from '../../components/icons/Icons';
-import { batchAddAnggota } from '../../services/anggotaService';
+import { batchUpsertAnggota } from '../../services/anggotaService';
 import { batchUpsertKeuangan, batchProcessTransaksiBulanan, getUploadedMonths, deleteMonthlyReport, rebuildUploadHistory, getKeuangan, resetAllFinancialData } from '../../services/keuanganService';
 import { Anggota, Keuangan, TransaksiBulanan } from '../../types';
 import { useAuth } from '../../context/AuthContext';
@@ -228,7 +228,7 @@ const AdminUpload: React.FC = () => {
 
             if (anggotaList.length === 0) throw new Error("File tidak berisi data anggota yang valid.");
             
-            await batchAddAnggota(anggotaList);
+            await batchUpsertAnggota(anggotaList);
         } catch (err: any) {
             alert(`Gagal memproses file: ${err.message}`);
         } finally {
