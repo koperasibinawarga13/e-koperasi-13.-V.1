@@ -13,7 +13,9 @@ import {
   arrayRemove,
   collectionGroup,
   // FIX: Import 'orderBy' to enable sorting in Firestore queries.
-  orderBy
+  orderBy,
+  // FIX: Import 'CollectionReference' for type-safe collection operations.
+  CollectionReference
 } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 import { Keuangan, TransaksiBulanan, TransaksiLog } from '../types';
@@ -202,8 +204,13 @@ export const rebuildUploadHistory = async (): Promise<string[]> => {
 };
 
 export const deleteMonthlyReport = async (monthToDelete: string): Promise<void> => {
-    const logsToDelete = await getLogsByPeriod(monthToDelete);
-    const affectedMembers = [...new Set(logsToDelete.map(log => log.no_anggota))];
+    // Get a list of all current members to preserve their names
+    const allKeuanganDocs = await getDocs(keuanganCollectionRef);
+    const keuanganMap = new Map<string, Keuangan>();
+    allKeuanganDocs.forEach(d => keuanganMap.set(d.id, d.data() as Keuangan));
+
+    const logsInPeriod = await getLogsByPeriod(monthToDelete);
+    const affectedMembers = [...new Set(logsInPeriod.map(log => log.no_anggota))];
 
     const batch = writeBatch(db);
 
@@ -211,27 +218,47 @@ export const deleteMonthlyReport = async (monthToDelete: string): Promise<void> 
         const docRef = doc(db, 'keuangan', no_anggota);
         const historyDocRef = doc(db, 'keuangan', no_anggota, 'history', monthToDelete);
 
+        // Determine the previous month to revert to
         const prevMonth = new Date(new Date(`${monthToDelete}-02`).setMonth(new Date(`${monthToDelete}-02`).getMonth() - 1)).toISOString().slice(0, 7);
         const prevHistoryDocRef = doc(db, 'keuangan', no_anggota, 'history', prevMonth);
         const prevHistoryDoc = await getDoc(prevHistoryDocRef);
 
         if (prevHistoryDoc.exists()) {
+            // If previous month's data exists, revert to it
             batch.set(docRef, prevHistoryDoc.data());
         } else {
-            const emptyKeuangan = { no: 0, no_anggota, nama_angota: '', awal_simpanan_pokok: 0, awal_simpanan_wajib: 0, sukarela: 0, awal_simpanan_wisata: 0, awal_pinjaman_berjangka: 0, awal_pinjaman_khusus: 0, transaksi_simpanan_pokok: 0, transaksi_simpanan_wajib: 0, transaksi_simpanan_sukarela: 0, transaksi_simpanan_wisata: 0, transaksi_pinjaman_berjangka: 0, transaksi_pinjaman_khusus: 0, transaksi_simpanan_jasa: 0, transaksi_niaga: 0, transaksi_dana_perlaya: 0, transaksi_dana_katineng: 0, Jumlah_setoran: 0, transaksi_pengambilan_simpanan_pokok: 0, transaksi_pengambilan_simpanan_wajib: 0, transaksi_pengambilan_simpanan_sukarela: 0, transaksi_pengambilan_simpanan_wisata: 0, transaksi_penambahan_pinjaman_berjangka: 0, transaksi_penambahan_pinjaman_khusus: 0, transaksi_penambahan_pinjaman_niaga: 0, akhir_simpanan_pokok: 0, akhir_simpanan_wajib: 0, akhir_simpanan_sukarela: 0, akhir_simpanan_wisata: 0, akhir_pinjaman_berjangka: 0, akhir_pinjaman_khusus: 0, jumlah_total_simpanan: 0, jumlah_total_pinjaman: 0 };
+            // If no previous data, reset to a clean slate but keep the name
+            const memberName = keuanganMap.get(no_anggota)?.nama_angota || 'Nama Dihapus';
+            const emptyKeuangan: Omit<Keuangan, 'id'> = {
+                no: 0,
+                no_anggota,
+                nama_angota: memberName,
+                periode: '',
+                awal_simpanan_pokok: 0, awal_simpanan_wajib: 0, sukarela: 0, awal_simpanan_wisata: 0, awal_pinjaman_berjangka: 0, awal_pinjaman_khusus: 0,
+                transaksi_simpanan_pokok: 0, transaksi_simpanan_wajib: 0, transaksi_simpanan_sukarela: 0, transaksi_simpanan_wisata: 0, transaksi_pinjaman_berjangka: 0, transaksi_pinjaman_khusus: 0,
+                transaksi_simpanan_jasa: 0, transaksi_niaga: 0, transaksi_dana_perlaya: 0, transaksi_dana_katineng: 0, Jumlah_setoran: 0,
+                transaksi_pengambilan_simpanan_pokok: 0, transaksi_pengambilan_simpanan_wajib: 0, transaksi_pengambilan_simpanan_sukarela: 0, transaksi_pengambilan_simpanan_wisata: 0,
+                transaksi_penambahan_pinjaman_berjangka: 0, transaksi_penambahan_pinjaman_khusus: 0, transaksi_penambahan_pinjaman_niaga: 0,
+                akhir_simpanan_pokok: 0, akhir_simpanan_wajib: 0, akhir_simpanan_sukarela: 0, akhir_simpanan_wisata: 0, akhir_pinjaman_berjangka: 0, akhir_pinjaman_khusus: 0,
+                jumlah_total_simpanan: 0, jumlah_total_pinjaman: 0,
+            };
             batch.set(docRef, emptyKeuangan);
         }
         
+        // Delete the history document for the selected month
         batch.delete(historyDocRef);
     }
     
+    // Delete all transaction logs associated with this period
     await deleteLogsByPeriod(monthToDelete);
 
+    // Remove the month from the central metadata history
     const historyMetaDoc = doc(metadataCollectionRef, UPLOAD_HISTORY_DOC_ID);
     batch.update(historyMetaDoc, { months: arrayRemove(monthToDelete) });
 
     await batch.commit();
 };
+
 
 export const getAvailableLaporanMonths = async (no_anggota: string): Promise<string[]> => {
     try {
@@ -357,4 +384,57 @@ export const correctPastTransaction = async (logId: string, updatedTx: Transaksi
             editedBy: adminName,
          });
     });
+};
+
+export const resetAllFinancialData = async (): Promise<void> => {
+    // Helper to delete all docs in a collection/subcollection
+    const deleteCollection = async (collectionRef: CollectionReference) => {
+        let querySnapshot = await getDocs(collectionRef);
+        while (!querySnapshot.empty) {
+            const batch = writeBatch(db);
+            querySnapshot.forEach(doc => {
+                batch.delete(doc.ref);
+            });
+            await batch.commit();
+            querySnapshot = await getDocs(collectionRef); // Check again in case of leftovers
+        }
+    };
+
+    // 1. Get all keuangan documents to iterate over them
+    const keuanganSnapshot = await getDocs(keuanganCollectionRef);
+
+    // 2. Reset main keuangan documents in a single batch
+    const resetBatch = writeBatch(db);
+    keuanganSnapshot.forEach(doc => {
+        const data = doc.data() as Keuangan;
+        const resetData: Omit<Keuangan, 'id'> = {
+            no: data.no || 0,
+            no_anggota: data.no_anggota,
+            nama_angota: data.nama_angota,
+            periode: '', admin_nama: '', tanggal_transaksi: '',
+            awal_simpanan_pokok: 0, awal_simpanan_wajib: 0, sukarela: 0, awal_simpanan_wisata: 0, awal_pinjaman_berjangka: 0, awal_pinjaman_khusus: 0,
+            transaksi_simpanan_pokok: 0, transaksi_simpanan_wajib: 0, transaksi_simpanan_sukarela: 0, transaksi_simpanan_wisata: 0, transaksi_pinjaman_berjangka: 0, transaksi_pinjaman_khusus: 0,
+            transaksi_simpanan_jasa: 0, transaksi_niaga: 0, transaksi_dana_perlaya: 0, transaksi_dana_katineng: 0, Jumlah_setoran: 0,
+            transaksi_pengambilan_simpanan_pokok: 0, transaksi_pengambilan_simpanan_wajib: 0, transaksi_pengambilan_simpanan_sukarela: 0, transaksi_pengambilan_simpanan_wisata: 0,
+            transaksi_penambahan_pinjaman_berjangka: 0, transaksi_penambahan_pinjaman_khusus: 0, transaksi_penambahan_pinjaman_niaga: 0,
+            akhir_simpanan_pokok: 0, akhir_simpanan_wajib: 0, akhir_simpanan_sukarela: 0, akhir_simpanan_wisata: 0, akhir_pinjaman_berjangka: 0, akhir_pinjaman_khusus: 0,
+            jumlah_total_simpanan: 0, jumlah_total_pinjaman: 0,
+        };
+        resetBatch.set(doc.ref, resetData); // Use set to overwrite completely
+    });
+    await resetBatch.commit();
+    
+    // 3. Delete all history subcollections
+    for (const docSnap of keuanganSnapshot.docs) {
+        const historyCollectionRef = collection(db, 'keuangan', docSnap.id, 'history');
+        await deleteCollection(historyCollectionRef);
+    }
+
+    // 4. Delete all transaction logs
+    const logCollectionRef = collection(db, 'transaksi_logs');
+    await deleteCollection(logCollectionRef);
+
+    // 5. Reset upload history metadata
+    const historyMetaDoc = doc(metadataCollectionRef, UPLOAD_HISTORY_DOC_ID);
+    await setDoc(historyMetaDoc, { months: [] });
 };

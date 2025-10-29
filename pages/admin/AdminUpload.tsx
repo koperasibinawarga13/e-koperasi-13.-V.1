@@ -8,7 +8,7 @@ import ProgressBar from '../../components/ProgressBar';
 import Modal from '../../components/Modal';
 import { UploadIcon, TrashIcon, DownloadIcon, ChevronDownIcon } from '../../components/icons/Icons';
 import { batchAddAnggota } from '../../services/anggotaService';
-import { batchUpsertKeuangan, batchProcessTransaksiBulanan, getUploadedMonths, deleteMonthlyReport, rebuildUploadHistory, getKeuangan } from '../../services/keuanganService';
+import { batchUpsertKeuangan, batchProcessTransaksiBulanan, getUploadedMonths, deleteMonthlyReport, rebuildUploadHistory, getKeuangan, resetAllFinancialData } from '../../services/keuanganService';
 import { Anggota, Keuangan, TransaksiBulanan } from '../../types';
 import { useAuth } from '../../context/AuthContext';
 
@@ -175,6 +175,9 @@ const AdminUpload: React.FC = () => {
     const [isDeleting, setIsDeleting] = useState<string | null>(null);
     const [isRebuilding, setIsRebuilding] = useState(false);
     const [isDownloading, setIsDownloading] = useState(false);
+    const [isResetModalOpen, setIsResetModalOpen] = useState(false);
+    const [isResetting, setIsResetting] = useState(false);
+
 
     // State for delete confirmation modal
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -413,6 +416,21 @@ const AdminUpload: React.FC = () => {
             setIsDownloading(false);
         }
     };
+    
+    const handleResetKeuangan = async () => {
+        setIsResetting(true);
+        setIsResetModalOpen(false);
+        try {
+            await resetAllFinancialData();
+            alert('Semua data keuangan, riwayat, dan log transaksi berhasil dihapus dan direset.');
+            setUploadHistory([]); // Clear history from UI state
+        } catch (error) {
+            console.error("Failed to reset financial data:", error);
+            alert('Terjadi kesalahan saat mereset data. Silakan coba lagi.');
+        } finally {
+            setIsResetting(false);
+        }
+    };
 
     const anggotaInstructions = `kode_anggota, nama_anggota, no_hp`;
     const keuanganAwalInstructions = `no, no_anggota, nama_angota, awal_simpanan_pokok, awal_simpanan_wajib, sukarela, awal_simpanan_wisata, awal_pinjaman_berjangka, awal_pinjaman_khusus, transaksi_simpanan_pokok, transaksi_simpanan_wajib, transaksi_simpanan_sukarela, transaksi_simpanan_wisata, transaksi_pinjaman_berjangka, transaksi_pinjaman_khusus, transaksi_simpanan_jasa, transaksi_niaga, transaksi_dana_perlaya, transaksi_dana_katineng, Jumlah_setoran, transaksi_pengambilan_simpanan_pokok, transaksi_pengambilan_simpanan_wajib, transaksi_pengambilan_simpanan_sukarela, transaksi_pengambilan_simpanan_wisata, transaksi_penambahan_pinjaman_berjangka, transaksi_penambahan_pinjaman_khusus, transaksi_penambahan_pinjaman_niaga, akhir_simpanan_pokok, akhir_simpanan_wajib, akhir_simpanan_sukarela, akhir_simpanan_wisata, akhir_pinjaman_berjangka, akhir_pinjaman_khusus, jumlah_total_simpanan, jumlah_total_pinjaman`;
@@ -446,12 +464,28 @@ const AdminUpload: React.FC = () => {
                 templateType="anggota"
                 onDownloadTemplate={handleDownloadTemplate}
             />
-            <UploadSection 
-                title="2. Upload Data Awal Keuangan"
-                instructions={keuanganAwalInstructions}
-                onFileUpload={handleKeuanganAwalUpload}
-                disabled={isUploading}
-            />
+            
+            <div>
+                 <div className="bg-white p-6 rounded-t-xl shadow-md border-b flex flex-wrap justify-between items-center gap-2">
+                    <h2 className="text-lg md:text-xl font-bold text-dark">2. Upload Data Awal Keuangan</h2>
+                    <button
+                        onClick={() => setIsResetModalOpen(true)}
+                        disabled={isUploading || isResetting}
+                        className="flex items-center gap-2 bg-red-600 text-white px-3 py-1.5 rounded-lg text-sm font-semibold hover:bg-red-700 transition-colors disabled:bg-gray-400"
+                    >
+                        <TrashIcon className="w-4 h-4" />
+                        <span>{isResetting ? 'Mereset...' : 'Reset Semua Data Keuangan'}</span>
+                    </button>
+                </div>
+                <UploadSection 
+                    title=""
+                    hideTitle={true}
+                    instructions={keuanganAwalInstructions}
+                    onFileUpload={handleKeuanganAwalUpload}
+                    disabled={isUploading || isResetting}
+                />
+            </div>
+
              <div>
                 <div className="bg-white p-6 rounded-t-xl shadow-md border-b flex flex-wrap justify-between items-center gap-2">
                     <div>
@@ -541,6 +575,43 @@ const AdminUpload: React.FC = () => {
                     </div>
                 </div>
             </Modal>
+            
+            <Modal
+                isOpen={isResetModalOpen}
+                onClose={() => setIsResetModalOpen(false)}
+                title="Konfirmasi Reset Semua Data Keuangan"
+            >
+                <div>
+                    <p className="text-gray-700 mb-4">
+                        Apakah Anda yakin ingin melanjutkan?
+                    </p>
+                    <div className="text-sm bg-red-50 text-red-800 p-3 rounded-lg">
+                        <p><strong>Peringatan Sangat Penting:</strong></p>
+                        <ul className="list-disc list-inside mt-2">
+                            <li>Semua data saldo (simpanan & pinjaman) akan menjadi <strong>NOL</strong>.</li>
+                            <li>Semua riwayat transaksi bulanan akan <strong>DIHAPUS</strong>.</li>
+                            <li>Semua log transaksi manual akan <strong>DIHAPUS</strong>.</li>
+                            <li>Data anggota (nama, no. anggota) <strong>TIDAK</strong> akan terhapus.</li>
+                        </ul>
+                        <p className="mt-2 font-bold">Aksi ini tidak dapat diurungkan.</p>
+                    </div>
+                    <div className="flex justify-end gap-4 mt-6">
+                        <button
+                            onClick={() => setIsResetModalOpen(false)}
+                            className="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
+                        >
+                            Batal
+                        </button>
+                        <button
+                            onClick={handleResetKeuangan}
+                            className="bg-red-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-red-700 transition-colors"
+                        >
+                            Ya, Reset Semua Data
+                        </button>
+                    </div>
+                </div>
+            </Modal>
+
         </div>
     );
 };
