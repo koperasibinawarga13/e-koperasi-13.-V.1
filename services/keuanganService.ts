@@ -276,6 +276,20 @@ export const getLaporanBulanan = async (no_anggota: string, month: string): Prom
     }
 };
 
+export const getLaporanBulananForAll = async (month: string): Promise<Keuangan[]> => {
+    try {
+        const historyQuery = query(collectionGroup(db, 'history'), where('periode', '==', month));
+        const snapshot = await getDocs(historyQuery);
+        if (snapshot.empty) {
+            return [];
+        }
+        return snapshot.docs.map(doc => doc.data() as Keuangan);
+    } catch (error) {
+        console.error(`Error fetching monthly report for all members for ${month}: `, error);
+        return [];
+    }
+};
+
 export const correctPastTransaction = async (logId: string, updatedTx: TransaksiBulanan, adminName: string): Promise<void> => {
     await runTransaction(db, async (transaction) => {
         const logDocRef = doc(db, 'transaksi_logs', logId);

@@ -6,7 +6,7 @@ import * as XLSX from 'xlsx';
 import Header from '../../components/Header';
 import ProgressBar from '../../components/ProgressBar';
 import Modal from '../../components/Modal';
-import { UploadIcon, TrashIcon, DownloadIcon } from '../../components/icons/Icons';
+import { UploadIcon, TrashIcon, DownloadIcon, ChevronDownIcon } from '../../components/icons/Icons';
 import { batchAddAnggota } from '../../services/anggotaService';
 import { batchUpsertKeuangan, batchProcessTransaksiBulanan, getUploadedMonths, deleteMonthlyReport, rebuildUploadHistory, getKeuangan } from '../../services/keuanganService';
 import { Anggota, Keuangan, TransaksiBulanan } from '../../types';
@@ -41,6 +41,7 @@ const UploadSection: React.FC<{
     const [status, setStatus] = useState<UploadStatus>('idle');
     const [progress, setProgress] = useState(0);
     const [result, setResult] = useState<UploadResult | null>(null);
+    const [isInstructionsVisible, setIsInstructionsVisible] = useState(false);
 
     const onDrop = useCallback((acceptedFiles: File[]) => {
         if (acceptedFiles.length > 0) {
@@ -98,9 +99,18 @@ const UploadSection: React.FC<{
                 </div>
             )}
             <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                <h3 className="font-bold text-blue-800">Struktur File Excel (.xlsx)</h3>
-                <p className="text-sm text-blue-700 mt-2">Pastikan file Anda memiliki kolom header berikut (urutan dan nama harus sesuai):</p>
-                <code className="block bg-blue-100 p-2 rounded-md text-xs mt-2 whitespace-pre-wrap">{instructions}</code>
+                <button 
+                    onClick={() => setIsInstructionsVisible(!isInstructionsVisible)}
+                    className="w-full flex justify-between items-center text-left"
+                    aria-expanded={isInstructionsVisible}
+                >
+                    <h3 className="font-bold text-blue-800">Struktur File Excel (.xlsx)</h3>
+                    <ChevronDownIcon className={`w-5 h-5 text-blue-800 transition-transform duration-300 ${isInstructionsVisible ? 'rotate-180' : ''}`} />
+                </button>
+                <div className={`overflow-hidden transition-all duration-500 ease-in-out ${isInstructionsVisible ? 'max-h-96 mt-2' : 'max-h-0'}`}>
+                    <p className="text-sm text-blue-700 mt-2">Pastikan file Anda memiliki kolom header berikut (urutan dan nama harus sesuai):</p>
+                    <code className="block bg-blue-100 p-2 rounded-md text-xs mt-2 whitespace-pre-wrap">{instructions}</code>
+                </div>
             </div>
             
             <div
