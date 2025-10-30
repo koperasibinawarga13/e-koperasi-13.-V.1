@@ -387,7 +387,7 @@ export const correctPastTransaction = async (logId: string, updatedTx: Transaksi
 };
 
 export const resetAllFinancialData = async (): Promise<void> => {
-    // Helper to delete all docs in a collection/subcollection
+    // Helper to delete all docs in a collection/subcollection in batches
     const deleteCollection = async (collectionRef: CollectionReference) => {
         let querySnapshot = await getDocs(collectionRef);
         while (!querySnapshot.empty) {
@@ -396,38 +396,26 @@ export const resetAllFinancialData = async (): Promise<void> => {
                 batch.delete(doc.ref);
             });
             await batch.commit();
-            querySnapshot = await getDocs(collectionRef); // Check again in case of leftovers
+            querySnapshot = await getDocs(collectionRef); // Check again for any remaining documents
         }
     };
 
-    // 1. Get all keuangan documents to iterate over them
+    // 1. Get all keuangan documents to iterate over them for subcollection deletion
     const keuanganSnapshot = await getDocs(keuanganCollectionRef);
-
-    // 2. Reset main keuangan documents in a single batch
-    const resetBatch = writeBatch(db);
-    keuanganSnapshot.forEach(doc => {
-        const data = doc.data() as Keuangan;
-        const resetData: Omit<Keuangan, 'id'> = {
-            no: data.no || 0,
-            no_anggota: data.no_anggota,
-            nama_angota: data.nama_angota,
-            periode: '', admin_nama: '', tanggal_transaksi: '',
-            awal_simpanan_pokok: 0, awal_simpanan_wajib: 0, sukarela: 0, awal_simpanan_wisata: 0, awal_pinjaman_berjangka: 0, awal_pinjaman_khusus: 0,
-            transaksi_simpanan_pokok: 0, transaksi_simpanan_wajib: 0, transaksi_simpanan_sukarela: 0, transaksi_simpanan_wisata: 0, transaksi_pinjaman_berjangka: 0, transaksi_pinjaman_khusus: 0,
-            transaksi_simpanan_jasa: 0, transaksi_niaga: 0, transaksi_dana_perlaya: 0, transaksi_dana_katineng: 0, Jumlah_setoran: 0,
-            transaksi_pengambilan_simpanan_pokok: 0, transaksi_pengambilan_simpanan_wajib: 0, transaksi_pengambilan_simpanan_sukarela: 0, transaksi_pengambilan_simpanan_wisata: 0,
-            transaksi_penambahan_pinjaman_berjangka: 0, transaksi_penambahan_pinjaman_khusus: 0, transaksi_penambahan_pinjaman_niaga: 0,
-            akhir_simpanan_pokok: 0, akhir_simpanan_wajib: 0, akhir_simpanan_sukarela: 0, akhir_simpanan_wisata: 0, akhir_pinjaman_berjangka: 0, akhir_pinjaman_khusus: 0,
-            jumlah_total_simpanan: 0, jumlah_total_pinjaman: 0,
-        };
-        resetBatch.set(doc.ref, resetData); // Use set to overwrite completely
-    });
-    await resetBatch.commit();
     
-    // 3. Delete all history subcollections
+    // 2. Delete all `history` subcollections for each member
     for (const docSnap of keuanganSnapshot.docs) {
         const historyCollectionRef = collection(db, 'keuangan', docSnap.id, 'history');
         await deleteCollection(historyCollectionRef);
+    }
+    
+    // 3. Delete the main `keuangan` documents themselves
+    if (!keuanganSnapshot.empty) {
+        const deleteKeuanganBatch = writeBatch(db);
+        keuanganSnapshot.forEach(doc => {
+            deleteKeuanganBatch.delete(doc.ref);
+        });
+        await deleteKeuanganBatch.commit();
     }
 
     // 4. Delete all transaction logs
