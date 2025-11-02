@@ -5,7 +5,7 @@ import { Anggota } from '../../types';
 import { PlusIcon, PencilIcon, TrashIcon, UploadIcon, SwitchHorizontalIcon } from '../../components/icons/Icons';
 import Modal from '../../components/Modal';
 import AnggotaForm from '../../components/AnggotaForm';
-import { getAnggota, addAnggota, updateAnggota, deleteAnggota, migrateAnggotaStatus } from '../../services/anggotaService';
+import { getAnggota, addAnggota, updateAnggota, deleteAnggota, migrateAnggotaStatus, deleteAllAnggota } from '../../services/anggotaService';
 
 const STATUS_PREFIXES = ['AK', 'PB', 'WL', 'TT'];
 
@@ -23,6 +23,12 @@ const AdminAnggota: React.FC = () => {
     const [confirmationInput, setConfirmationInput] = useState('');
     const [isMigrating, setIsMigrating] = useState(false);
     const [newStatusPrefix, setNewStatusPrefix] = useState<string>('');
+    
+    // State for delete all modal
+    const [isDeleteAllModalOpen, setIsDeleteAllModalOpen] = useState(false);
+    const [deleteAllConfirmation, setDeleteAllConfirmation] = useState('');
+    const [isDeletingAll, setIsDeletingAll] = useState(false);
+    const CONFIRMATION_TEXT = 'HAPUS SEMUA ANGGOTA';
 
 
     useEffect(() => {
@@ -111,6 +117,33 @@ const AdminAnggota: React.FC = () => {
         setSelectedAnggotaForStatusChange(null);
         setConfirmationInput('');
         setNewStatusPrefix('');
+    };
+
+    const openDeleteAllModal = () => {
+        setIsDeleteAllModalOpen(true);
+    };
+
+    const closeDeleteAllModal = () => {
+        setIsDeleteAllModalOpen(false);
+        setDeleteAllConfirmation('');
+    };
+
+    const handleDeleteAll = async () => {
+        if (deleteAllConfirmation !== CONFIRMATION_TEXT) {
+            alert("Teks konfirmasi tidak cocok.");
+            return;
+        }
+        setIsDeletingAll(true);
+        try {
+            await deleteAllAnggota();
+            setAnggotaList([]);
+            closeDeleteAllModal();
+            alert('Semua data anggota berhasil dihapus.');
+        } catch (error: any) {
+            alert(error.message);
+        } finally {
+            setIsDeletingAll(false);
+        }
     };
     
     const filteredAnggota = useMemo(() => 
@@ -227,6 +260,12 @@ const AdminAnggota: React.FC = () => {
                     <PlusIcon className="w-5 h-5" />
                     Tambah Anggota
                 </button>
+                <button 
+                    onClick={openDeleteAllModal} 
+                    className="bg-red-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-red-700 transition-all transform hover:scale-105 flex items-center gap-2">
+                    <TrashIcon className="w-5 h-5" />
+                    Hapus Semua Anggota
+                </button>
             </div>
         </div>
         <div className="overflow-x-auto">
@@ -290,6 +329,48 @@ const AdminAnggota: React.FC = () => {
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={selectedAnggota ? 'Edit Anggota' : 'Tambah Anggota'}>
         <AnggotaForm onSave={handleSave} initialData={selectedAnggota} />
       </Modal>
+
+      <Modal isOpen={isDeleteAllModalOpen} onClose={closeDeleteAllModal} title="Konfirmasi Hapus Semua Anggota">
+        <div>
+            <div className="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 mb-4" role="alert">
+                <p className="font-bold">Peringatan Keras!</p>
+                <p>Anda akan menghapus <strong>semua data profil anggota</strong> secara permanen.</p>
+                <ul className="list-disc list-inside mt-2 text-sm">
+                    <li>Tindakan ini <strong>tidak dapat dibatalkan</strong>.</li>
+                    <li>Data keuangan dan riwayat transaksi yang terkait dengan nomor anggota lama <strong>TIDAK akan terhapus</strong>, namun tidak akan bisa diakses melalui profil anggota.</li>
+                    <li>Sangat disarankan untuk melakukan backup data terlebih dahulu.</li>
+                </ul>
+            </div>
+            
+            <p className="mb-4">Untuk melanjutkan, silakan ketik teks berikut di bawah ini:</p>
+            <p className="text-center font-bold text-lg my-2 select-all">{CONFIRMATION_TEXT}</p>
+
+            <input
+                type="text"
+                value={deleteAllConfirmation}
+                onChange={(e) => setDeleteAllConfirmation(e.target.value)}
+                className="w-full border border-gray-300 rounded-md shadow-sm p-2"
+                placeholder="Ketik teks konfirmasi di sini"
+            />
+            
+            <div className="flex justify-end gap-4 mt-6">
+                <button
+                    onClick={closeDeleteAllModal}
+                    className="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
+                >
+                    Batal
+                </button>
+                <button
+                    onClick={handleDeleteAll}
+                    disabled={isDeletingAll || deleteAllConfirmation !== CONFIRMATION_TEXT}
+                    className="bg-red-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-red-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+                >
+                    {isDeletingAll ? 'Menghapus...' : 'Saya Mengerti, Hapus Semua'}
+                </button>
+            </div>
+        </div>
+      </Modal>
+
       {renderStatusChangeModal()}
     </div>
   );

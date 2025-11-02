@@ -32,7 +32,7 @@ export const getAnggotaById = async (id: string): Promise<Anggota | null> => {
 export const getAnggotaByNo = async (no_anggota: string): Promise<Anggota | null> => {
     try {
         if (!no_anggota) return null;
-        const q = query(anggotaCollectionRef, where("no_anggota", "==", no_anggota));
+        const q = query(anggotaCollectionRef, where("no_anggota", "==", no_anggota.toUpperCase()));
         const querySnapshot = await getDocs(q);
         if (!querySnapshot.empty) {
             const doc = querySnapshot.docs[0];
@@ -48,7 +48,7 @@ export const getAnggotaByNo = async (no_anggota: string): Promise<Anggota | null
 
 export const findAnggotaByCredentials = async (no_anggota: string, password: string): Promise<Anggota | null> => {
     try {
-        const q = query(anggotaCollectionRef, where("no_anggota", "==", no_anggota), where("password", "==", password));
+        const q = query(anggotaCollectionRef, where("no_anggota", "==", no_anggota.toUpperCase()), where("password", "==", password));
         const querySnapshot = await getDocs(q);
         if (!querySnapshot.empty) {
             const doc = querySnapshot.docs[0];
@@ -78,7 +78,7 @@ export const addAnggota = async (newAnggota: NewAnggotaData): Promise<Anggota> =
 export const batchUpsertAnggota = async (anggotaList: NewAnggotaFromUpload[]): Promise<void> => {
     try {
         const allAnggota = await getAnggota();
-        const anggotaMap = new Map(allAnggota.map(a => [a.no_anggota, a]));
+        const anggotaMap = new Map(allAnggota.map(a => [a.no_anggota.toUpperCase(), a]));
         
         const batch = writeBatch(db);
 
@@ -90,7 +90,8 @@ export const batchUpsertAnggota = async (anggotaList: NewAnggotaFromUpload[]): P
                 const docRef = doc(db, 'anggota', existingAnggota.id);
                 batch.update(docRef, {
                     nama: newAnggota.nama,
-                    no_telepon: newAnggota.no_telepon
+                    no_telepon: newAnggota.no_telepon,
+                    no_anggota: newAnggota.no_anggota // Enforce uppercase
                 });
             } else {
                 // Add new member
@@ -117,7 +118,7 @@ export const batchUpsertAnggota = async (anggotaList: NewAnggotaFromUpload[]): P
 
 export const registerAnggota = async (no_anggota: string, no_telepon: string, password: string): Promise<void> => {
     try {
-        const q = query(anggotaCollectionRef, where("no_anggota", "==", no_anggota));
+        const q = query(anggotaCollectionRef, where("no_anggota", "==", no_anggota.toUpperCase()));
         const querySnapshot = await getDocs(q);
 
         if (querySnapshot.empty) {
@@ -167,6 +168,31 @@ export const deleteAnggota = async (id: string): Promise<void> => {
     } catch (error) {
         console.error("Error deleting anggota: ", error);
         throw error;
+    }
+};
+
+export const deleteAllAnggota = async (): Promise<void> => {
+    try {
+        const querySnapshot = await getDocs(anggotaCollectionRef);
+        if (querySnapshot.empty) {
+            return; // Nothing to delete
+        }
+
+        const docs = querySnapshot.docs;
+        const batchArray = [];
+        // Firestore allows up to 500 operations in a single batch.
+        for (let i = 0; i < docs.length; i += 500) {
+            const batch = writeBatch(db);
+            const chunk = docs.slice(i, i + 500);
+            chunk.forEach(doc => batch.delete(doc.ref));
+            batchArray.push(batch.commit());
+        }
+
+        await Promise.all(batchArray);
+
+    } catch (error) {
+        console.error("Error deleting all anggota: ", error);
+        throw new Error("Gagal menghapus semua anggota.");
     }
 };
 

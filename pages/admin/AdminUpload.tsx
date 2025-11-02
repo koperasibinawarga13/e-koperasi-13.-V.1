@@ -221,7 +221,7 @@ const AdminUpload: React.FC = () => {
         try {
             const { json } = await readFile(file);
             const anggotaList = json.map(row => ({
-                no_anggota: String(row.kode_anggota || '').trim(),
+                no_anggota: String(row.kode_anggota || '').trim().toUpperCase(),
                 nama: String(row.nama_anggota || '').trim(),
                 no_telepon: String(row.no_hp || ''),
             })).filter(a => a.no_anggota && a.nama);
