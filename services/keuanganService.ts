@@ -291,11 +291,6 @@ export const getLaporanBulanan = async (no_anggota: string, month: string): Prom
         if (docSnap.exists()) {
             return docSnap.data() as Keuangan;
         }
-        const awalDocRef = doc(db, 'keuangan', no_anggota, 'history', 'awal');
-        const awalDocSnap = await getDoc(awalDocRef);
-        if (awalDocSnap.exists()) {
-            return awalDocSnap.data() as Keuangan;
-        }
         return null;
     } catch (error) {
         console.error("Error fetching monthly report: ", error);
