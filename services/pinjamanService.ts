@@ -66,11 +66,12 @@ export const getPengajuanPinjamanByNoAnggota = async (no_anggota: string): Promi
 };
 
 // Update the status of a loan application
-export const updatePengajuanStatus = async (id: string, newStatus: 'Disetujui' | 'Ditolak'): Promise<void> => {
+export const updatePengajuanStatus = async (id: string, newStatus: 'Disetujui' | 'Ditolak', catatan_admin?: string): Promise<void> => {
     try {
         const docRef = doc(db, 'pengajuan_pinjaman', id);
         await updateDoc(docRef, {
-            status: newStatus
+            status: newStatus,
+            catatan_admin: catatan_admin || ''
         });
     } catch (error) {
         console.error(`Error updating status for application ${id}: `, error);

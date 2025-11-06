@@ -136,6 +136,7 @@ export interface PengajuanPinjaman {
   jadwal_angsuran?: Array<any>;
   jenis_pinjaman: 'Berjangka' | 'Khusus';
   keterangan?: string;
+  catatan_admin?: string;
 }
 
 export interface Pengumuman {

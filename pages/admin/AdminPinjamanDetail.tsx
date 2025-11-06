@@ -4,6 +4,7 @@ import Header from '../../components/Header';
 import { PengajuanPinjaman } from '../../types';
 import { getPengajuanPinjamanById, updatePengajuanStatus } from '../../services/pinjamanService';
 import { ChevronLeftIcon, CheckIcon, XMarkIcon } from '../../components/icons/Icons';
+import Modal from '../../components/Modal';
 
 // Reusable helper components
 const formatCurrency = (amount: number | undefined) => {
@@ -39,7 +40,13 @@ const AdminPinjamanDetail: React.FC = () => {
     const navigate = useNavigate();
     const [pinjaman, setPinjaman] = useState<PengajuanPinjaman | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    
+    // State for action modal
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [actionType, setActionType] = useState<'Disetujui' | 'Ditolak' | null>(null);
+    const [adminNotes, setAdminNotes] = useState('');
     const [isUpdating, setIsUpdating] = useState(false);
+
 
     useEffect(() => {
         const fetchData = async () => {
@@ -53,14 +60,21 @@ const AdminPinjamanDetail: React.FC = () => {
         fetchData();
     }, [id]);
 
-    const handleStatusUpdate = async (newStatus: 'Disetujui' | 'Ditolak') => {
-        if (!pinjaman || !window.confirm(`Apakah Anda yakin ingin ${newStatus === 'Disetujui' ? 'menyetujui' : 'menolak'} pengajuan ini?`)) {
-            return;
-        }
+    const handleActionClick = (type: 'Disetujui' | 'Ditolak') => {
+        if (!pinjaman) return;
+        setActionType(type);
+        setAdminNotes(pinjaman.catatan_admin || '');
+        setIsModalOpen(true);
+    };
+
+    const handleConfirmAction = async () => {
+        if (!pinjaman || !actionType) return;
+        
         setIsUpdating(true);
         try {
-            await updatePengajuanStatus(pinjaman.id, newStatus);
-            setPinjaman(prev => prev ? { ...prev, status: newStatus } : null);
+            await updatePengajuanStatus(pinjaman.id!, actionType, adminNotes);
+            setPinjaman(prev => prev ? { ...prev, status: actionType, catatan_admin: adminNotes } : null);
+            setIsModalOpen(false);
         } catch (error) {
             console.error("Failed to update status:", error);
             alert("Gagal memperbarui status.");
@@ -131,16 +145,21 @@ const AdminPinjamanDetail: React.FC = () => {
                         <InfoItem label="Keterangan" value={<p className="whitespace-pre-wrap">{pinjaman.keterangan || '-'}</p>} />
                     </div>
                  )}
+                 {pinjaman.catatan_admin && (
+                    <div className="mt-4 pt-4 border-t col-span-2 md:col-span-4">
+                        <InfoItem label="Catatan Admin" value={<p className="whitespace-pre-wrap font-normal bg-yellow-50 p-3 rounded-md">{pinjaman.catatan_admin}</p>} />
+                    </div>
+                )}
             </div>
 
             {/* Action Buttons */}
             {pinjaman.status === 'Menunggu Persetujuan' && (
                 <div className="bg-white p-6 rounded-xl shadow-md mb-8 flex justify-center items-center gap-6">
                     <h3 className="text-base md:text-lg font-semibold text-dark">Tindakan Persetujuan:</h3>
-                    <button onClick={() => handleStatusUpdate('Disetujui')} disabled={isUpdating} className="flex items-center gap-2 bg-green-500 text-white px-6 py-2 rounded-lg font-bold hover:bg-green-600 disabled:bg-gray-400">
+                    <button onClick={() => handleActionClick('Disetujui')} disabled={isUpdating} className="flex items-center gap-2 bg-green-500 text-white px-6 py-2 rounded-lg font-bold hover:bg-green-600 disabled:bg-gray-400">
                         <CheckIcon className="w-5 h-5" /> {isUpdating ? 'Memproses...' : 'Setujui'}
                     </button>
-                    <button onClick={() => handleStatusUpdate('Ditolak')} disabled={isUpdating} className="flex items-center gap-2 bg-red-500 text-white px-6 py-2 rounded-lg font-bold hover:bg-red-600 disabled:bg-gray-400">
+                    <button onClick={() => handleActionClick('Ditolak')} disabled={isUpdating} className="flex items-center gap-2 bg-red-500 text-white px-6 py-2 rounded-lg font-bold hover:bg-red-600 disabled:bg-gray-400">
                         <XMarkIcon className="w-5 h-5" /> {isUpdating ? 'Memproses...' : 'Tolak'}
                     </button>
                 </div>
@@ -178,6 +197,37 @@ const AdminPinjamanDetail: React.FC = () => {
                     </div>
                 </div>
             )}
+
+            <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={`${actionType} Pengajuan Pinjaman`}>
+                <div>
+                     <p className="mb-4">
+                        Anda akan <span className="font-bold">{actionType?.toLowerCase()}</span> pengajuan untuk <span className="font-bold">{pinjaman?.nama_anggota}</span>.
+                    </p>
+                    <div>
+                        <label htmlFor="adminNotesDetail" className="block text-sm font-medium text-gray-700">
+                           Catatan / Alasan (Opsional)
+                        </label>
+                        <textarea
+                            id="adminNotesDetail"
+                            value={adminNotes}
+                            onChange={(e) => setAdminNotes(e.target.value)}
+                            rows={4}
+                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                            placeholder={actionType === 'Ditolak' ? 'Contoh: Total pinjaman aktif melebihi batas.' : 'Contoh: Disetujui dengan syarat...'}
+                        />
+                    </div>
+                     <div className="flex justify-end gap-4 mt-6">
+                        <button onClick={() => setIsModalOpen(false)} className="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg font-semibold hover:bg-gray-300">Batal</button>
+                        <button
+                            onClick={handleConfirmAction}
+                            disabled={isUpdating}
+                            className={`px-4 py-2 rounded-lg font-semibold text-white disabled:bg-gray-400 ${actionType === 'Disetujui' ? 'bg-secondary hover:bg-secondary-dark' : 'bg-red-600 hover:bg-red-700'}`}
+                        >
+                            {isUpdating ? 'Memproses...' : `Konfirmasi & ${actionType}`}
+                        </button>
+                    </div>
+                </div>
+            </Modal>
         </div>
     );
 };

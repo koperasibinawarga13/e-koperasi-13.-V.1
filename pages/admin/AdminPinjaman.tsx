@@ -4,6 +4,7 @@ import Header from '../../components/Header';
 import { PengajuanPinjaman } from '../../types';
 import { CheckIcon, XMarkIcon } from '../../components/icons/Icons';
 import { getAllPengajuanPinjaman, updatePengajuanStatus } from '../../services/pinjamanService';
+import Modal from '../../components/Modal';
 
 type StatusFilter = 'Semua' | 'Menunggu Persetujuan' | 'Disetujui' | 'Ditolak';
 
@@ -11,7 +12,13 @@ const AdminPinjaman: React.FC = () => {
     const [pinjamanList, setPinjamanList] = useState<PengajuanPinjaman[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [activeTab, setActiveTab] = useState<StatusFilter>('Menunggu Persetujuan');
-    const [isUpdating, setIsUpdating] = useState<string | null>(null);
+    
+    // State for action modal
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [currentPinjaman, setCurrentPinjaman] = useState<PengajuanPinjaman | null>(null);
+    const [actionType, setActionType] = useState<'Disetujui' | 'Ditolak' | null>(null);
+    const [adminNotes, setAdminNotes] = useState('');
+    const [isUpdating, setIsUpdating] = useState(false);
 
     useEffect(() => {
         const fetchPinjaman = async () => {
@@ -23,22 +30,36 @@ const AdminPinjaman: React.FC = () => {
         fetchPinjaman();
     }, []);
 
-    const handleStatusUpdate = async (id: string, newStatus: 'Disetujui' | 'Ditolak') => {
-        if (!window.confirm(`Apakah Anda yakin ingin ${newStatus === 'Disetujui' ? 'menyetujui' : 'menolak'} pengajuan ini?`)) {
-            return;
-        }
-        setIsUpdating(id);
+    const handleActionClick = (pinjaman: PengajuanPinjaman, type: 'Disetujui' | 'Ditolak') => {
+        setCurrentPinjaman(pinjaman);
+        setActionType(type);
+        setAdminNotes(pinjaman.catatan_admin || ''); // Pre-fill with existing notes
+        setIsModalOpen(true);
+    };
+
+    const handleConfirmAction = async () => {
+        if (!currentPinjaman || !actionType) return;
+        
+        setIsUpdating(true);
         try {
-            await updatePengajuanStatus(id, newStatus);
+            await updatePengajuanStatus(currentPinjaman.id!, actionType, adminNotes);
             setPinjamanList(prevList =>
-                prevList.map(p => (p.id === id ? { ...p, status: newStatus } : p))
+                prevList.map(p => (p.id === currentPinjaman.id ? { ...p, status: actionType, catatan_admin: adminNotes } : p))
             );
+            closeModal();
         } catch (error) {
             console.error("Failed to update status:", error);
             alert("Gagal memperbarui status.");
         } finally {
-            setIsUpdating(null);
+            setIsUpdating(false);
         }
+    };
+    
+    const closeModal = () => {
+        setIsModalOpen(false);
+        setCurrentPinjaman(null);
+        setActionType(null);
+        setAdminNotes('');
     };
 
     const filteredPinjaman = useMemo(() => {
@@ -107,6 +128,7 @@ const AdminPinjaman: React.FC = () => {
                                     <th className="px-4 py-3 text-right">Jumlah</th>
                                     <th className="px-4 py-3 text-center">Jangka Waktu</th>
                                     <th className="px-4 py-3 text-center">Status</th>
+                                    <th className="px-4 py-3">Catatan Admin</th>
                                     <th className="px-4 py-3 text-center">Aksi</th>
                                 </tr>
                             </thead>
@@ -124,21 +146,20 @@ const AdminPinjaman: React.FC = () => {
                                         <td className="px-4 py-3 text-right">{formatCurrency(p.pokok_pinjaman)}</td>
                                         <td className="px-4 py-3 text-center">{p.jangka_waktu ? `${p.jangka_waktu} bulan` : '-'}</td>
                                         <td className="px-4 py-3 text-center"><StatusBadge status={p.status} /></td>
+                                        <td className="px-4 py-3 text-xs max-w-xs truncate">{p.catatan_admin || '-'}</td>
                                         <td className="px-4 py-3">
                                             {p.status === 'Menunggu Persetujuan' ? (
                                                 <div className="flex justify-center gap-2">
                                                     <button
-                                                        onClick={() => handleStatusUpdate(p.id, 'Disetujui')}
-                                                        disabled={isUpdating === p.id}
-                                                        className="p-2 rounded-full bg-green-100 text-green-600 hover:bg-green-200 disabled:opacity-50"
+                                                        onClick={() => handleActionClick(p, 'Disetujui')}
+                                                        className="p-2 rounded-full bg-green-100 text-green-600 hover:bg-green-200"
                                                         title="Setujui"
                                                     >
                                                         <CheckIcon className="w-4 h-4" />
                                                     </button>
                                                     <button
-                                                        onClick={() => handleStatusUpdate(p.id, 'Ditolak')}
-                                                        disabled={isUpdating === p.id}
-                                                        className="p-2 rounded-full bg-red-100 text-red-600 hover:bg-red-200 disabled:opacity-50"
+                                                        onClick={() => handleActionClick(p, 'Ditolak')}
+                                                        className="p-2 rounded-full bg-red-100 text-red-600 hover:bg-red-200"
                                                         title="Tolak"
                                                     >
                                                         <XMarkIcon className="w-4 h-4" />
@@ -157,6 +178,37 @@ const AdminPinjaman: React.FC = () => {
                     )}
                 </div>
             </div>
+            
+            <Modal isOpen={isModalOpen} onClose={closeModal} title={`${actionType} Pengajuan Pinjaman`}>
+                <div>
+                    <p className="mb-4">
+                        Anda akan <span className="font-bold">{actionType?.toLowerCase()}</span> pengajuan untuk <span className="font-bold">{currentPinjaman?.nama_anggota}</span>.
+                    </p>
+                    <div>
+                        <label htmlFor="adminNotes" className="block text-sm font-medium text-gray-700">
+                           Catatan / Alasan (Opsional)
+                        </label>
+                        <textarea
+                            id="adminNotes"
+                            value={adminNotes}
+                            onChange={(e) => setAdminNotes(e.target.value)}
+                            rows={4}
+                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                            placeholder={actionType === 'Ditolak' ? 'Contoh: Total pinjaman aktif melebihi batas.' : 'Contoh: Disetujui dengan syarat...'}
+                        />
+                    </div>
+                     <div className="flex justify-end gap-4 mt-6">
+                        <button onClick={closeModal} className="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg font-semibold hover:bg-gray-300">Batal</button>
+                        <button
+                            onClick={handleConfirmAction}
+                            disabled={isUpdating}
+                            className={`px-4 py-2 rounded-lg font-semibold text-white disabled:bg-gray-400 ${actionType === 'Disetujui' ? 'bg-secondary hover:bg-secondary-dark' : 'bg-red-600 hover:bg-red-700'}`}
+                        >
+                            {isUpdating ? 'Memproses...' : `Konfirmasi & ${actionType}`}
+                        </button>
+                    </div>
+                </div>
+            </Modal>
         </div>
     );
 };
