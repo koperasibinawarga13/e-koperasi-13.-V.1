@@ -2,24 +2,27 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="/icon-192x192.png?v=14" />
+    <link rel="icon" type="image/png" href="/icon-192x192.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Koperasi Bina 13 Warga</title>
-    
-    <!-- PWA -->
-    <meta name="theme-color" content="#4338CA"/>
-    <link rel="manifest" href="/manifest.json?v=14" />
-    <link rel="apple-touch-icon" href="/icon-192x192.png?v=14" />
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="e-Koperasi13">
 
+    <!-- PWA Essentials -->
+    <meta name="theme-color" content="#4338CA" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" href="/icon-512x512.png" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="e-Koperasi13" />
 
     <!-- Google Fonts: Poppins -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
 
+    <!-- Tailwind CDN (for dev only) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
@@ -29,70 +32,67 @@
               sans: ['Poppins', 'sans-serif'],
             },
             colors: {
-              'primary': {
-                'DEFAULT': '#4338CA', // Indigo 700
-                'light': '#E0E7FF', // Indigo 100
-                'dark': '#3730A3', // Indigo 800
-              },
-              'secondary': {
-                'DEFAULT': '#10B981', // Emerald 500
-                'light': '#D1FAE5', // Emerald 100
-                'dark': '#059669', // Emerald 600
-              },
-              'accent': {
-                'DEFAULT': '#FBBF24', // Amber 400
-                'dark': '#F59E0B', // Amber 500
-              },
-              'background': '#E2E8F0', // Slate 200
-              'surface': '#FFFFFF',
-              'dark': '#1E293B',    // Slate 800
-              'gray-text': '#64748B', // Slate 500
+              primary: { DEFAULT: '#4338CA', light: '#E0E7FF', dark: '#3730A3' },
+              secondary: { DEFAULT: '#10B981', light: '#D1FAE5', dark: '#059669' },
+              accent: { DEFAULT: '#FBBF24', dark: '#F59E0B' },
+              background: '#E2E8F0',
+              surface: '#FFFFFF',
+              dark: '#1E293B',
+              'gray-text': '#64748B',
             },
           },
         },
+      };
+    </script>
+
+    <script type="importmap">
+      {
+        "imports": {
+          "react": "https://aistudiocdn.com/react@^19.2.0",
+          "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+          "react/": "https://aistudiocdn.com/react@^19.2.0/",
+          "recharts": "https://aistudiocdn.com/recharts@^3.2.1",
+          "react-router-dom": "https://aistudiocdn.com/react-router-dom@^7.9.4",
+          "firebase/": "https://aistudiocdn.com/firebase@^12.4.0/",
+          "react-dropzone": "https://aistudiocdn.com/react-dropzone@^14.3.8",
+          "xlsx": "https://aistudiocdn.com/xlsx@^0.18.5"
+        }
       }
     </script>
-    
-  <script type="importmap">
-{
-  "imports": {
-    "react": "https://aistudiocdn.com/react@^19.2.0",
-    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
-    "react/": "https://aistudiocdn.com/react@^19.2.0/",
-    "recharts": "https://aistudiocdn.com/recharts@^3.2.1",
-    "react-router-dom": "https://aistudiocdn.com/react-router-dom@^7.9.4",
-    "firebase/": "https://aistudiocdn.com/firebase@^12.4.0/",
-    "react-dropzone": "https://aistudiocdn.com/react-dropzone@^14.3.8",
-    "xlsx": "https://aistudiocdn.com/xlsx@^0.18.5"
-  }
-}
-</script>
-</head>
+  </head>
+
   <body class="bg-background">
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>
+
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./sw.js').then(registration => {
-            console.log('SW registered: ', registration);
-            
-            registration.onupdatefound = () => {
-              const installingWorker = registration.installing;
-              if (installingWorker) {
-                installingWorker.onstatechange = () => {
-                  if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                    console.log('New content is available; please refresh.');
-                    if (confirm('Versi baru aplikasi tersedia. Muat ulang sekarang?')) {
-                      installingWorker.postMessage({ type: 'SKIP_WAITING' });
+          navigator.serviceWorker
+            .register('/sw.js')
+            .then((registration) => {
+              console.log('SW registered: ', registration);
+
+              registration.onupdatefound = () => {
+                const installingWorker = registration.installing;
+                if (installingWorker) {
+                  installingWorker.onstatechange = () => {
+                    if (
+                      installingWorker.state === 'installed' &&
+                      navigator.serviceWorker.controller
+                    ) {
+                      console.log('New content is available; please refresh.');
+                      if (confirm('Versi baru aplikasi tersedia. Muat ulang sekarang?')) {
+                        installingWorker.postMessage({ type: 'SKIP_WAITING' });
+                      }
                     }
-                  }
-                };
-              }
-            };
-          }).catch(registrationError => {
-            console.log('SW registration failed: ', registrationError);
-          });
+                  };
+                }
+              };
+            })
+            .catch((err) => {
+              console.log('SW registration failed: ', err);
+            });
 
           let refreshing;
           navigator.serviceWorker.addEventListener('controllerchange', () => {
