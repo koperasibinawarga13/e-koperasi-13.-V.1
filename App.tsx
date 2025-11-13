@@ -50,7 +50,8 @@ const App: React.FC = () => {
   useEffect(() => {
     const registerAndUpdateListener = async () => {
         if ('serviceWorker' in navigator) {
-            const registration = await navigator.serviceWorker.getRegistration('/');
+            // Get registration for the current scope, don't specify a scope to avoid origin mismatch issues.
+            const registration = await navigator.serviceWorker.getRegistration();
             if (registration) {
                 // Listen for future updates
                 registration.addEventListener('updatefound', () => {
