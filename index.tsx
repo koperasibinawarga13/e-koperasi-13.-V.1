@@ -14,10 +14,8 @@ if (!rootElement) {
 // which would cause a "navigator is not defined" error and fail the deployment.
 window.addEventListener('load', () => {
   if ('serviceWorker' in navigator) {
-    // Use an absolute URL to avoid origin confusion in iframe environments.
-    // Let the browser infer the scope from the script URL.
-    const swUrl = `${window.location.origin}/sw.js`;
-    navigator.serviceWorker.register(swUrl).then(registration => {
+    // FIX: Revert to relative path to let the browser handle origin resolution correctly.
+    navigator.serviceWorker.register('/sw.js').then(registration => {
       console.log('Service Worker registered successfully:', registration.scope);
     }).catch(err => {
       console.error('Service Worker registration failed:', err);

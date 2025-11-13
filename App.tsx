@@ -48,32 +48,33 @@ const App: React.FC = () => {
   const [waitingWorker, setWaitingWorker] = useState<ServiceWorker | null>(null);
 
   useEffect(() => {
-    const registerAndUpdateListener = async () => {
-        if ('serviceWorker' in navigator) {
-            // Get registration for the current scope, don't specify a scope to avoid origin mismatch issues.
-            const registration = await navigator.serviceWorker.getRegistration();
-            if (registration) {
-                // Listen for future updates
-                registration.addEventListener('updatefound', () => {
-                    const newWorker = registration.installing;
-                    if (newWorker) {
-                        newWorker.addEventListener('statechange', () => {
-                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                setWaitingWorker(newWorker);
-                                setIsUpdateAvailable(true);
-                            }
-                        });
-                    }
-                });
-                // Handle case where a new worker is already waiting
-                if (registration.waiting) {
-                    setWaitingWorker(registration.waiting);
-                    setIsUpdateAvailable(true);
-                }
-            }
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.ready.then(registration => {
+        // This promise resolves only when a service worker is active.
+        // The registration object is now guaranteed to be available.
+
+        // Listen for future updates
+        registration.addEventListener('updatefound', () => {
+          const newWorker = registration.installing;
+          if (newWorker) {
+            newWorker.addEventListener('statechange', () => {
+              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                setWaitingWorker(newWorker);
+                setIsUpdateAvailable(true);
+              }
+            });
+          }
+        });
+
+        // Handle case where a new worker is already waiting
+        if (registration.waiting) {
+          setWaitingWorker(registration.waiting);
+          setIsUpdateAvailable(true);
         }
-    };
-    registerAndUpdateListener();
+      }).catch(error => {
+          console.error('Service Worker .ready failed:', error);
+      });
+    }
   }, []);
 
   const handleUpdate = () => {
