@@ -58,6 +58,7 @@ export interface Keuangan {
   awal_simpanan_wisata: number;
   awal_pinjaman_berjangka: number;
   awal_pinjaman_khusus: number;
+  awal_pinjaman_niaga: number;
   transaksi_simpanan_pokok: number;
   transaksi_simpanan_wajib: number;
   transaksi_simpanan_sukarela: number;
@@ -82,6 +83,7 @@ export interface Keuangan {
   akhir_simpanan_wisata: number;
   akhir_pinjaman_berjangka: number;
   akhir_pinjaman_khusus: number;
+  akhir_pinjaman_niaga: number;
   jumlah_total_simpanan: number;
   jumlah_total_pinjaman: number;
 }

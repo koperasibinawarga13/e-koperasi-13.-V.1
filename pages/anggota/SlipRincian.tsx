@@ -129,6 +129,7 @@ const SlipRincian: React.FC = () => {
                             <Item label="Simpanan Wisata" value={keuangan.awal_simpanan_wisata} />
                             <Item label="Pinjaman Berjangka" value={keuangan.awal_pinjaman_berjangka} />
                             <Item label="Pinjaman Khusus" value={keuangan.awal_pinjaman_khusus} />
+                            <Item label="Pinjaman Niaga" value={keuangan.awal_pinjaman_niaga} />
                         </Section>
                         
                         <Section title="KEADAAN AKHIR BULAN" color="bg-blue-100 text-blue-800">
@@ -138,6 +139,7 @@ const SlipRincian: React.FC = () => {
                             <Item label="Simpanan Wisata" value={keuangan.akhir_simpanan_wisata} />
                             <Item label="Pinjaman Berjangka" value={keuangan.akhir_pinjaman_berjangka} />
                             <Item label="Pinjaman Khusus" value={keuangan.akhir_pinjaman_khusus} />
+                            <Item label="Pinjaman Niaga" value={keuangan.akhir_pinjaman_niaga} />
                         </Section>
                     </div>
 
@@ -164,7 +166,7 @@ const SlipRincian: React.FC = () => {
                             <Item label="Angsuran P. Berjangka" value={keuangan.transaksi_pinjaman_berjangka} />
                             <Item label="Angsuran P. Khusus" value={keuangan.transaksi_pinjaman_khusus} />
                             <Item label="Jasa" value={keuangan.transaksi_simpanan_jasa} />
-                            <Item label="Niaga" value={keuangan.transaksi_niaga} />
+                            <Item label="Angsuran P. Niaga" value={keuangan.transaksi_niaga} />
                             <Item label="Dana Perlaya" value={keuangan.transaksi_dana_perlaya} />
                             <Item label="Dana Katineng" value={keuangan.transaksi_dana_katineng} />
                         </Section>

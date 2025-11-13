@@ -312,12 +312,12 @@ export const registerNewAnggota = async (data: NewMemberRegistrationData): Promi
             no: 0,
             no_anggota: data.no_anggota,
             nama_angota: data.nama,
-            awal_simpanan_pokok: 0, awal_simpanan_wajib: 0, sukarela: 0, awal_simpanan_wisata: 0, awal_pinjaman_berjangka: 0, awal_pinjaman_khusus: 0,
+            awal_simpanan_pokok: 0, awal_simpanan_wajib: 0, sukarela: 0, awal_simpanan_wisata: 0, awal_pinjaman_berjangka: 0, awal_pinjaman_khusus: 0, awal_pinjaman_niaga: 0,
             transaksi_simpanan_pokok: 0, transaksi_simpanan_wajib: 0, transaksi_simpanan_sukarela: 0, transaksi_simpanan_wisata: 0, transaksi_pinjaman_berjangka: 0, transaksi_pinjaman_khusus: 0,
             transaksi_simpanan_jasa: 0, transaksi_niaga: 0, transaksi_dana_perlaya: 0, transaksi_dana_katineng: 0, Jumlah_setoran: 0,
             transaksi_pengambilan_simpanan_pokok: 0, transaksi_pengambilan_simpanan_wajib: 0, transaksi_pengambilan_simpanan_sukarela: 0, transaksi_pengambilan_simpanan_wisata: 0,
             transaksi_penambahan_pinjaman_berjangka: 0, transaksi_penambahan_pinjaman_khusus: 0, transaksi_penambahan_pinjaman_niaga: 0,
-            akhir_simpanan_pokok: 0, akhir_simpanan_wajib: 0, akhir_simpanan_sukarela: 0, akhir_simpanan_wisata: 0, akhir_pinjaman_berjangka: 0, akhir_pinjaman_khusus: 0,
+            akhir_simpanan_pokok: 0, akhir_simpanan_wajib: 0, akhir_simpanan_sukarela: 0, akhir_simpanan_wisata: 0, akhir_pinjaman_berjangka: 0, akhir_pinjaman_khusus: 0, akhir_pinjaman_niaga: 0,
             jumlah_total_simpanan: 0, jumlah_total_pinjaman: 0,
         };
         batch.set(newKeuanganDocRef, initialKeuangan);

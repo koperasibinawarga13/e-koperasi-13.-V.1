@@ -47,9 +47,13 @@ export const getLogById = async (id: string): Promise<TransaksiLog | null> => {
 
 export const getLogsByAnggota = async (no_anggota: string): Promise<TransaksiLog[]> => {
     try {
-        const q = query(logCollectionRef, where('no_anggota', '==', no_anggota), orderBy('log_time', 'desc'));
+        // FIX: Removed orderBy to prevent composite index error. Sorting is now done on the client-side.
+        const q = query(logCollectionRef, where('no_anggota', '==', no_anggota));
         const data = await getDocs(q);
-        return data.docs.map(doc => ({...doc.data(), id: doc.id} as TransaksiLog));
+        const logs = data.docs.map(doc => ({...doc.data(), id: doc.id} as TransaksiLog));
+        // Sort client-side
+        logs.sort((a, b) => new Date(b.log_time).getTime() - new Date(a.log_time).getTime());
+        return logs;
     } catch (error) {
         console.error("Error fetching logs for member:", error);
         return [];
@@ -58,14 +62,17 @@ export const getLogsByAnggota = async (no_anggota: string): Promise<TransaksiLog
 
 export const getLogsByAdminAndPeriod = async (adminName: string, period: string): Promise<TransaksiLog[]> => {
     try {
+        // FIX: Removed orderBy to prevent composite index error. Sorting is now done on the client-side.
         const q = query(
             logCollectionRef, 
             where('admin_nama', '==', adminName), 
-            where('periode', '==', period),
-            orderBy('log_time', 'asc')
+            where('periode', '==', period)
         );
         const data = await getDocs(q);
-        return data.docs.map(doc => ({...doc.data(), id: doc.id} as TransaksiLog));
+        const logs = data.docs.map(doc => ({...doc.data(), id: doc.id} as TransaksiLog));
+        // Sort client-side
+        logs.sort((a, b) => new Date(a.log_time).getTime() - new Date(b.log_time).getTime());
+        return logs;
     } catch (error) {
         console.error("Error fetching logs by admin and period:", error);
         return [];

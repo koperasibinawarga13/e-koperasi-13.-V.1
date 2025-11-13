@@ -136,6 +136,7 @@ const AdminKeuanganDetail: React.FC = () => {
                     <InfoItem label="Simpanan Wisata" value={data.awal_simpanan_wisata} />
                     <InfoItem label="Pinjaman Berjangka" value={data.awal_pinjaman_berjangka} />
                     <InfoItem label="Pinjaman Khusus" value={data.awal_pinjaman_khusus} />
+                    <InfoItem label="Pinjaman Niaga" value={data.awal_pinjaman_niaga} />
                 </DetailCard>
 
                 <DetailCard title="Transaksi Bulan Ini (Setoran)">
@@ -169,6 +170,7 @@ const AdminKeuanganDetail: React.FC = () => {
                      <InfoItem label="Simpanan Wisata" value={data.akhir_simpanan_wisata} />
                      <InfoItem label="Pinjaman Berjangka" value={data.akhir_pinjaman_berjangka} />
                      <InfoItem label="Pinjaman Khusus" value={data.akhir_pinjaman_khusus} />
+                     <InfoItem label="Pinjaman Niaga" value={data.akhir_pinjaman_niaga} />
                      <InfoItem label="Total Simpanan" value={data.jumlah_total_simpanan} />
                      <InfoItem label="Total Pinjaman" value={data.jumlah_total_pinjaman} />
                 </DetailCard>

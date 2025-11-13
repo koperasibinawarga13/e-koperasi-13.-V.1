@@ -49,6 +49,7 @@ const AdminLaporan: React.FC = () => {
             'Total Simpanan': k.jumlah_total_simpanan,
             'Akhir Pinjaman Berjangka': k.akhir_pinjaman_berjangka,
             'Akhir Pinjaman Khusus': k.akhir_pinjaman_khusus,
+            'Akhir Pinjaman Niaga': k.akhir_pinjaman_niaga,
             'Total Pinjaman': k.jumlah_total_pinjaman,
             'Transaksi Simpanan Pokok': k.transaksi_simpanan_pokok,
             'Transaksi Simpanan Wajib': k.transaksi_simpanan_wajib,
@@ -74,6 +75,7 @@ const AdminLaporan: React.FC = () => {
             'Awal Simpanan Wisata': k.awal_simpanan_wisata,
             'Awal Pinjaman Berjangka': k.awal_pinjaman_berjangka,
             'Awal Pinjaman Khusus': k.awal_pinjaman_khusus,
+            'Awal Pinjaman Niaga': k.awal_pinjaman_niaga,
         }));
     };
     

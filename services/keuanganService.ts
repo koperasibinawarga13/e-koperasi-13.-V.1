@@ -33,13 +33,16 @@ const calculateAkhir = (awal: Partial<Keuangan>, tx: Partial<TransaksiBulanan>):
     const awal_swi = awal.awal_simpanan_wisata ?? awal.akhir_simpanan_wisata ?? 0;
     const awal_pb = awal.awal_pinjaman_berjangka ?? awal.akhir_pinjaman_berjangka ?? 0;
     const awal_pk = awal.awal_pinjaman_khusus ?? awal.akhir_pinjaman_khusus ?? 0;
+    const awal_pn = awal.awal_pinjaman_niaga ?? awal.akhir_pinjaman_niaga ?? 0;
 
     const akhir_simpanan_pokok = awal_sp + (tx.transaksi_simpanan_pokok ?? 0) - (tx.transaksi_pengambilan_simpanan_pokok ?? 0);
     const akhir_simpanan_wajib = awal_sw + (tx.transaksi_simpanan_wajib ?? 0) - (tx.transaksi_pengambilan_simpanan_wajib ?? 0);
     const akhir_simpanan_sukarela = awal_ss + (tx.transaksi_simpanan_sukarela ?? 0) - (tx.transaksi_pengambilan_simpanan_sukarela ?? 0);
     const akhir_simpanan_wisata = awal_swi + (tx.transaksi_simpanan_wisata ?? 0) - (tx.transaksi_pengambilan_simpanan_wisata ?? 0);
+    
     const akhir_pinjaman_berjangka = awal_pb - (tx.transaksi_pinjaman_berjangka ?? 0) + (tx.transaksi_penambahan_pinjaman_berjangka ?? 0);
     const akhir_pinjaman_khusus = awal_pk - (tx.transaksi_pinjaman_khusus ?? 0) + (tx.transaksi_penambahan_pinjaman_khusus ?? 0);
+    const akhir_pinjaman_niaga = awal_pn - (tx.transaksi_niaga ?? 0) + (tx.transaksi_penambahan_pinjaman_niaga ?? 0);
     
     return {
         akhir_simpanan_pokok,
@@ -49,7 +52,8 @@ const calculateAkhir = (awal: Partial<Keuangan>, tx: Partial<TransaksiBulanan>):
         jumlah_total_simpanan: akhir_simpanan_pokok + akhir_simpanan_wajib + akhir_simpanan_sukarela + akhir_simpanan_wisata,
         akhir_pinjaman_berjangka,
         akhir_pinjaman_khusus,
-        jumlah_total_pinjaman: akhir_pinjaman_berjangka + akhir_pinjaman_khusus,
+        akhir_pinjaman_niaga,
+        jumlah_total_pinjaman: akhir_pinjaman_berjangka + akhir_pinjaman_khusus + akhir_pinjaman_niaga,
     };
 };
 
@@ -113,8 +117,8 @@ export const batchProcessTransaksiBulanan = async (transaksiList: TransaksiBulan
                         no: 0,
                         no_anggota: tx.no_anggota,
                         nama_angota: tx.nama_angota || '',
-                        awal_simpanan_pokok: 0, awal_simpanan_wajib: 0, sukarela: 0, awal_simpanan_wisata: 0, awal_pinjaman_berjangka: 0, awal_pinjaman_khusus: 0,
-                        akhir_simpanan_pokok: 0, akhir_simpanan_wajib: 0, akhir_simpanan_sukarela: 0, akhir_simpanan_wisata: 0, akhir_pinjaman_berjangka: 0, akhir_pinjaman_khusus: 0,
+                        awal_simpanan_pokok: 0, awal_simpanan_wajib: 0, sukarela: 0, awal_simpanan_wisata: 0, awal_pinjaman_berjangka: 0, awal_pinjaman_khusus: 0, awal_pinjaman_niaga: 0,
+                        akhir_simpanan_pokok: 0, akhir_simpanan_wajib: 0, akhir_simpanan_sukarela: 0, akhir_simpanan_wisata: 0, akhir_pinjaman_berjangka: 0, akhir_pinjaman_khusus: 0, akhir_pinjaman_niaga: 0,
                         jumlah_total_simpanan: 0, jumlah_total_pinjaman: 0,
                     } as Keuangan;
                 }
@@ -141,6 +145,7 @@ export const batchProcessTransaksiBulanan = async (transaksiList: TransaksiBulan
                     awal_simpanan_wisata: currentData.akhir_simpanan_wisata,
                     awal_pinjaman_berjangka: currentData.akhir_pinjaman_berjangka,
                     awal_pinjaman_khusus: currentData.akhir_pinjaman_khusus,
+                    awal_pinjaman_niaga: currentData.akhir_pinjaman_niaga,
                 };
                 
                 const akhirData = calculateAkhir({ ...currentData, ...awalData }, mergedTx);
@@ -234,12 +239,12 @@ export const deleteMonthlyReport = async (monthToDelete: string): Promise<void> 
                 no_anggota,
                 nama_angota: memberName,
                 periode: '',
-                awal_simpanan_pokok: 0, awal_simpanan_wajib: 0, sukarela: 0, awal_simpanan_wisata: 0, awal_pinjaman_berjangka: 0, awal_pinjaman_khusus: 0,
+                awal_simpanan_pokok: 0, awal_simpanan_wajib: 0, sukarela: 0, awal_simpanan_wisata: 0, awal_pinjaman_berjangka: 0, awal_pinjaman_khusus: 0, awal_pinjaman_niaga: 0,
                 transaksi_simpanan_pokok: 0, transaksi_simpanan_wajib: 0, transaksi_simpanan_sukarela: 0, transaksi_simpanan_wisata: 0, transaksi_pinjaman_berjangka: 0, transaksi_pinjaman_khusus: 0,
                 transaksi_simpanan_jasa: 0, transaksi_niaga: 0, transaksi_dana_perlaya: 0, transaksi_dana_katineng: 0, Jumlah_setoran: 0,
                 transaksi_pengambilan_simpanan_pokok: 0, transaksi_pengambilan_simpanan_wajib: 0, transaksi_pengambilan_simpanan_sukarela: 0, transaksi_pengambilan_simpanan_wisata: 0,
                 transaksi_penambahan_pinjaman_berjangka: 0, transaksi_penambahan_pinjaman_khusus: 0, transaksi_penambahan_pinjaman_niaga: 0,
-                akhir_simpanan_pokok: 0, akhir_simpanan_wajib: 0, akhir_simpanan_sukarela: 0, akhir_simpanan_wisata: 0, akhir_pinjaman_berjangka: 0, akhir_pinjaman_khusus: 0,
+                akhir_simpanan_pokok: 0, akhir_simpanan_wajib: 0, akhir_simpanan_sukarela: 0, akhir_simpanan_wisata: 0, akhir_pinjaman_berjangka: 0, akhir_pinjaman_khusus: 0, akhir_pinjaman_niaga: 0,
                 jumlah_total_simpanan: 0, jumlah_total_pinjaman: 0,
             };
             batch.set(docRef, emptyKeuangan);
@@ -333,8 +338,8 @@ export const correctPastTransaction = async (logId: string, updatedTx: Transaksi
         // Ensure currentState is a fully-formed, zeroed-out object.
         let currentState: Keuangan = {
             no: 0, no_anggota, nama_angota: logDoc.nama_angota || '',
-            awal_simpanan_pokok: 0, awal_simpanan_wajib: 0, sukarela: 0, awal_simpanan_wisata: 0, awal_pinjaman_berjangka: 0, awal_pinjaman_khusus: 0,
-            akhir_simpanan_pokok: 0, akhir_simpanan_wajib: 0, akhir_simpanan_sukarela: 0, akhir_simpanan_wisata: 0, akhir_pinjaman_berjangka: 0, akhir_pinjaman_khusus: 0,
+            awal_simpanan_pokok: 0, awal_simpanan_wajib: 0, sukarela: 0, awal_simpanan_wisata: 0, awal_pinjaman_berjangka: 0, awal_pinjaman_khusus: 0, awal_pinjaman_niaga: 0,
+            akhir_simpanan_pokok: 0, akhir_simpanan_wajib: 0, akhir_simpanan_sukarela: 0, akhir_simpanan_wisata: 0, akhir_pinjaman_berjangka: 0, akhir_pinjaman_khusus: 0, akhir_pinjaman_niaga: 0,
             jumlah_total_simpanan: 0, jumlah_total_pinjaman: 0,
         } as Keuangan;
         
@@ -352,6 +357,7 @@ export const correctPastTransaction = async (logId: string, updatedTx: Transaksi
                 awal_simpanan_wisata: currentState.akhir_simpanan_wisata,
                 awal_pinjaman_berjangka: currentState.akhir_pinjaman_berjangka,
                 awal_pinjaman_khusus: currentState.akhir_pinjaman_khusus,
+                awal_pinjaman_niaga: currentState.akhir_pinjaman_niaga,
             };
 
             const akhirData = calculateAkhir({ ...currentState, ...awalData }, txForThisMonth);
