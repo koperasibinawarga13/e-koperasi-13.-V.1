@@ -1,4 +1,5 @@
-import React from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import LoginPage from './pages/LoginPage';
@@ -26,12 +27,70 @@ import AdminRiwayatTransaksi from './pages/admin/AdminRiwayatTransaksi';
 import AdminRekapTransaksiManual from './pages/admin/AdminRekapSetoran';
 import AdminPengaturanKewajiban from './pages/admin/AdminPengaturanKewajiban';
 
+const PWAUpdatePrompt: React.FC<{ onUpdate: () => void }> = ({ onUpdate }) => (
+  <div className="fixed bottom-4 right-4 z-50 bg-dark text-white p-4 rounded-lg shadow-lg flex items-center gap-4 animate-fade-in-up">
+    <div>
+      <p className="font-bold">Update Tersedia!</p>
+      <p className="text-sm">Versi baru aplikasi telah siap.</p>
+    </div>
+    <button
+      onClick={onUpdate}
+      className="bg-accent text-dark font-bold py-2 px-4 rounded-lg hover:bg-accent-dark transition-colors"
+    >
+      Muat Ulang
+    </button>
+  </div>
+);
+
+
 const App: React.FC = () => {
+  const [isUpdateAvailable, setIsUpdateAvailable] = useState(false);
+  const [waitingWorker, setWaitingWorker] = useState<ServiceWorker | null>(null);
+
+  useEffect(() => {
+    const registerAndUpdateListener = async () => {
+        if ('serviceWorker' in navigator) {
+            const registration = await navigator.serviceWorker.getRegistration('/');
+            if (registration) {
+                // Listen for future updates
+                registration.addEventListener('updatefound', () => {
+                    const newWorker = registration.installing;
+                    if (newWorker) {
+                        newWorker.addEventListener('statechange', () => {
+                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                setWaitingWorker(newWorker);
+                                setIsUpdateAvailable(true);
+                            }
+                        });
+                    }
+                });
+                // Handle case where a new worker is already waiting
+                if (registration.waiting) {
+                    setWaitingWorker(registration.waiting);
+                    setIsUpdateAvailable(true);
+                }
+            }
+        }
+    };
+    registerAndUpdateListener();
+  }, []);
+
+  const handleUpdate = () => {
+    if (waitingWorker) {
+      waitingWorker.postMessage({ type: 'SKIP_WAITING' });
+      // Reload the page once the new service worker has taken control.
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        window.location.reload();
+      }, { once: true });
+    }
+  };
+
   return (
     <AuthProvider>
       <HashRouter>
         <AppRoutes />
       </HashRouter>
+      {isUpdateAvailable && <PWAUpdatePrompt onUpdate={handleUpdate} />}
     </AuthProvider>
   );
 };

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'e-koperasi-cache-v9'; // Increment version to force updates
+const CACHE_NAME = 'e-koperasi-cache-v10'; // Increment version to force updates
 const urlsToCache = [
   '/',               // App root
   '/index.html',     // Main shell
