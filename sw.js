@@ -1,11 +1,11 @@
-const CACHE_NAME = 'e-koperasi-cache-v24'; // Incremented version
+const CACHE_NAME = 'e-koperasi-cache-v25'; // Incremented version
 const urlsToCache = [
   // App Shell
   '/',
   '/index.html',
-  '/manifest.json?v=14',
-  '/icon-192x192.png?v=14',
-  '/icon-512x512.png?v=14',
+  '/manifest.json',
+  '/icon-192x192.png?v=16', // Match manifest.json
+  '/icon-512x512.png?v=16', // Match manifest.json
   // Main script
   '/index.tsx',
   // Styles & Fonts
@@ -14,10 +14,10 @@ const urlsToCache = [
   // JS Dependencies from importmap
   'https://aistudiocdn.com/react@^19.2.0',
   'https://aistudiocdn.com/react-dom@^19.2.0/client',
-  'https://aistudiocdn.com/react-router-dom@^7.9.4',
-  'https://aistudiocdn.com/recharts@^3.2.1',
-  'https://aistudiocdn.com/firebase@^12.4.0/app',
-  'https://aistudiocdn.com/firebase@^12.4.0/firestore',
+  'https://aistudiocdn.com/react-router-dom@^7.9.5',
+  'https://aistudiocdn.com/recharts@^3.4.1',
+  'https://aistudiocdn.com/firebase@^12.5.0/app',
+  'https://aistudiocdn.com/firebase@^12.5.0/firestore',
   'https://aistudiocdn.com/react-dropzone@^14.3.8',
   'https://aistudiocdn.com/xlsx@^0.18.5'
 ];

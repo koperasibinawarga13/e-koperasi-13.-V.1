@@ -9,19 +9,17 @@ if (!rootElement) {
 }
 
 // Register Service Worker
-// FIX: Moved the entire service worker registration logic inside the 'load' event listener.
-// This prevents the 'navigator' object from being accessed during server-side build,
-// which would cause a "navigator is not defined" error and fail the deployment.
-window.addEventListener('load', () => {
-  if ('serviceWorker' in navigator) {
-    // FIX: Revert to relative path to let the browser handle origin resolution correctly.
+// FIX: This check ensures the code only runs in a browser environment,
+// preventing "window is not defined" errors during the server-side build process.
+if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js').then(registration => {
       console.log('Service Worker registered successfully:', registration.scope);
     }).catch(err => {
       console.error('Service Worker registration failed:', err);
     });
-  }
-});
+  });
+}
 
 
 const root = ReactDOM.createRoot(rootElement);
