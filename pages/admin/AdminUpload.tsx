@@ -238,52 +238,72 @@ const AdminUpload: React.FC = () => {
 
     const handleKeuanganAwalUpload = async (file: File) => {
         setIsUploading(true);
-         try {
+        try {
             const { json } = await readFile(file);
-            const keuanganList: Keuangan[] = json.map(row => ({
-                no: parseNumber(row.no),
-                no_anggota: String(row.no_anggota || '').trim(),
-                nama_angota: String(row.nama_angota || '').trim(),
-                awal_simpanan_pokok: parseNumber(row.awal_simpanan_pokok),
-                awal_simpanan_wajib: parseNumber(row.awal_simpanan_wajib),
-                sukarela: parseNumber(row.sukarela),
-                awal_simpanan_wisata: parseNumber(row.awal_simpanan_wisata),
-                awal_pinjaman_berjangka: parseNumber(row.awal_pinjaman_berjangka),
-                awal_pinjaman_khusus: parseNumber(row.awal_pinjaman_khusus),
-                awal_pinjaman_niaga: parseNumber(row.awal_pinjaman_niaga),
-                transaksi_simpanan_pokok: parseNumber(row.transaksi_simpanan_pokok),
-                transaksi_simpanan_wajib: parseNumber(row.transaksi_simpanan_wajib),
-                transaksi_simpanan_sukarela: parseNumber(row.transaksi_simpanan_sukarela),
-                transaksi_simpanan_wisata: parseNumber(row.transaksi_simpanan_wisata),
-                transaksi_pinjaman_berjangka: parseNumber(row.transaksi_pinjaman_berjangka),
-                transaksi_pinjaman_khusus: parseNumber(row.transaksi_pinjaman_khusus),
-                transaksi_simpanan_jasa: parseNumber(row.transaksi_simpanan_jasa),
-                transaksi_niaga: parseNumber(row.transaksi_niaga),
-                transaksi_dana_perlaya: parseNumber(row.transaksi_dana_perlaya),
-                transaksi_dana_katineng: parseNumber(row.transaksi_dana_katineng),
-                Jumlah_setoran: parseNumber(row.Jumlah_setoran),
-                transaksi_pengambilan_simpanan_pokok: parseNumber(row.transaksi_pengambilan_simpanan_pokok),
-                transaksi_pengambilan_simpanan_wajib: parseNumber(row.transaksi_pengambilan_simpanan_wajib),
-                transaksi_pengambilan_simpanan_sukarela: parseNumber(row.transaksi_pengambilan_simpanan_sukarela),
-                transaksi_pengambilan_simpanan_wisata: parseNumber(row.transaksi_pengambilan_simpanan_wisata),
-                transaksi_penambahan_pinjaman_berjangka: parseNumber(row.transaksi_penambahan_pinjaman_berjangka),
-                transaksi_penambahan_pinjaman_khusus: parseNumber(row.transaksi_penambahan_pinjaman_khusus),
-                transaksi_penambahan_pinjaman_niaga: parseNumber(row.transaksi_penambahan_pinjaman_niaga),
-                akhir_simpanan_pokok: parseNumber(row.akhir_simpanan_pokok),
-                akhir_simpanan_wajib: parseNumber(row.akhir_simpanan_wajib),
-                akhir_simpanan_sukarela: parseNumber(row.akhir_simpanan_sukarela),
-                akhir_simpanan_wisata: parseNumber(row.akhir_simpanan_wisata),
-                akhir_pinjaman_berjangka: parseNumber(row.akhir_pinjaman_berjangka),
-                akhir_pinjaman_khusus: parseNumber(row.akhir_pinjaman_khusus),
-                akhir_pinjaman_niaga: parseNumber(row.akhir_pinjaman_niaga),
-                jumlah_total_simpanan: parseNumber(row.jumlah_total_simpanan),
-                jumlah_total_pinjaman: parseNumber(row.jumlah_total_pinjaman),
-            })).filter(k => k.no_anggota);
+            const keuanganList: Keuangan[] = json.map(row => {
+                const rawData = {
+                    no: parseNumber(row.no),
+                    no_anggota: String(row.no_anggota || '').trim(),
+                    nama_angota: String(row.nama_angota || '').trim(),
+                    awal_simpanan_pokok: parseNumber(row.awal_simpanan_pokok),
+                    awal_simpanan_wajib: parseNumber(row.awal_simpanan_wajib),
+                    sukarela: parseNumber(row.sukarela),
+                    awal_simpanan_wisata: parseNumber(row.awal_simpanan_wisata),
+                    awal_pinjaman_berjangka: parseNumber(row.awal_pinjaman_berjangka),
+                    awal_pinjaman_khusus: parseNumber(row.awal_pinjaman_khusus),
+                    awal_pinjaman_niaga: parseNumber(row.awal_pinjaman_niaga),
+                    transaksi_simpanan_pokok: parseNumber(row.transaksi_simpanan_pokok),
+                    transaksi_simpanan_wajib: parseNumber(row.transaksi_simpanan_wajib),
+                    transaksi_simpanan_sukarela: parseNumber(row.transaksi_simpanan_sukarela),
+                    transaksi_simpanan_wisata: parseNumber(row.transaksi_simpanan_wisata),
+                    transaksi_pinjaman_berjangka: parseNumber(row.transaksi_pinjaman_berjangka),
+                    transaksi_pinjaman_khusus: parseNumber(row.transaksi_pinjaman_khusus),
+                    transaksi_simpanan_jasa: parseNumber(row.transaksi_simpanan_jasa),
+                    transaksi_niaga: parseNumber(row.transaksi_niaga),
+                    transaksi_dana_perlaya: parseNumber(row.transaksi_dana_perlaya),
+                    transaksi_dana_katineng: parseNumber(row.transaksi_dana_katineng),
+                    Jumlah_setoran: parseNumber(row.Jumlah_setoran),
+                    transaksi_pengambilan_simpanan_pokok: parseNumber(row.transaksi_pengambilan_simpanan_pokok),
+                    transaksi_pengambilan_simpanan_wajib: parseNumber(row.transaksi_pengambilan_simpanan_wajib),
+                    transaksi_pengambilan_simpanan_sukarela: parseNumber(row.transaksi_pengambilan_simpanan_sukarela),
+                    transaksi_pengambilan_simpanan_wisata: parseNumber(row.transaksi_pengambilan_simpanan_wisata),
+                    transaksi_penambahan_pinjaman_berjangka: parseNumber(row.transaksi_penambahan_pinjaman_berjangka),
+                    transaksi_penambahan_pinjaman_khusus: parseNumber(row.transaksi_penambahan_pinjaman_khusus),
+                    transaksi_penambahan_pinjaman_niaga: parseNumber(row.transaksi_penambahan_pinjaman_niaga),
+                };
+    
+                // FIX: Perform explicit calculation for initial data upload instead of reusing the incremental transaction logic.
+                // This correctly calculates final balances based on the 'awal_*' and 'transaksi_*' columns from the uploaded file.
+                const akhir_simpanan_pokok = rawData.awal_simpanan_pokok + rawData.transaksi_simpanan_pokok - rawData.transaksi_pengambilan_simpanan_pokok;
+                const akhir_simpanan_wajib = rawData.awal_simpanan_wajib + rawData.transaksi_simpanan_wajib - rawData.transaksi_pengambilan_simpanan_wajib;
+                const akhir_simpanan_sukarela = rawData.sukarela + rawData.transaksi_simpanan_sukarela - rawData.transaksi_pengambilan_simpanan_sukarela;
+                const akhir_simpanan_wisata = rawData.awal_simpanan_wisata + rawData.transaksi_simpanan_wisata - rawData.transaksi_pengambilan_simpanan_wisata;
             
-             if (keuanganList.length === 0) throw new Error("File tidak berisi data keuangan yang valid.");
+                const akhir_pinjaman_berjangka = rawData.awal_pinjaman_berjangka - rawData.transaksi_pinjaman_berjangka + rawData.transaksi_penambahan_pinjaman_berjangka;
+                const akhir_pinjaman_khusus = rawData.awal_pinjaman_khusus - rawData.transaksi_pinjaman_khusus + rawData.transaksi_penambahan_pinjaman_khusus;
+                const akhir_pinjaman_niaga = rawData.awal_pinjaman_niaga - rawData.transaksi_niaga + rawData.transaksi_penambahan_pinjaman_niaga;
+
+                const jumlah_total_simpanan = akhir_simpanan_pokok + akhir_simpanan_wajib + akhir_simpanan_sukarela + akhir_simpanan_wisata;
+                const jumlah_total_pinjaman = akhir_pinjaman_berjangka + akhir_pinjaman_khusus + akhir_pinjaman_niaga;
+    
+                return {
+                    ...rawData,
+                    akhir_simpanan_pokok,
+                    akhir_simpanan_wajib,
+                    akhir_simpanan_sukarela,
+                    akhir_simpanan_wisata,
+                    akhir_pinjaman_berjangka,
+                    akhir_pinjaman_khusus,
+                    akhir_pinjaman_niaga,
+                    jumlah_total_simpanan,
+                    jumlah_total_pinjaman,
+                } as Keuangan;
+            }).filter(k => k.no_anggota);
+            
+            if (keuanganList.length === 0) throw new Error("File tidak berisi data keuangan yang valid.");
             
             await batchUpsertKeuangan(keuanganList);
-
+            alert('Data awal keuangan berhasil diunggah dan semua saldo akhir telah dihitung ulang oleh sistem.');
         } catch (err: any) {
             alert(`Gagal memproses file: ${err.message}`);
         } finally {

@@ -26,7 +26,7 @@ const metadataCollectionRef = collection(db, 'metadata');
 const UPLOAD_HISTORY_DOC_ID = '_upload_history';
 
 // Helper function to calculate final balances
-const calculateAkhir = (awal: Partial<Keuangan>, tx: Partial<TransaksiBulanan>): { [key: string]: number } => {
+export const calculateAkhir = (awal: Partial<Keuangan>, tx: Partial<TransaksiBulanan>): { [key: string]: number } => {
     const awal_sp = awal.awal_simpanan_pokok ?? awal.akhir_simpanan_pokok ?? 0;
     const awal_sw = awal.awal_simpanan_wajib ?? awal.akhir_simpanan_wajib ?? 0;
     const awal_ss = awal.sukarela ?? awal.akhir_simpanan_sukarela ?? 0;
