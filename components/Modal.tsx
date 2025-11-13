@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 interface ModalProps {
   isOpen: boolean;
@@ -8,6 +8,34 @@ interface ModalProps {
 }
 
 const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }) => {
+  // FIX: Moved the style injection logic into a useEffect hook.
+  // This ensures the code only runs on the client-side (in the browser) after the component mounts,
+  // preventing a "document is not defined" error during the server-side build process.
+  // An ID is added to the style tag to prevent it from being injected multiple times.
+  useEffect(() => {
+    const styleId = 'modal-animation-styles';
+    if (!document.getElementById(styleId)) {
+        const style = document.createElement('style');
+        style.id = styleId;
+        style.innerHTML = `
+        @keyframes fade-in-up {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .animate-fade-in-up {
+            animation: fade-in-up 0.3s ease-out forwards;
+        }
+        `;
+        document.head.appendChild(style);
+    }
+  }, []); // Run only once when the component mounts
+
   if (!isOpen) return null;
 
   return (
@@ -26,25 +54,5 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }) => {
     </div>
   );
 };
-
-// Simple fade-in-up animation for the modal
-const style = document.createElement('style');
-style.innerHTML = `
-@keyframes fade-in-up {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-.animate-fade-in-up {
-    animation: fade-in-up 0.3s ease-out forwards;
-}
-`;
-document.head.appendChild(style);
-
 
 export default Modal;
