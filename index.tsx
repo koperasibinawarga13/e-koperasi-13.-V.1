@@ -13,7 +13,10 @@ if (!rootElement) {
 // preventing "window is not defined" errors during the server-side build process.
 if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').then(registration => {
+    // FIX: Changed path from absolute '/sw.js' to relative './sw.js'
+    // to resolve against the current page's origin, not a potentially
+    // different base URL, fixing the cross-origin registration error.
+    navigator.serviceWorker.register('./sw.js').then(registration => {
       console.log('Service Worker registered successfully:', registration.scope);
     }).catch(err => {
       console.error('Service Worker registration failed:', err);
