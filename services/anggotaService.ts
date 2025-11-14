@@ -8,7 +8,8 @@ const anggotaCollectionRef = collection(db, 'anggota');
 export const getAnggota = async (): Promise<Anggota[]> => {
     try {
         const data = await getDocs(anggotaCollectionRef);
-        return data.docs.map((doc) => ({ ...doc.data(), id: doc.id } as Anggota));
+        // FIX: Cast doc.data() to Anggota to resolve spread type error.
+        return data.docs.map((doc) => ({ ...(doc.data() as Anggota), id: doc.id }));
     } catch (error) {
         console.error("Error fetching anggota: ", error);
         return [];
@@ -20,7 +21,8 @@ export const getAnggotaById = async (id: string): Promise<Anggota | null> => {
         const docRef = doc(db, 'anggota', id);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
-            return { ...docSnap.data(), id: docSnap.id } as Anggota;
+            // FIX: Cast docSnap.data() to Anggota to resolve spread type error.
+            return { ...(docSnap.data() as Anggota), id: docSnap.id };
         }
         return null;
     } catch (error) {
@@ -36,7 +38,8 @@ export const getAnggotaByNo = async (no_anggota: string): Promise<Anggota | null
         const querySnapshot = await getDocs(q);
         if (!querySnapshot.empty) {
             const doc = querySnapshot.docs[0];
-            return { ...doc.data(), id: doc.id } as Anggota;
+            // FIX: Cast doc.data() to Anggota to resolve spread type error.
+            return { ...(doc.data() as Anggota), id: doc.id };
         }
         return null;
     } catch (error) {
@@ -52,7 +55,8 @@ export const findAnggotaByCredentials = async (no_anggota: string, password: str
         const querySnapshot = await getDocs(q);
         if (!querySnapshot.empty) {
             const doc = querySnapshot.docs[0];
-            return { ...doc.data(), id: doc.id } as Anggota;
+            // FIX: Cast doc.data() to Anggota to resolve spread type error.
+            return { ...(doc.data() as Anggota), id: doc.id };
         }
         return null;
     } catch (error) {
@@ -210,7 +214,8 @@ export const migrateAnggotaStatus = async (anggota: Anggota, newNoAnggota: strin
         const oldKeuanganDocRef = doc(db, 'keuangan', oldNoAnggota);
         const oldKeuanganDocSnap = await getDoc(oldKeuanganDocRef);
         if (oldKeuanganDocSnap.exists()) {
-            const keuanganData = oldKeuanganDocSnap.data();
+            // FIX: Cast Firestore document data to the 'Keuangan' type to access its properties.
+            const keuanganData = oldKeuanganDocSnap.data() as Keuangan;
             keuanganData.no_anggota = newNoAnggota;
             keuanganData.nama_angota = anggota.nama; // Ensure name is up-to-date
             const newKeuanganDocRef = doc(db, 'keuangan', newNoAnggota);
@@ -223,7 +228,8 @@ export const migrateAnggotaStatus = async (anggota: Anggota, newNoAnggota: strin
         const historySnapshot = await getDocs(oldHistoryCollectionRef);
         if (!historySnapshot.empty) {
             historySnapshot.forEach(historyDoc => {
-                const historyData = historyDoc.data();
+                // FIX: Cast Firestore document data to the 'Keuangan' type to access its properties.
+                const historyData = historyDoc.data() as Keuangan;
                 historyData.no_anggota = newNoAnggota;
                 const newHistoryDocRef = doc(db, 'keuangan', newNoAnggota, 'history', historyDoc.id);
                 batch.set(newHistoryDocRef, historyData);
@@ -262,7 +268,8 @@ export const generateNewAnggotaNo = async (prefix: 'AK' | 'PB' | 'WL'): Promise<
         }
 
         const numbers = snapshot.docs
-            .map(doc => parseInt(doc.data().no_anggota.split('-')[1], 10))
+            // FIX: Cast Firestore document data to the 'Anggota' type to access its properties.
+            .map(doc => parseInt((doc.data() as Anggota).no_anggota.split('-')[1], 10))
             .filter(n => !isNaN(n));
 
         const maxNumber = numbers.length > 0 ? Math.max(...numbers) : 100;

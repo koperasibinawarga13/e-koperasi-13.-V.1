@@ -8,7 +8,8 @@ export const getPengumuman = async (): Promise<Pengumuman[]> => {
     try {
         const q = query(pengumumanCollectionRef, orderBy('tanggal', 'desc'));
         const data = await getDocs(q);
-        return data.docs.map((doc) => ({ ...doc.data(), id: doc.id } as Pengumuman));
+        // FIX: Cast doc.data() to Pengumuman to resolve spread type error.
+        return data.docs.map((doc) => ({ ...(doc.data() as Pengumuman), id: doc.id }));
     } catch (error) {
         console.error("Error fetching pengumuman: ", error);
         return [];

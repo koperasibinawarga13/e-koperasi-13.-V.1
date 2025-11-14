@@ -9,13 +9,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "react": "^19.2.0",
-    "recharts": "^3.4.1",
-    "react-router-dom": "^7.9.5",
-    "xlsx": "^0.18.5",
-    "react-dropzone": "^14.3.8",
-    "firebase": "^12.6.0",
-    "react-dom": "^19.2.0"
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "react-router-dom": "6.23.1",
+    "recharts": "2.12.7",
+    "xlsx": "0.18.5",
+    "react-dropzone": "14.2.3",
+    "firebase": "12.6.0"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",

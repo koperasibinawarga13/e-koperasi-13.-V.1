@@ -1,26 +1,27 @@
-const CACHE_NAME = 'e-koperasi-cache-v27'; // Incremented version
+const CACHE_NAME = 'e-koperasi-cache-v30'; // Incremented version
 const urlsToCache = [
   // App Shell
   '/',
   '/index.html',
   '/manifest.json',
-  '/icon-192x192.png?v=16', // Match manifest.json
-  '/icon-512x512.png?v=16', // Match manifest.json
+  '/icon-192x192.png?v=16',
+  '/icon-512x512.png?v=16',
   // Main script
   '/index.tsx',
   // Styles & Fonts
   'https://cdn.tailwindcss.com',
   'https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap',
   // JS Dependencies from importmap
-  'https://aistudiocdn.com/react@^19.2.0',
-  'https://aistudiocdn.com/react-dom@^19.2.0/client',
-  'https://aistudiocdn.com/react-router-dom@^7.9.5',
-  'https://aistudiocdn.com/recharts@^3.4.1',
-  'https://aistudiocdn.com/firebase@^12.6.0/app',
-  'https://aistudiocdn.com/firebase@^12.6.0/firestore',
-  'https://aistudiocdn.com/react-dropzone@^14.3.8',
-  'https://aistudiocdn.com/xlsx@^0.18.5'
+  'https://aistudiocdn.com/react@19.2.0',
+  'https://aistudiocdn.com/react-dom@19.2.0/client',
+  'https://esm.sh/react-router-dom@6.23.1',
+  'https://esm.sh/recharts@2.12.7',
+  'https://aistudiocdn.com/firebase@12.6.0/app',
+  'https://aistudiocdn.com/firebase@12.6.0/firestore',
+  'https://esm.sh/react-dropzone@14.2.3',
+  'https://esm.sh/xlsx@0.18.5'
 ];
+
 
 // Install the service worker and cache all critical assets
 self.addEventListener('install', event => {

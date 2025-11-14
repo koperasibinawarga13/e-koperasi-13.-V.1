@@ -7,7 +7,8 @@ const adminCollectionRef = collection(db, 'admins');
 export const getAdmins = async (): Promise<AdminUser[]> => {
     try {
         const data = await getDocs(adminCollectionRef);
-        return data.docs.map((doc) => ({ ...doc.data(), id: doc.id } as AdminUser));
+        // FIX: Cast doc.data() to AdminUser to resolve spread type error.
+        return data.docs.map((doc) => ({ ...(doc.data() as AdminUser), id: doc.id }));
     } catch (error) {
         console.error("Error fetching admins: ", error);
         return [];
@@ -19,7 +20,8 @@ export const getAdminById = async (id: string): Promise<AdminUser | null> => {
         const docRef = doc(db, 'admins', id);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
-            return { ...docSnap.data(), id: docSnap.id } as AdminUser;
+            // FIX: Cast docSnap.data() to AdminUser to resolve spread type error.
+            return { ...(docSnap.data() as AdminUser), id: docSnap.id };
         }
         return null;
     } catch (error) {
@@ -47,8 +49,10 @@ export const findAdminByCredentials = async (email: string, password: string): P
             } else {
                  const adminDoc = querySnapshot.docs[0];
                  // Security check: ensure password matches
-                 if (adminDoc.data().password === password) {
-                    return { ...adminDoc.data(), id: adminDoc.id } as AdminUser;
+                 // FIX: Cast Firestore document data to AdminUser to access the 'password' property.
+                 if ((adminDoc.data() as AdminUser).password === password) {
+                    // FIX: Cast doc.data() to AdminUser to resolve spread type error.
+                    return { ...(adminDoc.data() as AdminUser), id: adminDoc.id };
                  }
                  return null; // Password mismatch
             }
@@ -59,7 +63,8 @@ export const findAdminByCredentials = async (email: string, password: string): P
         const querySnapshot = await getDocs(q);
         if (!querySnapshot.empty) {
             const doc = querySnapshot.docs[0];
-            return { ...doc.data(), id: doc.id } as AdminUser;
+            // FIX: Cast doc.data() to AdminUser to resolve spread type error.
+            return { ...(doc.data() as AdminUser), id: doc.id };
         }
         return null;
     } catch (error) {

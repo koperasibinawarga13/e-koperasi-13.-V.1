@@ -36,7 +36,8 @@ export const getLogById = async (id: string): Promise<TransaksiLog | null> => {
         const docRef = doc(db, 'transaksi_logs', id);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
-            return { ...docSnap.data(), id: docSnap.id } as TransaksiLog;
+            // FIX: Cast docSnap.data() to TransaksiLog to resolve spread type error.
+            return { ...(docSnap.data() as TransaksiLog), id: docSnap.id };
         }
         return null;
     } catch (error) {
@@ -50,7 +51,8 @@ export const getLogsByAnggota = async (no_anggota: string): Promise<TransaksiLog
         // FIX: Removed orderBy to prevent composite index error. Sorting is now done on the client-side.
         const q = query(logCollectionRef, where('no_anggota', '==', no_anggota));
         const data = await getDocs(q);
-        const logs = data.docs.map(doc => ({...doc.data(), id: doc.id} as TransaksiLog));
+        // FIX: Cast doc.data() to TransaksiLog to resolve spread type error.
+        const logs = data.docs.map(doc => ({...(doc.data() as TransaksiLog), id: doc.id}));
         // Sort client-side
         logs.sort((a, b) => new Date(b.log_time).getTime() - new Date(a.log_time).getTime());
         return logs;
@@ -69,7 +71,8 @@ export const getLogsByAdminAndPeriod = async (adminName: string, period: string)
             where('periode', '==', period)
         );
         const data = await getDocs(q);
-        const logs = data.docs.map(doc => ({...doc.data(), id: doc.id} as TransaksiLog));
+        // FIX: Cast doc.data() to TransaksiLog to resolve spread type error.
+        const logs = data.docs.map(doc => ({...(doc.data() as TransaksiLog), id: doc.id}));
         // Sort client-side
         logs.sort((a, b) => new Date(a.log_time).getTime() - new Date(b.log_time).getTime());
         return logs;
@@ -85,8 +88,10 @@ export const getAvailableLogPeriods = async (): Promise<string[]> => {
         const snapshot = await getDocs(logCollectionRef);
         const periods = new Set<string>();
         snapshot.forEach(doc => {
-            const data = doc.data();
+            // FIX: Cast Firestore document data to TransaksiLog to access the 'periode' property.
+            const data = doc.data() as TransaksiLog;
             if (data.periode) {
+                // FIX: Cast Firestore document data to TransaksiLog to access the 'periode' property.
                 periods.add(data.periode);
             }
         });
@@ -102,7 +107,8 @@ export const getLogsByPeriod = async (periode: string): Promise<TransaksiLog[]> 
     try {
         const q = query(logCollectionRef, where('periode', '==', periode));
         const data = await getDocs(q);
-        return data.docs.map((doc) => ({ ...doc.data(), id: doc.id } as TransaksiLog));
+        // FIX: Cast doc.data() to TransaksiLog to resolve spread type error.
+        return data.docs.map((doc) => ({ ...(doc.data() as TransaksiLog), id: doc.id }));
     } catch (error) {
         console.error(`Error fetching logs for period ${periode}: `, error);
         return [];
@@ -145,7 +151,11 @@ export const synchronizeMissingLogs = async (): Promise<number> => {
     
     // Get all periods that already have a log
     const allLogsSnapshot = await getDocs(logCollectionRef);
-    const existingLogKeys = new Set(allLogsSnapshot.docs.map(doc => `${doc.data().no_anggota}_${doc.data().periode}`));
+    // FIX: Cast Firestore document data to TransaksiLog to access its properties.
+    const existingLogKeys = new Set(allLogsSnapshot.docs.map(doc => {
+        const data = doc.data() as TransaksiLog;
+        return `${data.no_anggota}_${data.periode}`;
+    }));
 
     // Get all history documents from all members
     const historyQuery = query(collectionGroup(db, 'history'));

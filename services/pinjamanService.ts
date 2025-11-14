@@ -23,7 +23,8 @@ export const getAllPengajuanPinjaman = async (): Promise<PengajuanPinjaman[]> =>
     try {
         const q = query(pengajuanCollectionRef, orderBy("tanggal_pengajuan", "desc"));
         const data = await getDocs(q);
-        return data.docs.map((doc) => ({ ...doc.data(), id: doc.id } as PengajuanPinjaman));
+        // FIX: Cast doc.data() to PengajuanPinjaman to resolve spread type error.
+        return data.docs.map((doc) => ({ ...(doc.data() as PengajuanPinjaman), id: doc.id }));
     } catch (error) {
         console.error(`Error fetching all loan applications: `, error);
         return [];
@@ -36,7 +37,8 @@ export const getPengajuanPinjamanByStatus = async (status: string): Promise<Peng
         // Query without orderBy to avoid composite index requirement
         const q = query(pengajuanCollectionRef, where("status", "==", status));
         const data = await getDocs(q);
-        const results = data.docs.map((doc) => ({ ...doc.data(), id: doc.id } as PengajuanPinjaman));
+        // FIX: Cast doc.data() to PengajuanPinjaman to resolve spread type error.
+        const results = data.docs.map((doc) => ({ ...(doc.data() as PengajuanPinjaman), id: doc.id }));
         
         // Sort results client-side by date in descending order
         results.sort((a, b) => new Date(b.tanggal_pengajuan).getTime() - new Date(a.tanggal_pengajuan).getTime());
@@ -53,7 +55,8 @@ export const getPengajuanPinjamanByNoAnggota = async (no_anggota: string): Promi
     try {
         const q = query(pengajuanCollectionRef, where("no_anggota", "==", no_anggota));
         const data = await getDocs(q);
-        const results = data.docs.map((doc) => ({ ...doc.data(), id: doc.id } as PengajuanPinjaman));
+        // FIX: Cast doc.data() to PengajuanPinjaman to resolve spread type error.
+        const results = data.docs.map((doc) => ({ ...(doc.data() as PengajuanPinjaman), id: doc.id }));
         
         // Sort client-side to avoid composite index
         results.sort((a, b) => new Date(b.tanggal_pengajuan).getTime() - new Date(a.tanggal_pengajuan).getTime());
@@ -94,7 +97,8 @@ export const getPengajuanPinjamanById = async (id: string): Promise<PengajuanPin
         const docRef = doc(db, 'pengajuan_pinjaman', id);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
-            return { ...docSnap.data(), id: docSnap.id } as PengajuanPinjaman;
+            // FIX: Cast docSnap.data() to PengajuanPinjaman to resolve spread type error.
+            return { ...(docSnap.data() as PengajuanPinjaman), id: docSnap.id };
         }
         return null;
     } catch (error) {

@@ -1,4 +1,6 @@
 import { initializeApp } from "firebase/app";
+// FIX: Add a side-effect import for 'firebase/firestore' to ensure the Firestore service is registered with the Firebase app before it's used. This resolves the "Service firestore is not available" error.
+import "firebase/firestore";
 import { getFirestore } from "firebase/firestore";
 
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional

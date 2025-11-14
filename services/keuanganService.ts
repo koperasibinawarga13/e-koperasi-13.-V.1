@@ -60,7 +60,8 @@ export const calculateAkhir = (awal: Partial<Keuangan>, tx: Partial<TransaksiBul
 export const getKeuangan = async (): Promise<Keuangan[]> => {
     try {
         const data = await getDocs(keuanganCollectionRef);
-        return data.docs.map((doc) => ({ ...doc.data(), id: doc.id } as Keuangan));
+        // FIX: Cast doc.data() to Keuangan to resolve spread type error.
+        return data.docs.map((doc) => ({ ...(doc.data() as Keuangan), id: doc.id }));
     } catch (error) {
         console.error("Error fetching keuangan: ", error);
         return [];
@@ -72,7 +73,8 @@ export const getKeuanganByNoAnggota = async (no_anggota: string): Promise<Keuang
         const docRef = doc(db, 'keuangan', no_anggota);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
-            return { ...docSnap.data(), id: docSnap.id } as Keuangan;
+            // FIX: Cast docSnap.data() to Keuangan to resolve spread type error.
+            return { ...(docSnap.data() as Keuangan), id: docSnap.id };
         }
         return null;
     } catch (error) {
@@ -183,8 +185,11 @@ export const getUploadedMonths = async (): Promise<string[]> => {
     try {
         const docRef = doc(metadataCollectionRef, UPLOAD_HISTORY_DOC_ID);
         const docSnap = await getDoc(docRef);
-        if (docSnap.exists() && docSnap.data().months) {
-            return (docSnap.data().months as string[]).sort((a, b) => b.localeCompare(a));
+        // FIX: Cast Firestore document data to access the 'months' property safely.
+        const data = docSnap.data();
+        if (docSnap.exists() && data?.months) {
+            // FIX: Cast Firestore document data to access the 'months' property safely.
+            return (data.months as string[]).sort((a, b) => b.localeCompare(a));
         }
         return [];
     } catch (error) {
@@ -282,7 +287,8 @@ export const getHistoryByAnggota = async (no_anggota: string): Promise<Keuangan[
         const historyCollectionRef = collection(db, 'keuangan', no_anggota, 'history');
         const q = query(historyCollectionRef, orderBy('periode', 'desc'));
         const snapshot = await getDocs(q);
-        return snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as Keuangan));
+        // FIX: Cast doc.data() to Keuangan to resolve spread type error.
+        return snapshot.docs.map(doc => ({ ...(doc.data() as Keuangan), id: doc.id }));
     } catch (error) {
         console.error("Error fetching member history:", error);
         return [];
@@ -344,7 +350,7 @@ export const correctPastTransaction = async (logId: string, updatedTx: Transaksi
         } as Keuangan;
         
         if (prevHistorySnap.exists()) {
-            currentState = { ...currentState, ...prevHistorySnap.data() as Keuangan };
+            currentState = { ...currentState, ...(prevHistorySnap.data() as Keuangan) };
         }
 
         for (const history of affectedHistory) {
