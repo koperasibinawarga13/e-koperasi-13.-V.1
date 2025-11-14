@@ -1,4 +1,4 @@
-const CACHE_NAME = 'e-koperasi-cache-v25'; // Incremented version
+const CACHE_NAME = 'e-koperasi-cache-v27'; // Incremented version
 const urlsToCache = [
   // App Shell
   '/',
@@ -16,8 +16,8 @@ const urlsToCache = [
   'https://aistudiocdn.com/react-dom@^19.2.0/client',
   'https://aistudiocdn.com/react-router-dom@^7.9.5',
   'https://aistudiocdn.com/recharts@^3.4.1',
-  'https://aistudiocdn.com/firebase@^12.5.0/app',
-  'https://aistudiocdn.com/firebase@^12.5.0/firestore',
+  'https://aistudiocdn.com/firebase@^12.6.0/app',
+  'https://aistudiocdn.com/firebase@^12.6.0/firestore',
   'https://aistudiocdn.com/react-dropzone@^14.3.8',
   'https://aistudiocdn.com/xlsx@^0.18.5'
 ];

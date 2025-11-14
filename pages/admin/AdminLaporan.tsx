@@ -37,76 +37,117 @@ const AdminLaporan: React.FC = () => {
         return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(amount);
     };
     
-    const generateExportData = (list: Keuangan[]) => {
-        return list.map(k => ({
-            'No Anggota': k.no_anggota,
-            'Nama': k.nama_angota,
-            'Periode Laporan': k.periode || '',
-            'Akhir Simpanan Pokok': k.akhir_simpanan_pokok,
-            'Akhir Simpanan Wajib': k.akhir_simpanan_wajib,
-            'Akhir Simpanan Sukarela': k.akhir_simpanan_sukarela,
-            'Akhir Simpanan Wisata': k.akhir_simpanan_wisata,
-            'Total Simpanan': k.jumlah_total_simpanan,
-            'Akhir Pinjaman Berjangka': k.akhir_pinjaman_berjangka,
-            'Akhir Pinjaman Khusus': k.akhir_pinjaman_khusus,
-            'Akhir Pinjaman Niaga': k.akhir_pinjaman_niaga,
-            'Total Pinjaman': k.jumlah_total_pinjaman,
-            'Transaksi Simpanan Pokok': k.transaksi_simpanan_pokok,
-            'Transaksi Simpanan Wajib': k.transaksi_simpanan_wajib,
-            'Transaksi Simpanan Sukarela': k.transaksi_simpanan_sukarela,
-            'Transaksi Simpanan Wisata': k.transaksi_simpanan_wisata,
-            'Transaksi Pinjaman Berjangka': k.transaksi_pinjaman_berjangka,
-            'Transaksi Pinjaman Khusus': k.transaksi_pinjaman_khusus,
-            'Transaksi Simpanan Jasa': k.transaksi_simpanan_jasa,
-            'Transaksi Niaga': k.transaksi_niaga,
-            'Transaksi Dana Perlaya': k.transaksi_dana_perlaya,
-            'Transaksi Dana Katineng': k.transaksi_dana_katineng,
-            'Jumlah Setoran': k.Jumlah_setoran,
-            'Pengambilan Simpanan Pokok': k.transaksi_pengambilan_simpanan_pokok,
-            'Pengambilan Simpanan Wajib': k.transaksi_pengambilan_simpanan_wajib,
-            'Pengambilan Simpanan Sukarela': k.transaksi_pengambilan_simpanan_sukarela,
-            'Pengambilan Simpanan Wisata': k.transaksi_pengambilan_simpanan_wisata,
-            'Penambahan Pinjaman Berjangka': k.transaksi_penambahan_pinjaman_berjangka,
-            'Penambahan Pinjaman Khusus': k.transaksi_penambahan_pinjaman_khusus,
-            'Penambahan Pinjaman Niaga': k.transaksi_penambahan_pinjaman_niaga,
-            'Awal Simpanan Pokok': k.awal_simpanan_pokok,
-            'Awal Simpanan Wajib': k.awal_simpanan_wajib,
-            'Awal Simpanan Sukarela': k.sukarela,
-            'Awal Simpanan Wisata': k.awal_simpanan_wisata,
-            'Awal Pinjaman Berjangka': k.awal_pinjaman_berjangka,
-            'Awal Pinjaman Khusus': k.awal_pinjaman_khusus,
-            'Awal Pinjaman Niaga': k.awal_pinjaman_niaga,
-        }));
-    };
-    
     const handleDownload = async () => {
         setIsDownloading(true);
         try {
             let dataForExport: Keuangan[] = [];
             let reportPeriod = 'Terkini';
-
+    
             if (selectedMonth === 'latest') {
                 dataForExport = keuanganList;
             } else {
                 dataForExport = await getLaporanBulananForAll(selectedMonth);
                 reportPeriod = new Date(`${selectedMonth}-02`).toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
             }
-
+    
             if (dataForExport.length === 0) {
                 alert('Tidak ada data untuk diunduh pada periode yang dipilih.');
+                setIsDownloading(false);
                 return;
             }
-            
+    
             dataForExport.sort((a, b) => a.no_anggota.localeCompare(b.no_anggota));
-            
-            const processedData = generateExportData(dataForExport);
-            const worksheet = XLSX.utils.json_to_sheet(processedData);
+    
+            const header1 = [
+                null, null, null,
+                'KEADAAN AWAL BULAN', null, null, null, null, null,
+                'TRANSAKSI BULAN INI', null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                'KEADAAN AKHIR BULAN', null, null, null, null, null,
+                null, null
+            ];
+            const header2 = [
+                null, null, null,
+                'SIMPANAN', null, null, null, 'PINJAMAN', null,
+                'SIMPANAN', null, null, null, 'PINJAMAN', null, null, 'LAIN LAIN', null, null, 'JUMLAH', 'PENGAMBILAN SIMPANAN', null, null, null, 'PENAMBAHAN PINJAMAN', null, null,
+                'SIMPANAN', null, null, null, 'PINJAMAN', null,
+                null, null
+            ];
+            const header3 = [
+                'NO', 'NO ANGGOTA', 'NAMA ANGGOTA',
+                // Keadaan Awal (6)
+                'POKOK', 'WAJIB', 'SUKARELA', 'WISATA', 'BERJANGKA', 'KHUSUS',
+                // Transaksi (18)
+                'POKOK', 'WAJIB', 'SUKARELA', 'WISATA',
+                'BERJANGKA', 'KHUSUS', 'JASA',
+                'NIAGA', 'KEMATIAN', 'DASOS',
+                'JUMLAH',
+                'POKOK', 'WAJIB', 'SUKARELA', 'WISATA',
+                'BERJANGKA', 'KHUSUS', 'NIAGA',
+                // Keadaan Akhir (6)
+                'POKOK', 'WAJIB', 'SUKARELA', 'WISATA', 'BERJANGKA', 'KHUSUS',
+                // Totals (2)
+                'TOTAL SIMPANAN', 'TOTAL PINJAMAN'
+            ];
+    
+            const dataBody = dataForExport.map((k, index) => ([
+                index + 1, k.no_anggota, k.nama_angota,
+                k.awal_simpanan_pokok, k.awal_simpanan_wajib, k.sukarela, k.awal_simpanan_wisata, k.awal_pinjaman_berjangka, k.awal_pinjaman_khusus,
+                k.transaksi_simpanan_pokok, k.transaksi_simpanan_wajib, k.transaksi_simpanan_sukarela, k.transaksi_simpanan_wisata,
+                k.transaksi_pinjaman_berjangka, k.transaksi_pinjaman_khusus, k.transaksi_simpanan_jasa,
+                k.transaksi_niaga, k.transaksi_dana_perlaya, k.transaksi_dana_katineng,
+                k.Jumlah_setoran,
+                k.transaksi_pengambilan_simpanan_pokok, k.transaksi_pengambilan_simpanan_wajib, k.transaksi_pengambilan_simpanan_sukarela, k.transaksi_pengambilan_simpanan_wisata,
+                k.transaksi_penambahan_pinjaman_berjangka, k.transaksi_penambahan_pinjaman_khusus, k.transaksi_penambahan_pinjaman_niaga,
+                k.akhir_simpanan_pokok, k.akhir_simpanan_wajib, k.akhir_simpanan_sukarela, k.akhir_simpanan_wisata,
+                k.akhir_pinjaman_berjangka, k.akhir_pinjaman_khusus,
+                k.jumlah_total_simpanan, k.jumlah_total_pinjaman
+            ]));
+    
+            const worksheetData = [
+                ['Laporan Koperasi Periode', reportPeriod],
+                [], // Empty row for spacing
+                header1, 
+                header2, 
+                header3, 
+                ...dataBody
+            ];
+
+            const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
+    
+            worksheet['!merges'] = [
+                // Merged Title
+                { s: { r: 0, c: 0 }, e: { r: 0, c: 2 } }, 
+                // Main Table Merges (shifted down by 2 rows)
+                { s: { r: 2, c: 0 }, e: { r: 4, c: 0 } },   // NO
+                { s: { r: 2, c: 1 }, e: { r: 4, c: 1 } },   // NO ANGGOTA
+                { s: { r: 2, c: 2 }, e: { r: 4, c: 2 } },   // NAMA ANGGOTA
+                { s: { r: 2, c: 33 }, e: { r: 4, c: 33 } }, // TOTAL SIMPANAN
+                { s: { r: 2, c: 34 }, e: { r: 4, c: 34 } }, // TOTAL PINJAMAN
+                { s: { r: 2, c: 3 }, e: { r: 2, c: 8 } },   // KEADAAN AWAL BULAN
+                { s: { r: 3, c: 3 }, e: { r: 3, c: 6 } },   // SIMPANAN (AWAL)
+                { s: { r: 3, c: 7 }, e: { r: 3, c: 8 } },   // PINJAMAN (AWAL)
+                { s: { r: 2, c: 9 }, e: { r: 2, c: 26 } },  // TRANSAKSI BULAN INI
+                { s: { r: 3, c: 9 }, e: { r: 3, c: 12 } },  // SIMPANAN (TX)
+                { s: { r: 3, c: 13 }, e: { r: 3, c: 15 } }, // PINJAMAN (TX)
+                { s: { r: 3, c: 16 }, e: { r: 3, c: 18 } }, // LAIN LAIN (TX)
+                { s: { r: 3, c: 19 }, e: { r: 4, c: 19 } }, // JUMLAH (TX)
+                { s: { r: 3, c: 20 }, e: { r: 3, c: 23 } }, // PENGAMBILAN SIMPANAN (TX)
+                { s: { r: 3, c: 24 }, e: { r: 3, c: 26 } }, // PENAMBAHAN PINJAMAN (TX)
+                { s: { r: 2, c: 27 }, e: { r: 2, c: 32 } }, // KEADAAN AKHIR BULAN
+                { s: { r: 3, c: 27 }, e: { r: 3, c: 30 } }, // SIMPANAN (AKHIR)
+                { s: { r: 3, c: 31 }, e: { r: 3, c: 32 } }, // PINJAMAN (AKHIR)
+            ];
+
+            worksheet['!cols'] = [
+                { wch: 5 }, { wch: 15 }, { wch: 30 }, // NO, NO ANGGOTA, NAMA
+                ...Array(32).fill({ wch: 15 }) // All other data columns
+            ];
+    
             const workbook = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(workbook, worksheet, `Laporan ${reportPeriod}`);
-            
             const today = new Date().toISOString().split('T')[0];
-            XLSX.writeFile(workbook, `Laporan_Koperasi_${reportPeriod.replace(' ', '_')}_${today}.xlsx`);
-
+            XLSX.writeFile(workbook, `Laporan_Koperasi_${reportPeriod.replace(/ /g, '_')}_${today}.xlsx`);
+    
         } catch (error) {
             console.error("Gagal mengunduh laporan:", error);
             alert("Terjadi kesalahan saat menyiapkan file unduhan.");
