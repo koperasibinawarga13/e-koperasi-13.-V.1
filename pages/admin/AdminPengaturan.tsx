@@ -84,9 +84,9 @@ const AdminPengaturan: React.FC = () => {
     return (
         <div>
             <Header title="Pengaturan Akun Admin" />
-            <div className="bg-surface p-6 rounded-xl shadow-md">
+            <div className="bg-surface p-6 rounded-xl">
                 <div className="flex justify-end mb-6">
-                    <button onClick={() => openModal()} className="bg-primary text-white px-4 py-2 rounded-lg font-semibold hover:bg-primary-dark transition-colors flex items-center gap-2">
+                    <button onClick={() => openModal()} className="bg-primary text-black px-4 py-2 rounded-lg font-semibold hover:bg-primary-dark transition-colors flex items-center gap-2">
                         <PlusIcon className="w-5 h-5" />
                         Tambah Admin
                     </button>
@@ -94,7 +94,7 @@ const AdminPengaturan: React.FC = () => {
                 <div className="overflow-x-auto">
                     {isLoading ? <p className="text-gray-text">Memuat data admin...</p> : (
                         <table className="w-full text-sm text-left text-gray-text">
-                            <thead className="text-xs text-gray-text uppercase">
+                            <thead className="text-xs text-gray-text uppercase border-b border-zinc-800">
                                 <tr>
                                     <th className="px-6 py-3">Nama</th>
                                     <th className="px-6 py-3">Email</th>
@@ -103,14 +103,14 @@ const AdminPengaturan: React.FC = () => {
                             </thead>
                             <tbody>
                                 {admins.map((admin) => (
-                                    <tr key={admin.id} className="border-t border-slate-100 hover:bg-slate-50">
+                                    <tr key={admin.id} className="hover:bg-zinc-800/50">
                                         <td className="px-6 py-4 font-medium text-dark">{admin.nama}</td>
                                         <td className="px-6 py-4">{admin.email}</td>
                                         <td className="px-6 py-4 flex gap-4">
                                             <button onClick={() => openModal(admin)} className="text-primary hover:text-primary-dark"><PencilIcon className="w-5 h-5"/></button>
                                             <button 
                                                 onClick={() => handleDelete(admin.id)} 
-                                                className="text-red-500 hover:text-red-600 disabled:text-slate-400 disabled:cursor-not-allowed"
+                                                className="text-red-500 hover:text-red-600 disabled:text-zinc-600 disabled:cursor-not-allowed"
                                                 disabled={user?.id === admin.id}
                                                 title={user?.id === admin.id ? 'Tidak dapat menghapus diri sendiri' : 'Hapus Admin'}
                                             >
@@ -135,7 +135,7 @@ const AdminPengaturan: React.FC = () => {
                             value={formData.nama}
                             onChange={(e) => setFormData({ ...formData, nama: e.target.value })}
                             required
-                            className="mt-1 block w-full bg-slate-100 rounded-md py-2 px-3 text-dark"
+                            className="mt-1 block w-full bg-zinc-800 rounded-md py-2 px-3 text-dark"
                         />
                     </div>
                      <div>
@@ -146,7 +146,7 @@ const AdminPengaturan: React.FC = () => {
                             value={formData.email}
                             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                             required
-                            className="mt-1 block w-full bg-slate-100 rounded-md py-2 px-3 text-dark"
+                            className="mt-1 block w-full bg-zinc-800 rounded-md py-2 px-3 text-dark"
                         />
                     </div>
                      <div>
@@ -158,14 +158,14 @@ const AdminPengaturan: React.FC = () => {
                             onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                             required={!selectedAdmin} // Required only for new admin
                             placeholder={selectedAdmin ? 'Isi untuk mengubah password' : 'Wajib diisi'}
-                            className="mt-1 block w-full bg-slate-100 rounded-md py-2 px-3 text-dark"
+                            className="mt-1 block w-full bg-zinc-800 rounded-md py-2 px-3 text-dark"
                         />
                     </div>
                     <div className="flex justify-end gap-4 pt-4">
-                         <button type="button" onClick={closeModal} className="bg-slate-200 text-slate-700 px-4 py-2 rounded-lg font-semibold hover:bg-slate-300">
+                         <button type="button" onClick={closeModal} className="bg-zinc-700 text-dark px-4 py-2 rounded-lg font-semibold hover:bg-zinc-600">
                             Batal
                         </button>
-                        <button type="submit" className="bg-primary text-white px-4 py-2 rounded-lg font-semibold hover:bg-primary-dark">
+                        <button type="submit" className="bg-primary text-black px-4 py-2 rounded-lg font-semibold hover:bg-primary-dark">
                             Simpan
                         </button>
                     </div>

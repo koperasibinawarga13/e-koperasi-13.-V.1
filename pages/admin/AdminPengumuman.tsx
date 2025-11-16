@@ -76,9 +76,9 @@ const AdminPengumuman: React.FC = () => {
     return (
         <div>
             <Header title="Kelola Pengumuman & Berita Produk" />
-            <div className="bg-surface p-6 rounded-xl shadow-md">
+            <div className="bg-surface p-6 rounded-xl">
                 <div className="flex justify-end mb-6">
-                    <button onClick={() => openModal()} className="bg-primary text-white px-4 py-2 rounded-lg font-semibold hover:bg-primary-dark transition-colors flex items-center gap-2">
+                    <button onClick={() => openModal()} className="bg-primary text-black px-4 py-2 rounded-lg font-semibold hover:bg-primary-dark transition-colors flex items-center gap-2">
                         <PlusIcon className="w-5 h-5" />
                         Buat Konten Baru
                     </button>
@@ -86,7 +86,7 @@ const AdminPengumuman: React.FC = () => {
                 <div className="overflow-x-auto">
                     {isLoading ? <p className="text-gray-text">Memuat data pengumuman...</p> : (
                         <table className="w-full text-sm text-left text-gray-text">
-                            <thead className="text-xs text-gray-text uppercase">
+                            <thead className="text-xs text-gray-text uppercase border-b border-zinc-800">
                                 <tr>
                                     <th className="px-6 py-3">Judul</th>
                                     <th className="px-6 py-3">Tanggal Terbit</th>
@@ -96,13 +96,13 @@ const AdminPengumuman: React.FC = () => {
                             </thead>
                             <tbody>
                                 {pengumumanList.map((item) => (
-                                    <tr key={item.id} className="border-t border-slate-100 hover:bg-slate-50">
+                                    <tr key={item.id} className="hover:bg-zinc-800/50">
                                         <td className="px-6 py-4 font-medium text-dark">{item.judul}</td>
                                         <td className="px-6 py-4">{new Date(item.tanggal).toLocaleDateString('id-ID')}</td>
                                         <td className="px-6 py-4">{item.penulis}</td>
                                         <td className="px-6 py-4 flex gap-4">
                                             <button onClick={() => openModal(item)} className="text-primary hover:text-primary-dark"><PencilIcon className="w-5 h-5"/></button>
-                                            <button onClick={() => handleDelete(item.id)} className="text-red-500 hover:text-red-600"><TrashIcon className="w-5 h-5"/></button>
+                                            <button onClick={() => handleDelete(item.id!)} className="text-red-500 hover:text-red-600"><TrashIcon className="w-5 h-5"/></button>
                                         </td>
                                     </tr>
                                 ))}
@@ -122,7 +122,7 @@ const AdminPengumuman: React.FC = () => {
                             value={formData.judul}
                             onChange={(e) => setFormData({ ...formData, judul: e.target.value })}
                             required
-                            className="mt-1 block w-full bg-slate-100 rounded-md py-2 px-3 text-dark"
+                            className="mt-1 block w-full bg-zinc-800 rounded-md py-2 px-3 text-dark"
                         />
                     </div>
                     <div>
@@ -133,10 +133,10 @@ const AdminPengumuman: React.FC = () => {
                         />
                     </div>
                     <div className="flex justify-end gap-4 pt-4">
-                         <button type="button" onClick={closeModal} className="bg-slate-200 text-slate-700 px-4 py-2 rounded-lg font-semibold hover:bg-slate-300">
+                         <button type="button" onClick={closeModal} className="bg-zinc-700 text-dark px-4 py-2 rounded-lg font-semibold hover:bg-zinc-600">
                             Batal
                         </button>
-                        <button type="submit" className="bg-primary text-white px-4 py-2 rounded-lg font-semibold hover:bg-primary-dark">
+                        <button type="submit" className="bg-primary text-black px-4 py-2 rounded-lg font-semibold hover:bg-primary-dark">
                             Simpan
                         </button>
                     </div>

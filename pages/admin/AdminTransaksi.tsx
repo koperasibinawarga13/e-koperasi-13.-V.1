@@ -43,7 +43,7 @@ const FormField: React.FC<{
             name={name}
             value={value === 0 ? '' : new Intl.NumberFormat('id-ID').format(value)}
             onChange={onChange}
-            className="mt-1 block w-full bg-slate-100 rounded-md py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary text-right text-dark"
+            className="mt-1 block w-full bg-zinc-800 rounded-md py-2 px-3 focus:outline-none focus:ring-primary text-right text-dark"
             placeholder="0"
             autoComplete="off"
         />
@@ -199,23 +199,23 @@ const AdminTransaksi: React.FC = () => {
     return (
         <div>
             <Header title={formTitle} />
-            <div className="bg-surface p-6 rounded-xl shadow-md">
+            <div className="bg-surface p-6 rounded-xl">
                 {lastSuccessfulTx ? (
                     <div className="py-8 text-center">
-                        <div className="mb-6 p-4 rounded-md text-sm bg-green-100 text-green-700">
+                        <div className={`mb-6 p-4 rounded-md text-sm ${message?.type === 'success' ? 'bg-primary-light text-primary' : ''}`}>
                            {message?.text}
                         </div>
                         <h3 className="text-lg font-bold text-dark mb-4">Rincian Transaksi Tersimpan</h3>
-                         <div className="max-w-md mx-auto bg-slate-100 p-4 rounded-lg text-left">
+                         <div className="max-w-md mx-auto bg-zinc-800 p-4 rounded-lg text-left">
                             <DetailItem label="No. Anggota" value={lastSuccessfulTx.no_anggota} />
                             <DetailItem label="Nama" value={lastSuccessfulTx.nama_angota || ''} />
                             <div className="mt-4 p-3 rounded-md bg-primary-light flex justify-between items-center">
-                                <span className="font-bold text-sky-700">TOTAL SETORAN</span>
-                                <span className="font-bold text-sky-800 text-lg">{new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(lastSuccessfulTx.Jumlah_setoran)}</span>
+                                <span className="font-bold text-primary">TOTAL SETORAN</span>
+                                <span className="font-bold text-primary text-lg">{new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(lastSuccessfulTx.Jumlah_setoran)}</span>
                             </div>
                         </div>
                         <div className="flex justify-center gap-4 mt-8">
-                             <button onClick={handleReset} className="bg-primary text-white py-2 px-4 rounded-md text-sm font-medium hover:bg-primary-dark flex items-center gap-2">
+                             <button onClick={handleReset} className="bg-primary text-black py-2 px-4 rounded-md text-sm font-medium hover:bg-primary-dark flex items-center gap-2">
                                 <PlusIcon className="w-5 h-5"/> Input Transaksi Baru
                             </button>
                         </div>
@@ -223,7 +223,7 @@ const AdminTransaksi: React.FC = () => {
                 ) : (
                     <form onSubmit={handleSubmit}>
                         {message && (
-                             <div className={`mb-4 p-4 rounded-md text-sm ${message.type === 'success' ? 'bg-sky-100 text-sky-800' : 'bg-red-100 text-red-700'}`}>
+                             <div className={`mb-4 p-4 rounded-md text-sm ${message.type === 'success' ? 'bg-secondary-light text-secondary' : 'bg-red-500/10 text-red-400'}`}>
                                 {message.text}
                             </div>
                         )}
@@ -232,7 +232,7 @@ const AdminTransaksi: React.FC = () => {
                                 <label htmlFor="noAnggota" className="block text-sm font-medium text-gray-text">Nomor Anggota</label>
                                 <input
                                     type="text" id="noAnggota" value={noAnggota} onChange={(e) => setNoAnggota(e.target.value)} required disabled={!!editLogId}
-                                    className="mt-1 block w-full bg-slate-100 rounded-md py-2 px-3 text-dark disabled:bg-slate-200 disabled:text-gray-text"
+                                    className="mt-1 block w-full bg-zinc-800 rounded-md py-2 px-3 text-dark disabled:bg-zinc-900 disabled:text-gray-text"
                                 />
                                 <div className="mt-1 min-h-[20px] text-sm font-semibold">
                                     {isAnggotaLoading && <span className="text-gray-text">Mencari...</span>}
@@ -243,12 +243,12 @@ const AdminTransaksi: React.FC = () => {
                                 <label htmlFor="periode" className="block text-sm font-medium text-gray-text">Periode Laporan</label>
                                 <input
                                     type="month" id="periode" value={periode} onChange={(e) => setPeriode(e.target.value)} required disabled={!!editLogId}
-                                    className="mt-1 block w-full bg-slate-100 rounded-md py-2 px-3 text-dark disabled:bg-slate-200 disabled:text-gray-text"
+                                    className="mt-1 block w-full bg-zinc-800 rounded-md py-2 px-3 text-dark disabled:bg-zinc-900 disabled:text-gray-text"
                                 />
                             </div>
                             <div>
                                 <label htmlFor="tanggalTransaksi" className="block text-sm font-medium text-gray-text">Tanggal Input Transaksi</label>
-                                <input type="date" id="tanggalTransaksi" value={tanggalTransaksi} onChange={(e) => setTanggalTransaksi(e.target.value)} required className="mt-1 block w-full bg-slate-100 rounded-md py-2 px-3 text-dark"/>
+                                <input type="date" id="tanggalTransaksi" value={tanggalTransaksi} onChange={(e) => setTanggalTransaksi(e.target.value)} required className="mt-1 block w-full bg-zinc-800 rounded-md py-2 px-3 text-dark"/>
                             </div>
                         </div>
                         
@@ -271,8 +271,8 @@ const AdminTransaksi: React.FC = () => {
                         <div className="mt-8">
                             <h3 className="text-lg font-medium text-dark pb-2 mb-4">Total Setoran</h3>
                             <div className="bg-primary-light p-4 rounded-lg text-center">
-                                <p className="text-sm text-sky-700">Total Setoran Bulan Ini</p>
-                                <p className="text-2xl font-bold text-sky-800">{new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(jumlahSetoran)}</p>
+                                <p className="text-sm text-primary">Total Setoran Bulan Ini</p>
+                                <p className="text-2xl font-bold text-primary">{new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(jumlahSetoran)}</p>
                             </div>
                         </div>
                         
@@ -289,12 +289,12 @@ const AdminTransaksi: React.FC = () => {
                             <FormField label="Penambahan Pinj. Niaga" name="transaksi_penambahan_pinjaman_niaga" value={transaksiData.transaksi_penambahan_pinjaman_niaga} onChange={handleInputChange} />
                         </Section>
                         
-                        <div className="mt-8 border-t border-slate-100 pt-5">
+                        <div className="mt-8 border-t border-zinc-800 pt-5">
                             <div className="flex justify-end gap-4">
-                                <button type="button" onClick={handleReset} className="bg-slate-200 text-slate-700 py-2 px-4 rounded-md text-sm font-medium hover:bg-slate-300">
+                                <button type="button" onClick={handleReset} className="bg-zinc-700 text-dark py-2 px-4 rounded-md text-sm font-medium hover:bg-zinc-600">
                                    {editLogId ? 'Batalkan Edit' : 'Reset Form'}
                                 </button>
-                                <button type="submit" disabled={isSubmitting || !namaAnggota || namaAnggota === 'Anggota tidak ditemukan'} className="bg-primary text-white py-2 px-4 rounded-md text-sm font-medium hover:bg-primary-dark disabled:bg-slate-400">
+                                <button type="submit" disabled={isSubmitting || !namaAnggota || namaAnggota === 'Anggota tidak ditemukan'} className="bg-primary text-black py-2 px-4 rounded-md text-sm font-medium hover:bg-primary-dark disabled:bg-zinc-700">
                                     {submitButtonText}
                                 </button>
                             </div>

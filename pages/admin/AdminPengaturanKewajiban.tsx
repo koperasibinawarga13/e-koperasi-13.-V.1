@@ -25,7 +25,7 @@ const FormField: React.FC<{
             name={name}
             value={value === 0 ? '' : new Intl.NumberFormat('id-ID').format(value)}
             onChange={onChange}
-            className="mt-1 block w-full bg-slate-100 rounded-md py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary text-right text-dark"
+            className="mt-1 block w-full bg-zinc-800 rounded-md py-2 px-3 focus:outline-none focus:ring-primary text-right text-dark"
             placeholder="0"
         />
     </div>
@@ -82,14 +82,14 @@ const AdminPengaturanKewajiban: React.FC = () => {
     return (
         <div>
             <Header title="Pengaturan Kewajiban Anggota Baru" />
-            <div className="bg-surface p-6 rounded-xl shadow-md max-w-2xl mx-auto">
+            <div className="bg-surface p-6 rounded-xl max-w-2xl mx-auto">
                 <form onSubmit={handleSave} className="space-y-6">
                     <p className="text-sm text-gray-text">
                         Ubah nilai-nilai di bawah ini untuk memperbarui informasi yang ditampilkan pada halaman pendaftaran anggota baru.
                     </p>
                     
                      {message && (
-                        <div className={`p-3 rounded-md text-sm ${message.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                        <div className={`p-3 rounded-md text-sm ${message.type === 'success' ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>
                             {message.text}
                         </div>
                     )}
@@ -107,7 +107,7 @@ const AdminPengaturanKewajiban: React.FC = () => {
                         <button 
                             type="submit" 
                             disabled={isSaving}
-                            className="bg-primary text-white py-2 px-6 rounded-lg font-semibold hover:bg-primary-dark transition-colors disabled:bg-slate-400"
+                            className="bg-primary text-black py-2 px-6 rounded-lg font-semibold hover:bg-primary-dark transition-colors disabled:bg-zinc-700"
                         >
                             {isSaving ? 'Menyimpan...' : 'Simpan Perubahan'}
                         </button>

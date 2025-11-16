@@ -102,11 +102,11 @@ const SlipRincian: React.FC = () => {
         <div className="bg-background min-h-screen font-sans">
             <div className="max-w-4xl mx-auto p-4 print:hidden">
                  <div className="flex justify-between items-center mb-4">
-                    <button onClick={() => navigate(-1)} className="flex items-center gap-2 bg-surface px-4 py-2 rounded-lg shadow-sm hover:bg-slate-100 text-dark">
+                    <button onClick={() => navigate(-1)} className="flex items-center gap-2 bg-surface px-4 py-2 rounded-lg text-dark">
                         <ChevronLeftIcon className="w-5 h-5" />
                         Kembali
                     </button>
-                    <button onClick={() => window.print()} className="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-dark">
+                    <button onClick={() => window.print()} className="flex items-center gap-2 bg-primary text-black px-4 py-2 rounded-lg font-semibold hover:bg-primary-dark">
                         <PrintIcon className="w-5 h-5" />
                         Cetak
                     </button>

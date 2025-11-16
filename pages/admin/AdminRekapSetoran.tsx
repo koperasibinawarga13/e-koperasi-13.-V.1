@@ -63,7 +63,7 @@ const AdminRekapTransaksiManual: React.FC = () => {
             <Header title="Rekapitulasi Transaksi Manual" />
 
             {/* Filter Section */}
-            <div className="bg-surface p-6 rounded-xl shadow-md mb-8 print:hidden">
+            <div className="bg-surface p-6 rounded-xl mb-8 print:hidden">
                 <form onSubmit={handleGenerateReport} className="flex flex-wrap items-end gap-4">
                     <div>
                         <label htmlFor="periode" className="block text-sm font-medium text-gray-text">Periode Laporan</label>
@@ -71,7 +71,7 @@ const AdminRekapTransaksiManual: React.FC = () => {
                             id="periode"
                             value={selectedPeriod}
                             onChange={(e) => setSelectedPeriod(e.target.value)}
-                            className="mt-1 block w-full bg-slate-100 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md text-dark py-2 pl-3 pr-10"
+                            className="mt-1 block w-full bg-zinc-800 focus:outline-none focus:ring-primary sm:text-sm rounded-md text-dark py-2 pl-3 pr-10"
                         >
                             {availablePeriods.map(p => <option key={p} value={p}>{formatPeriod(p)}</option>)}
                         </select>
@@ -82,7 +82,7 @@ const AdminRekapTransaksiManual: React.FC = () => {
                             id="admin"
                             value={selectedAdmin}
                             onChange={(e) => setSelectedAdmin(e.target.value)}
-                            className="mt-1 block w-full bg-slate-100 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md text-dark py-2 pl-3 pr-10"
+                            className="mt-1 block w-full bg-zinc-800 focus:outline-none focus:ring-primary sm:text-sm rounded-md text-dark py-2 pl-3 pr-10"
                         >
                             <option value="">-- Pilih Admin --</option>
                             {admins.map(admin => <option key={admin.id} value={admin.nama}>{admin.nama}</option>)}
@@ -91,7 +91,7 @@ const AdminRekapTransaksiManual: React.FC = () => {
                     <button
                         type="submit"
                         disabled={isLoading}
-                        className="bg-primary text-white px-6 py-2 rounded-lg font-semibold hover:bg-primary-dark disabled:bg-slate-400"
+                        className="bg-primary text-black px-6 py-2 rounded-lg font-semibold hover:bg-primary-dark disabled:bg-zinc-700"
                     >
                         {isLoading ? 'Memuat...' : 'Tampilkan Rekap'}
                     </button>
@@ -100,7 +100,7 @@ const AdminRekapTransaksiManual: React.FC = () => {
 
             {/* Report Section */}
             {rekapData && (
-                <div id="rekap-content" className="bg-surface p-6 rounded-xl shadow-md">
+                <div id="rekap-content" className="bg-surface p-6 rounded-xl">
                     <div className="flex justify-between items-start mb-6">
                         <div>
                             <h2 className="text-xl font-bold text-dark">Rekapitulasi Transaksi Manual</h2>
@@ -109,20 +109,20 @@ const AdminRekapTransaksiManual: React.FC = () => {
                                 <strong>Periode:</strong> {formatPeriod(selectedPeriod)}
                             </p>
                         </div>
-                        <button onClick={handlePrint} className="flex items-center gap-2 bg-slate-200 text-slate-700 px-4 py-2 rounded-lg font-semibold hover:bg-slate-300 print:hidden">
+                        <button onClick={handlePrint} className="flex items-center gap-2 bg-zinc-700 text-dark px-4 py-2 rounded-lg font-semibold hover:bg-zinc-600 print:hidden">
                             <PrintIcon className="w-5 h-5" /> Cetak
                         </button>
                     </div>
 
                     <div className="bg-primary-light p-4 rounded-lg mb-6 text-center">
-                        <p className="text-sm font-medium text-sky-700">TOTAL SETORAN TUNAI PERIODE INI</p>
-                        <p className="text-3xl font-bold text-sky-800">{formatCurrency(totalSetoran)}</p>
+                        <p className="text-sm font-medium text-lime-100">TOTAL SETORAN TUNAI PERIODE INI</p>
+                        <p className="text-3xl font-bold text-primary">{formatCurrency(totalSetoran)}</p>
                     </div>
 
                     <h3 className="text-lg font-semibold text-dark mb-4">Rincian Transaksi</h3>
                     <div className="overflow-x-auto">
                         <table className="w-full text-sm text-left text-gray-text">
-                            <thead className="text-xs text-gray-text uppercase">
+                            <thead className="text-xs text-gray-text uppercase border-b border-zinc-800">
                                 <tr>
                                     <th className="px-4 py-3">Tanggal Input</th>
                                     <th className="px-4 py-3">No. Anggota</th>
@@ -132,7 +132,7 @@ const AdminRekapTransaksiManual: React.FC = () => {
                             </thead>
                             <tbody>
                                 {rekapData.map(log => (
-                                    <tr key={log.id} className="border-t border-slate-100 hover:bg-slate-50">
+                                    <tr key={log.id} className="hover:bg-zinc-800/50">
                                         <td className="px-4 py-3">{formatDate(log.log_time)}</td>
                                         <td className="px-4 py-3">{log.no_anggota}</td>
                                         <td className="px-4 py-3 font-medium text-dark">{log.nama_angota}</td>
@@ -169,7 +169,7 @@ const AdminRekapTransaksiManual: React.FC = () => {
                         background-color: #f3f4f6 !important;
                     }
                      .bg-primary-light {
-                        background-color: #e0f2fe !important; /* sky-100 */
+                        background-color: #f7fee7 !important; /* lime-50 */
                     }
                 }
             `}</style>
