@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { DownloadIcon, EyeIcon, EyeSlashIcon, ChevronDownIcon } from '../components/icons/Icons';
-import { registerAnggota, generateNewAnggotaNo, registerNewAnggota } from '../services/anggotaService';
+import { registerAnggota, generateNewAnggotaNo, registerNewAnggota, getAnggotaByNo } from '../services/anggotaService';
 import { Logo } from '../components/icons/Logo';
 import { getPengaturanKewajiban, PengaturanKewajiban } from '../services/pengaturanService';
 
@@ -17,6 +17,7 @@ export const LoginPage: React.FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [welcomeMessage, setWelcomeMessage] = useState('Selamat Datang');
   
   // Activate State
   const [activateNoAnggota, setActivateNoAnggota] = useState('');
@@ -48,6 +49,24 @@ export const LoginPage: React.FC = () => {
     };
     fetchSettings();
   }, []);
+  
+  // Dynamic Welcome Message on username input
+  useEffect(() => {
+    const timer = setTimeout(async () => {
+      if (username && username.includes('-')) {
+        const anggota = await getAnggotaByNo(username);
+        if (anggota) {
+          setWelcomeMessage(`Selamat Datang, ${anggota.nama}`);
+        } else {
+          setWelcomeMessage('Selamat Datang');
+        }
+      } else {
+        setWelcomeMessage('Selamat Datang');
+      }
+    }, 500); // Debounce for 500ms
+
+    return () => clearTimeout(timer);
+  }, [username]);
 
   // Auto-generate new member number for registration form
   useEffect(() => {
@@ -155,7 +174,7 @@ export const LoginPage: React.FC = () => {
             
             <div className="flex justify-center mb-6">
                 <span className="bg-sky-100 text-sky-700 text-sm font-semibold px-5 py-2 rounded-full shadow-sm">
-                    Selamat Datang
+                    {welcomeMessage}
                 </span>
             </div>
             
