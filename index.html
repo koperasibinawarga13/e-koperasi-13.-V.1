@@ -5,18 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Koperasi Bina 13 Warga</title>
 
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="/icon-192x192.png" />
-    <link rel="apple-touch-icon" href="/icon-512x512.png" />
-
     <!-- PWA Manifest -->
     <link rel="manifest" href="/manifest.json" />
-    <meta name="theme-color" content="#4338CA" />
 
-    <!-- iOS PWA Tags -->
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <meta name="apple-mobile-web-app-title" content="e-Koperasi13" />
+    <!-- Favicon and Apple Touch Icon -->
+    <link rel="icon" type="image/png" href="/icon-192x192.png" />
+    <link rel="apple-touch-icon" href="/icon-192x192.png">
+    
+    <meta name="theme-color" content="#4338CA" />
 
 
     <!-- Import Map (React 18 for compatibility) -->
@@ -110,17 +106,20 @@
     <!-- ENTRY POINT -->
     <script type="module" src="index.tsx"></script>
 
-    <!-- PWA Service Worker Registration -->
+    <!-- Service Worker Registration -->
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js').then(registration => {
-            console.log('Service Worker registered: ', registration);
-          }).catch(registrationError => {
-            console.log('Service Worker registration failed: ', registrationError);
-          });
+          navigator.serviceWorker.register('/sw.js')
+            .then(registration => {
+              console.log('ServiceWorker registration successful with scope: ', registration.scope);
+            })
+            .catch(err => {
+              console.log('ServiceWorker registration failed: ', err);
+            });
         });
       }
     </script>
+
   </body>
 </html>
