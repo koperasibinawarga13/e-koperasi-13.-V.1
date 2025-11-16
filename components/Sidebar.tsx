@@ -106,7 +106,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar, isMobileO
       ></div>
       
       <div 
-        className={`bg-dark text-white flex flex-col h-screen fixed z-40 transform transition-transform duration-300 ease-in-out md:translate-x-0 ${
+        className={`bg-sidebar text-white flex flex-col h-screen fixed z-40 transform transition-transform duration-300 ease-in-out md:translate-x-0 ${
           isCollapsed ? 'w-20 p-2' : 'w-64 p-4'
         } ${
           isMobileOpen ? 'translate-x-0' : '-translate-x-full'
@@ -168,7 +168,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar, isMobileO
                   </NavLink>
                 )}
                 {isCollapsed && (
-                  <div className="absolute left-full top-1/2 -translate-y-1/2 ml-4 px-2 py-1 bg-dark text-white text-xs rounded-md shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap z-20">
+                  <div className="absolute left-full top-1/2 -translate-y-1/2 ml-4 px-2 py-1 bg-sidebar text-white text-xs rounded-md shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap z-20">
                     {item.label}
                   </div>
                 )}
@@ -186,7 +186,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar, isMobileO
             <span className={`ml-4 whitespace-nowrap overflow-hidden transition-all duration-300 ${isCollapsed ? 'w-0 opacity-0' : 'w-auto opacity-100'}`}>Logout</span>
           </button>
           {isCollapsed && (
-            <div className="absolute left-full top-1/2 -translate-y-1/2 ml-4 px-2 py-1 bg-dark text-white text-xs rounded-md shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap z-20">
+            <div className="absolute left-full top-1/2 -translate-y-1/2 ml-4 px-2 py-1 bg-sidebar text-white text-xs rounded-md shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap z-20">
               Logout
             </div>
           )}

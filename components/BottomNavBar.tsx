@@ -21,13 +21,13 @@ const BottomNavBar: React.FC = () => {
 
   const NavLinkClasses = ({ isActive }: { isActive: boolean }) =>
     `flex flex-col items-center justify-center text-center w-full pt-2 pb-1 transition-colors duration-200 ${
-      isActive ? 'text-primary' : 'text-gray-500 hover:text-primary'
+      isActive ? 'text-primary' : 'text-gray-400 hover:text-primary'
     }`;
     
-  const LogoutButtonClasses = `flex flex-col items-center justify-center text-center w-full pt-2 pb-1 transition-colors duration-200 text-gray-500 hover:text-primary`;
+  const LogoutButtonClasses = `flex flex-col items-center justify-center text-center w-full pt-2 pb-1 transition-colors duration-200 text-gray-400 hover:text-primary`;
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-[0_-1px_4px_rgba(0,0,0,0.05)] z-50">
+    <nav className="fixed bottom-0 left-0 right-0 bg-gray-800 border-t border-gray-700 z-50">
       <div className="flex justify-around max-w-lg mx-auto">
         {navItems.map((item) => (
           <NavLink key={item.to} to={item.to} className={NavLinkClasses}>

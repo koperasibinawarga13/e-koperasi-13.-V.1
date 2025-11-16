@@ -3,26 +3,25 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { DownloadIcon, EyeIcon, EyeSlashIcon, ChevronDownIcon } from '../components/icons/Icons';
-import { registerAnggota, getAnggotaByNo, generateNewAnggotaNo, registerNewAnggota } from '../services/anggotaService';
-import { Logo } from '../components/icons/Logo';
+import { registerAnggota, generateNewAnggotaNo, registerNewAnggota } from '../services/anggotaService';
+import { Logo13 } from '../components/icons/Logo13';
 import { getPengaturanKewajiban, PengaturanKewajiban } from '../services/pengaturanService';
 
 type ViewState = 'login' | 'activate' | 'register-new';
 
-const LoginPage: React.FC = () => {
+// FIX: Changed to a named export to resolve a "no default export" error.
+export const LoginPage: React.FC = () => {
   const [view, setView] = useState<ViewState>('login');
   
   // Login State
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [loginAnggotaName, setLoginAnggotaName] = useState<string | null>(null);
   
   // Activate State
   const [activateNoAnggota, setActivateNoAnggota] = useState('');
   const [activateNoHp, setActivateNoHp] = useState('');
   const [activatePassword, setActivatePassword] = useState('');
-  const [activateAnggotaName, setActivateAnggotaName] = useState<string | null>(null);
 
   // New Member Registration State
   const [regNama, setRegNama] = useState('');
@@ -37,30 +36,7 @@ const LoginPage: React.FC = () => {
   const [success, setSuccess] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isKewajibanVisible, setIsKewajibanVisible] = useState(false);
-  const [isNameLoading, setIsNameLoading] = useState(false);
   const { login } = useAuth();
-  
-  const [installPrompt, setInstallPrompt] = useState<any>(null);
-
-  // PWA Install Prompt Logic
-  useEffect(() => {
-    const handleBeforeInstallPrompt = (e: Event) => {
-      e.preventDefault();
-      setInstallPrompt(e);
-    };
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-    return () => {
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-    };
-  }, []);
-
-  const handleInstallClick = () => {
-    if (!installPrompt) return;
-    installPrompt.prompt();
-    installPrompt.userChoice.then(() => {
-      setInstallPrompt(null);
-    });
-  };
 
   // Fetch kewajiban settings
   useEffect(() => {
@@ -72,32 +48,6 @@ const LoginPage: React.FC = () => {
     };
     fetchSettings();
   }, []);
-
-  // Name check for Login and Activation forms
-  useEffect(() => {
-    const searchInput = view === 'login' ? username : activateNoAnggota;
-    const setName = view === 'login' ? setLoginAnggotaName : setActivateAnggotaName;
-
-    if (view === 'register-new' || !searchInput || (view === 'login' && searchInput.includes('@'))) {
-        setName(null);
-        setIsNameLoading(false);
-        return;
-    }
-
-    setIsNameLoading(true);
-    const handler = setTimeout(async () => {
-        try {
-            const anggota = await getAnggotaByNo(searchInput.toUpperCase());
-            setName(anggota ? anggota.nama : 'Anggota tidak ditemukan');
-        } catch (err) {
-            setName('Gagal memuat nama');
-        } finally {
-            setIsNameLoading(false);
-        }
-    }, 500);
-
-    return () => clearTimeout(handler);
-  }, [username, activateNoAnggota, view]);
 
   // Auto-generate new member number for registration form
   useEffect(() => {
@@ -172,33 +122,13 @@ const LoginPage: React.FC = () => {
     setError('');
     setSuccess('');
     // Reset all form states
-    setUsername(''); setPassword(''); setLoginAnggotaName(null);
-    setActivateNoAnggota(''); setActivateNoHp(''); setActivatePassword(''); setActivateAnggotaName(null);
+    setUsername(''); setPassword('');
+    setActivateNoAnggota(''); setActivateNoHp(''); setActivatePassword('');
     setRegNama(''); setRegAlamat(''); setRegStatus('WL'); setRegPassword(''); setRegNoAnggota('');
   }
   
   const formatCurrency = (amount: number) => `Rp ${new Intl.NumberFormat('id-ID').format(amount)}`;
 
-  const InstallBanner = () => (
-    <div className="bg-dark text-white p-6 shadow-lg rounded-lg animate-fade-in-up">
-        <div className="flex flex-col items-start gap-4">
-            <div>
-                <h3 className="text-lg font-bold">Instal Aplikasi untuk Pengalaman Terbaik</h3>
-                <p className="text-sm text-slate-300 mt-1">
-                    Akses lebih cepat dan fitur offline dengan menambahkan aplikasi ini ke layar utama (home screen) Anda.
-                </p>
-            </div>
-            <button
-                onClick={handleInstallClick}
-                className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-secondary font-bold rounded-lg hover:bg-secondary-dark transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-dark focus:ring-secondary"
-            >
-                <DownloadIcon className="w-5 h-5" />
-                <span>Instal Aplikasi</span>
-            </button>
-        </div>
-    </div>
-  );
-  
   const getTitle = () => {
       switch(view) {
           case 'login': return 'Masuk ke Akun Anda';
@@ -214,91 +144,88 @@ const LoginPage: React.FC = () => {
           case 'register-new': return 'Lengkapi data untuk menjadi anggota baru.';
       }
   }
-  
-  const getHeaderName = () => {
-      if (isNameLoading) return '...';
-      switch(view) {
-          case 'login': return loginAnggotaName;
-          case 'activate': return activateAnggotaName;
-          case 'register-new': return regNama || 'Calon Anggota Baru';
-          default: return 'Selamat Datang';
-      }
-  }
 
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center font-sans">
-        <header 
-          className="relative w-full bg-primary text-white p-6 pt-8 pb-20 z-20 text-center flex flex-col items-center"
-        >
-             <div className="w-48 z-30 mb-2">
-                <Logo />
+    <div className="min-h-screen flex flex-col justify-center items-center p-4 font-sans">
+        <div className="w-full max-w-sm">
+            <div className="flex justify-center mb-4">
+                <Logo13 className="h-14 w-auto" />
             </div>
-            <div className="relative z-20 w-full max-w-md">
-                <p className="text-base sm:text-lg text-white/90 -mt-2">Sistem Informasi Koperasi Karyawan SMPN 13 Tasikmalaya</p>
-                <div className="mt-4 transition-all duration-300 min-h-[28px] flex items-center justify-center">
-                    <p className="text-base sm:text-lg font-bold bg-slate-100 text-slate-700 px-4 py-1 rounded-full">
-                      {getHeaderName() || 'Selamat Datang'}
-                    </p>
-                </div>
+            
+            <div className="flex justify-center mb-6">
+                <span className="bg-gray-700 text-gray-200 text-sm font-semibold px-5 py-2 rounded-full shadow-sm">
+                    Selamat Datang
+                </span>
             </div>
-             <div className="absolute bottom-0 left-0 w-full h-12 bg-background rounded-t-3xl z-10"></div>
-        </header>
-
-        <main className="relative w-full flex-grow bg-background z-10 p-4 sm:p-8 flex flex-col items-center -mt-10">
-           <div className="w-full max-w-md z-10 bg-surface shadow-lg rounded-2xl p-6 sm:p-8">
-                <h2 className="text-xl sm:text-2xl font-bold text-dark mb-1 text-center">{getTitle()}</h2>
-                <p className="text-sm text-gray-500 mb-6 text-center">{getSubtitle()}</p>
+            
+            <div className="w-full bg-surface shadow-md rounded-xl p-8">
+                <h2 className="text-2xl font-bold text-dark text-center mb-1">{getTitle()}</h2>
+                <p className="text-center text-gray-400 text-sm mb-6">{getSubtitle()}</p>
                 
-                {error && <p className="text-sm text-red-600 text-center font-semibold bg-red-50 p-3 rounded-md mb-4">{error}</p>}
-                {success && <p className="text-sm text-green-600 text-center font-semibold bg-green-50 p-3 rounded-md mb-4">{success}</p>}
+                {error && <p className="text-sm text-red-400 text-center font-semibold bg-red-900/50 p-3 rounded-md mb-4">{error}</p>}
+                {success && <p className="text-sm text-green-400 text-center font-semibold bg-green-900/50 p-3 rounded-md mb-4">{success}</p>}
 
                 {view === 'login' && (
-                  <form className="space-y-4" onSubmit={handleLogin}>
+                  <form className="space-y-5" onSubmit={handleLogin}>
                     <div>
-                      <input type="text" autoComplete="username" required className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-surface" placeholder="No. Anggota / Email Admin" value={username} onChange={(e) => setUsername(e.target.value)} />
+                      <input type="text" autoComplete="username" required className="w-full px-4 py-3 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 bg-gray-800 placeholder-gray-500 text-dark" placeholder="No. Anggota / Email Admin" value={username} onChange={(e) => setUsername(e.target.value)} />
                     </div>
                     <div className="relative">
-                      <input type={showPassword ? "text" : "password"} autoComplete="current-password" required className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-surface" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
-                      <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500">{showPassword ? <EyeSlashIcon className="w-5 h-5"/> : <EyeIcon className="w-5 h-5"/>}</button>
+                      <input type={showPassword ? "text" : "password"} autoComplete="current-password" required className="w-full px-4 py-3 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 bg-gray-800 placeholder-gray-500 text-dark" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
+                      <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-0 px-4 flex items-center text-gray-400 hover:text-gray-200">
+                        {showPassword ? <EyeSlashIcon className="w-5 h-5"/> : <EyeIcon className="w-5 h-5"/>}
+                      </button>
                     </div>
-                    <button type="submit" disabled={isLoading} className="w-full py-3 px-4 text-sm font-bold rounded-lg text-dark bg-accent hover:bg-accent-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent transition-colors disabled:bg-gray-400">{isLoading ? 'MEMPROSES...' : 'LOGIN'}</button>
-                    <p className="text-center text-sm text-gray-600 pt-2">Sudah jadi anggota?{' '} <button type="button" onClick={() => switchView('activate')} className="font-medium text-primary hover:underline">Aktivasi Akun</button></p>
-                    <p className="text-center text-sm text-gray-600">Belum jadi anggota?{' '} <button type="button" onClick={() => switchView('register-new')} className="font-medium text-primary hover:underline">Daftar Disini</button></p>
+                    <div className="pt-2 text-center">
+                        <button type="submit" disabled={isLoading} className="w-auto text-center py-2 px-4 text-sm font-bold tracking-widest rounded-lg text-gray-200 bg-transparent hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors disabled:text-gray-500">
+                            {isLoading ? 'MEMPROSES...' : 'LOGIN'}
+                        </button>
+                    </div>
+                     <div className="text-center text-sm text-gray-400 space-y-2 pt-2">
+                        <p>
+                            Sudah jadi anggota?{' '} 
+                            <button type="button" onClick={() => switchView('activate')} className="font-semibold text-white hover:underline">Aktivasi Akun</button>
+                        </p>
+                        <p>
+                            Belum jadi anggota?{' '} 
+                            <button type="button" onClick={() => switchView('register-new')} className="font-semibold text-white hover:underline">Daftar Disini</button>
+                        </p>
+                    </div>
                   </form>
                 )}
                 
                 {view === 'activate' && (
                 <form className="space-y-4" onSubmit={handleActivate}>
-                    <div><input type="text" required className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-surface" placeholder="No. Anggota" value={activateNoAnggota} onChange={(e) => setActivateNoAnggota(e.target.value)} /></div>
-                    <div><input type="tel" required className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-surface" placeholder="No. HP (Contoh: 081234...)" value={activateNoHp} onChange={(e) => setActivateNoHp(e.target.value)} /></div>
+                    <div><input type="text" required className="w-full px-4 py-3 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 bg-gray-800 placeholder-gray-500 text-dark" placeholder="No. Anggota" value={activateNoAnggota} onChange={(e) => setActivateNoAnggota(e.target.value)} /></div>
+                    <div><input type="tel" required className="w-full px-4 py-3 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 bg-gray-800 placeholder-gray-500 text-dark" placeholder="No. HP (Contoh: 081234...)" value={activateNoHp} onChange={(e) => setActivateNoHp(e.target.value)} /></div>
                     <div className="relative">
-                      <input type={showPassword ? "text" : "password"} required className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-surface" placeholder="Buat Password Baru" value={activatePassword} onChange={(e) => setActivatePassword(e.target.value)} />
-                       <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500">{showPassword ? <EyeSlashIcon className="w-5 h-5"/> : <EyeIcon className="w-5 h-5"/>}</button>
+                      <input type={showPassword ? "text" : "password"} required className="w-full px-4 py-3 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 bg-gray-800 placeholder-gray-500 text-dark" placeholder="Buat Password Baru" value={activatePassword} onChange={(e) => setActivatePassword(e.target.value)} />
+                       <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-0 px-4 flex items-center text-gray-400 hover:text-gray-200">{showPassword ? <EyeSlashIcon className="w-5 h-5"/> : <EyeIcon className="w-5 h-5"/>}</button>
                     </div>
-                    <button type="submit" disabled={isLoading || !activateAnggotaName || activateAnggotaName === 'Anggota tidak ditemukan'} className="w-full py-3 px-4 text-sm font-bold rounded-lg text-white bg-secondary hover:bg-secondary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary transition-colors disabled:bg-gray-400">{isLoading ? 'MEMPROSES...' : 'AKTIVASI AKUN'}</button>
-                    <p className="text-center text-sm text-gray-600 pt-2">Sudah punya akun?{' '} <button type="button" onClick={() => switchView('login')} className="font-medium text-primary hover:underline">Login</button></p>
+                    <button type="submit" disabled={isLoading} className="w-full py-3 px-4 text-sm font-bold rounded-lg text-white bg-secondary hover:bg-secondary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary transition-colors disabled:bg-gray-500">{isLoading ? 'MEMPROSES...' : 'AKTIVASI AKUN'}</button>
+                    <p className="text-center text-sm text-gray-400 pt-2">Sudah punya akun?{' '} <button type="button" onClick={() => switchView('login')} className="font-medium text-white hover:underline">Login</button></p>
                 </form>
                 )}
 
                 {view === 'register-new' && (
                     <form className="space-y-4" onSubmit={handleNewMemberRegister}>
-                        <div><input type="text" required value={regNama} onChange={(e) => setRegNama(e.target.value)} className="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="Nama Lengkap" /></div>
-                        <div><textarea value={regAlamat} onChange={(e) => setRegAlamat(e.target.value)} className="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="Alamat" required rows={2}></textarea></div>
+                        <div><input type="text" required value={regNama} onChange={(e) => setRegNama(e.target.value)} className="w-full px-4 py-3 border border-gray-600 rounded-lg bg-gray-800 placeholder-gray-500 text-dark" placeholder="Nama Lengkap" /></div>
+                        <div><textarea value={regAlamat} onChange={(e) => setRegAlamat(e.target.value)} className="w-full px-4 py-3 border border-gray-600 rounded-lg bg-gray-800 placeholder-gray-500 text-dark" placeholder="Alamat" required rows={2}></textarea></div>
                         <div>
-                            <select value={regStatus} onChange={(e) => setRegStatus(e.target.value as any)} className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-surface">
+                            <select value={regStatus} onChange={(e) => setRegStatus(e.target.value as any)} className="w-full px-4 py-3 border border-gray-600 rounded-lg bg-gray-800 text-dark">
                                 <option value="AK">Pegawai Aktif SMPN 13 Tasikmalaya</option>
                                 <option value="PB">Purna Bakti SMPN 13 Tasikmalaya</option>
                                 <option value="WL">Warga Luar SMPN 13 Tasikmalaya</option>
                             </select>
                         </div>
-                        <div><input type="text" value={isLoading ? 'Membuat kode...' : regNoAnggota} className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-100" placeholder="Kode Anggota" readOnly /></div>
+                        <div><input type="text" value={isLoading ? 'Membuat kode...' : regNoAnggota} className="w-full px-4 py-3 border border-gray-700 rounded-lg bg-gray-900 text-gray-400" placeholder="Kode Anggota" readOnly /></div>
                         <div className="relative">
-                            <input type={showPassword ? "text" : "password"} value={regPassword} onChange={(e) => setRegPassword(e.target.value)} className="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="Buat Password" required />
-                             <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500">{showPassword ? <EyeSlashIcon className="w-5 h-5"/> : <EyeIcon className="w-5 h-5"/>}</button>
+                            <input type={showPassword ? "text" : "password"} value={regPassword} onChange={(e) => setRegPassword(e.target.value)} className="w-full px-4 py-3 border border-gray-600 rounded-lg bg-gray-800 placeholder-gray-500 text-dark" placeholder="Buat Password" required />
+                             <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-0 px-4 flex items-center text-gray-400 hover:text-gray-200">{showPassword ? <EyeSlashIcon className="w-5 h-5"/> : <EyeIcon className="w-5 h-5"/>}</button>
                         </div>
                         
-                        <div className="bg-blue-50 p-4 rounded-lg text-sm text-blue-800">
+                        <div className="bg-gray-800 border border-blue-500/50 p-4 rounded-lg text-sm text-blue-200">
                             <button 
                                 type="button"
                                 onClick={() => setIsKewajibanVisible(!isKewajibanVisible)}
@@ -319,24 +246,17 @@ const LoginPage: React.FC = () => {
                             </div>
                         </div>
 
-                        <button type="submit" disabled={isLoading} className="w-full py-3 px-4 text-sm font-bold rounded-lg text-white bg-secondary hover:bg-secondary-dark disabled:bg-gray-400">{isLoading ? 'MEMPROSES...' : 'DAFTAR SEBAGAI ANGGOTA BARU'}</button>
-                        <p className="text-center text-sm text-gray-600 pt-2">Sudah punya akun?{' '} <button type="button" onClick={() => switchView('login')} className="font-medium text-primary hover:underline">Login</button></p>
+                        <button type="submit" disabled={isLoading} className="w-full py-3 px-4 text-sm font-bold rounded-lg text-white bg-secondary hover:bg-secondary-dark disabled:bg-gray-500">{isLoading ? 'MEMPROSES...' : 'DAFTAR SEBAGAI ANGGOTA BARU'}</button>
+                        <p className="text-center text-sm text-gray-400 pt-2">Sudah punya akun?{' '} <button type="button" onClick={() => switchView('login')} className="font-medium text-white hover:underline">Login</button></p>
                     </form>
                 )}
                 
-                <div className="mt-6 text-center border-t pt-4">
-                  <Link to="/berita" className="text-sm font-medium text-primary hover:underline">Lihat Pengumuman Koperasi &rarr;</Link>
+                <div className="mt-6 text-center border-t border-gray-700 pt-4">
+                  <Link to="/berita" className="text-sm font-medium text-white hover:underline">Lihat Pengumuman Koperasi &rarr;</Link>
                 </div>
-           </div>
-
-           {installPrompt && (
-                <div className="w-full max-w-md md:fixed md:bottom-4 md:right-4 md:max-w-sm md:w-auto z-50 mt-8">
-                    <InstallBanner />
-                </div>
-            )}
-        </main>
-    </div>
-  );
+            </div>
+        </div>
+    );
 };
 
 export default LoginPage;

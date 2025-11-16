@@ -1,8 +1,11 @@
 
+
+
 import React, { useState, useEffect } from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import LoginPage from './pages/LoginPage';
+// FIX: Changed import to be a named import to fix module resolution error.
+import { LoginPage } from './pages/LoginPage';
 import AdminLayout from './pages/admin/AdminLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminAnggota from './pages/admin/AdminAnggota';
@@ -28,14 +31,14 @@ import AdminRekapTransaksiManual from './pages/admin/AdminRekapSetoran';
 import AdminPengaturanKewajiban from './pages/admin/AdminPengaturanKewajiban';
 
 const PWAUpdatePrompt: React.FC<{ onUpdate: () => void }> = ({ onUpdate }) => (
-  <div className="fixed bottom-4 right-4 z-50 bg-dark text-white p-4 rounded-lg shadow-lg flex items-center gap-4 animate-fade-in-up">
+  <div className="fixed bottom-4 right-4 z-50 bg-surface text-dark p-4 rounded-lg shadow-lg flex items-center gap-4 animate-fade-in-up">
     <div>
       <p className="font-bold">Update Tersedia!</p>
       <p className="text-sm">Versi baru aplikasi telah siap.</p>
     </div>
     <button
       onClick={onUpdate}
-      className="bg-accent text-dark font-bold py-2 px-4 rounded-lg hover:bg-accent-dark transition-colors"
+      className="bg-accent text-white font-bold py-2 px-4 rounded-lg hover:bg-accent-dark transition-colors"
     >
       Muat Ulang
     </button>
