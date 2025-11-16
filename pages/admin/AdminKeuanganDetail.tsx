@@ -66,8 +66,8 @@ const AdminKeuanganDetail: React.FC = () => {
 
 
     const DetailCard: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => (
-        <div className="bg-surface p-6 rounded-xl border border-slate-200 mb-8">
-            <h3 className="text-xl font-bold text-dark border-b border-slate-200 pb-3 mb-4">{title}</h3>
+        <div className="bg-surface p-6 rounded-xl border border-zinc-800 mb-8">
+            <h3 className="text-xl font-bold text-dark border-b border-zinc-800 pb-3 mb-4">{title}</h3>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-4">
                 {children}
             </div>
@@ -112,7 +112,7 @@ const AdminKeuanganDetail: React.FC = () => {
                         id="month-select"
                         value={selectedMonth}
                         onChange={(e) => setSelectedMonth(e.target.value)}
-                        className="w-48 bg-slate-50 border border-slate-300 rounded-md py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary text-dark"
+                        className="w-48 bg-zinc-800 rounded-md py-2 px-3 focus:outline-none focus:ring-primary text-dark"
                         disabled={isLoading || availableMonths.length <= 1}
                     >
                         {(availableMonths.length > 0) ? 
@@ -120,7 +120,7 @@ const AdminKeuanganDetail: React.FC = () => {
                             : <option>Memuat...</option>
                         }
                     </select>
-                    <Link to="/admin/laporan" className="inline-flex items-center gap-2 text-sm font-medium bg-slate-200 px-4 py-2 rounded-lg hover:bg-slate-300 transition-colors text-slate-700">
+                    <Link to="/admin/laporan" className="inline-flex items-center gap-2 text-sm font-medium bg-zinc-700 px-4 py-2 rounded-lg hover:bg-zinc-600 transition-colors text-dark">
                         <ChevronLeftIcon className="w-5 h-5" />
                         Kembali
                     </Link>

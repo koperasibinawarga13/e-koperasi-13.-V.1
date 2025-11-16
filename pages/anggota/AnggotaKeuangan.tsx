@@ -116,7 +116,7 @@ export const AnggotaKeuangan: React.FC = () => {
                             id="month-select"
                             value={selectedMonth}
                             onChange={(e) => setSelectedMonth(e.target.value)}
-                            className="w-48 bg-slate-100 rounded-md py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary text-dark"
+                            className="w-48 bg-zinc-800 rounded-md py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary text-dark"
                             disabled={isLoading || availableMonths.length <= 1}
                         >
                            {(availableMonths.length > 0) ? 
@@ -128,11 +128,11 @@ export const AnggotaKeuangan: React.FC = () => {
                     <Link 
                         to="/anggota/slip" 
                         state={{ slipData: data }} 
-                        className={`inline-flex items-center gap-2 bg-slate-200 px-4 py-2 rounded-lg hover:bg-slate-300 transition-colors ${!data ? 'pointer-events-none opacity-50' : ''}`}
+                        className={`inline-flex items-center gap-2 bg-zinc-700 px-4 py-2 rounded-lg hover:bg-zinc-600 transition-colors ${!data ? 'pointer-events-none opacity-50' : ''}`}
                         aria-disabled={!data}
                     >
-                        <PrintIcon className="w-5 h-5 text-slate-600" />
-                        <span className="text-slate-700 font-semibold">Cetak Slip</span>
+                        <PrintIcon className="w-5 h-5 text-dark" />
+                        <span className="text-dark font-semibold">Cetak Slip</span>
                     </Link>
                  </div>
             </div>
