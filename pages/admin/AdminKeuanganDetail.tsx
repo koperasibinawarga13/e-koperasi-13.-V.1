@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import Header from '../../components/Header';
 import { Keuangan } from '../../types';
 import { getKeuanganByNoAnggota, getAvailableLaporanMonths, getLaporanBulanan } from '../../services/keuanganService';
 import { ChevronLeftIcon } from '../../components/icons/Icons';
@@ -66,8 +65,8 @@ const AdminKeuanganDetail: React.FC = () => {
 
 
     const DetailCard: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => (
-        <div className="bg-white p-6 rounded-xl shadow-md mb-8">
-            <h3 className="text-xl font-bold text-dark border-b pb-3 mb-4">{title}</h3>
+        <div className="bg-surface p-6 rounded-xl shadow-md mb-8 border border-border">
+            <h3 className="text-xl font-bold text-dark border-b border-border pb-3 mb-4">{title}</h3>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-4">
                 {children}
             </div>
@@ -78,7 +77,7 @@ const AdminKeuanganDetail: React.FC = () => {
         const isNegative = typeof value === 'number' && value < 0;
         return (
             <div>
-                <p className="text-sm text-gray-500">{label}</p>
+                <p className="text-sm text-gray-text">{label}</p>
                 <p className={`font-semibold ${isNegative ? 'text-red-600' : 'text-dark'}`}>{isCurrency ? formatCurrency(value as number) : value}</p>
             </div>
         );
@@ -90,29 +89,27 @@ const AdminKeuanganDetail: React.FC = () => {
 
     if (!data) {
         return (
-             <div>
-                <Header title="Data Tidak Ditemukan" />
-                <div className="p-8 text-center">
-                    <p>Data keuangan untuk anggota dengan nomor {no_anggota} tidak dapat ditemukan.</p>
-                    <Link to="/admin/laporan" className="mt-4 inline-flex items-center gap-2 text-primary hover:underline">
-                        <ChevronLeftIcon className="w-4 h-4" />
-                        Kembali ke Laporan
-                    </Link>
-                </div>
+             <div className="p-8 text-center">
+                <h1 className="text-xl font-bold text-dark mb-4">Data Tidak Ditemukan</h1>
+                <p className="text-gray-text">Data keuangan untuk anggota dengan nomor {no_anggota} tidak dapat ditemukan.</p>
+                <Link to="/admin/laporan" className="mt-4 inline-flex items-center gap-2 text-primary hover:underline">
+                    <ChevronLeftIcon className="w-4 h-4" />
+                    Kembali ke Laporan
+                </Link>
             </div>
         );
     }
 
     return (
         <div>
-            <div className="bg-white shadow-sm p-4 rounded-lg mb-6 flex flex-wrap items-center justify-between gap-4">
+            <div className="bg-surface p-4 rounded-lg mb-6 flex flex-wrap items-center justify-between gap-4">
                 <h1 className="text-lg sm:text-xl font-bold text-dark">{getPageTitle()}</h1>
                 <div className="flex items-center gap-4">
                     <select
                         id="month-select"
                         value={selectedMonth}
                         onChange={(e) => setSelectedMonth(e.target.value)}
-                        className="w-48 bg-white border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary"
+                        className="w-48 bg-zinc-800 border border-border rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary"
                         disabled={isLoading || availableMonths.length <= 1}
                     >
                         {(availableMonths.length > 0) ? 
@@ -120,7 +117,7 @@ const AdminKeuanganDetail: React.FC = () => {
                             : <option>Memuat...</option>
                         }
                     </select>
-                    <Link to="/admin/laporan" className="inline-flex items-center gap-2 text-sm font-medium bg-gray-100 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors">
+                    <Link to="/admin/laporan" className="inline-flex items-center gap-2 text-sm font-medium bg-zinc-700 px-4 py-2 rounded-lg hover:bg-zinc-600 transition-colors">
                         <ChevronLeftIcon className="w-5 h-5" />
                         Kembali
                     </Link>

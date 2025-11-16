@@ -112,49 +112,49 @@ const AdminDashboard: React.FC = () => {
         <div>
             <Header title="Dashboard Admin" />
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <StatCard title="Total Anggota" value={stats.totalAnggota.toLocaleString('id-ID')} icon={<UsersIcon className="w-6 h-6" />} color="bg-gradient-to-br from-indigo-500 to-blue-600" />
-                <StatCard title="Total Simpanan" value={formatCurrency(stats.totalSimpanan)} icon={<CreditCardIcon className="w-6 h-6" />} color="bg-gradient-to-br from-emerald-500 to-green-600" />
-                <StatCard title="Total Pinjaman" value={formatCurrency(stats.totalPinjaman)} icon={<ChartBarIcon className="w-6 h-6" />} color="bg-gradient-to-br from-amber-400 to-yellow-500" />
-                <StatCard title="Saldo Kas" value={formatCurrency(stats.saldoKas)} icon={<BuildingOfficeIcon className="w-6 h-6" />} color="bg-gradient-to-br from-rose-400 to-red-500" />
+                <StatCard title="Total Anggota" value={stats.totalAnggota.toLocaleString('id-ID')} icon={<UsersIcon className="w-6 h-6" />} iconBgColor="bg-blue-600" />
+                <StatCard title="Total Simpanan" value={formatCurrency(stats.totalSimpanan)} icon={<CreditCardIcon className="w-6 h-6" />} iconBgColor="bg-emerald-600" />
+                <StatCard title="Total Pinjaman" value={formatCurrency(stats.totalPinjaman)} icon={<ChartBarIcon className="w-6 h-6" />} iconBgColor="bg-amber-500" />
+                <StatCard title="Saldo Kas" value={formatCurrency(stats.saldoKas)} icon={<BuildingOfficeIcon className="w-6 h-6" />} iconBgColor="bg-red-500" />
             </div>
-            <div className="bg-surface p-6 rounded-xl border border-gray-700">
+            <div className="bg-surface p-6 rounded-xl border border-border">
                 <h2 className="text-lg md:text-xl font-bold text-dark mb-4">Ringkasan Saldo Akhir</h2>
                  {chartData.length > 0 ? (
                     <div style={{ width: '100%', height: 400 }}>
                         <ResponsiveContainer>
                             <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                                <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.2}/>
-                                <XAxis dataKey="name" angle={-15} textAnchor="end" height={50} tick={{ fill: '#94a3b8' }} />
-                                <YAxis tickFormatter={(tick) => `${(tick / 1000000).toLocaleString('id-ID')} Jt`} tick={{ fill: '#94a3b8' }}/>
-                                <Tooltip contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155' }}/>
-                                <Legend wrapperStyle={{ color: '#94a3b8' }}/>
+                                <CartesianGrid strokeDasharray="3 3" stroke="#3f3f46" strokeOpacity={0.6}/>
+                                <XAxis dataKey="name" angle={-15} textAnchor="end" height={50} tick={{ fill: '#a1a1aa' }} />
+                                <YAxis tickFormatter={(tick) => `${(tick / 1000000).toLocaleString('id-ID')} Jt`} tick={{ fill: '#a1a1aa' }}/>
+                                <Tooltip contentStyle={{ backgroundColor: '#18181b', border: '1px solid #3f3f46' }}/>
+                                <Legend wrapperStyle={{ color: '#a1a1aa' }}/>
                                 <Bar dataKey="total" name="Total Saldo Akhir" fill="#4338CA" />
                             </BarChart>
                         </ResponsiveContainer>
                     </div>
                  ) : (
-                    <p className="text-center text-gray-400 py-10">Data tidak tersedia untuk menampilkan grafik.</p>
+                    <p className="text-center text-gray-text py-10">Data tidak tersedia untuk menampilkan grafik.</p>
                  )}
             </div>
 
-             <div className="mt-8 bg-surface p-6 rounded-xl border border-gray-700">
+             <div className="mt-8 bg-surface p-6 rounded-xl border border-border">
                 <h2 className="text-lg md:text-xl font-bold text-dark mb-4">Pengajuan Pinjaman Baru</h2>
                 {pendingLoans.length > 0 ? (
                     <div className="overflow-x-auto">
-                        <table className="w-full text-sm text-left text-gray-400">
-                            <thead className="text-xs text-gray-400 uppercase">
+                        <table className="w-full text-sm text-left text-gray-text">
+                            <thead className="text-xs text-gray-text uppercase">
                                 <tr>
-                                    <th className="px-4 py-4 font-semibold border-b-2 border-gray-700">Nama Anggota</th>
-                                    <th className="px-4 py-4 font-semibold border-b-2 border-gray-700">Jenis</th>
-                                    <th className="px-4 py-4 font-semibold border-b-2 border-gray-700">Tanggal</th>
-                                    <th className="px-4 py-4 font-semibold border-b-2 border-gray-700 text-right">Jumlah Pinjaman</th>
-                                    <th className="px-4 py-4 font-semibold border-b-2 border-gray-700 text-center">Jangka Waktu</th>
-                                    <th className="px-4 py-4 font-semibold border-b-2 border-gray-700 text-center">Aksi</th>
+                                    <th className="px-4 py-4 font-semibold border-b-2 border-border">Nama Anggota</th>
+                                    <th className="px-4 py-4 font-semibold border-b-2 border-border">Jenis</th>
+                                    <th className="px-4 py-4 font-semibold border-b-2 border-border">Tanggal</th>
+                                    <th className="px-4 py-4 font-semibold border-b-2 border-border text-right">Jumlah Pinjaman</th>
+                                    <th className="px-4 py-4 font-semibold border-b-2 border-border text-center">Jangka Waktu</th>
+                                    <th className="px-4 py-4 font-semibold border-b-2 border-border text-center">Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-gray-700">
+                            <tbody className="divide-y divide-border">
                                 {pendingLoans.map(loan => (
-                                    <tr key={loan.id} className="hover:bg-gray-600 transition-colors">
+                                    <tr key={loan.id} className="hover:bg-zinc-700 transition-colors">
                                         <td className="px-4 py-4 font-medium text-dark">{loan.nama_anggota}</td>
                                         <td className="px-4 py-4 font-semibold">{loan.jenis_pinjaman}</td>
                                         <td className="px-4 py-4">{new Date(loan.tanggal_pengajuan).toLocaleDateString('id-ID')}</td>
@@ -165,7 +165,7 @@ const AdminDashboard: React.FC = () => {
                                                 <button
                                                     onClick={() => handleLoanAction(loan.id, 'Disetujui')}
                                                     disabled={isUpdatingLoan === loan.id}
-                                                    className="p-2 rounded-full bg-green-900/50 text-green-300 hover:bg-green-900 disabled:opacity-50"
+                                                    className="p-2 rounded-full bg-green-900/50 text-green-300 hover:bg-green-800/80 disabled:opacity-50"
                                                     title="Setujui"
                                                 >
                                                     <CheckIcon className="w-4 h-4" />
@@ -173,7 +173,7 @@ const AdminDashboard: React.FC = () => {
                                                 <button
                                                     onClick={() => handleLoanAction(loan.id, 'Ditolak')}
                                                     disabled={isUpdatingLoan === loan.id}
-                                                    className="p-2 rounded-full bg-red-900/50 text-red-300 hover:bg-red-900 disabled:opacity-50"
+                                                    className="p-2 rounded-full bg-red-900/50 text-red-300 hover:bg-red-800/80 disabled:opacity-50"
                                                     title="Tolak"
                                                 >
                                                     <XMarkIcon className="w-4 h-4" />
@@ -186,7 +186,7 @@ const AdminDashboard: React.FC = () => {
                         </table>
                     </div>
                 ) : (
-                    <p className="text-center text-gray-400 py-6">Tidak ada pengajuan pinjaman baru.</p>
+                    <p className="text-center text-gray-text py-6">Tidak ada pengajuan pinjaman baru.</p>
                 )}
             </div>
         </div>

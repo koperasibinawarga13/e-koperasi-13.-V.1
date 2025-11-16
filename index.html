@@ -12,7 +12,7 @@
     <link rel="icon" type="image/png" href="/icon-192x192.png" />
     <link rel="apple-touch-icon" href="/icon-192x192.png">
     
-    <meta name="theme-color" content="#4338CA" />
+    <meta name="theme-color" content="#18181b" />
 
 
     <!-- Import Map (React 18 for compatibility) -->
@@ -48,32 +48,24 @@
         theme: {
           extend: {
             colors: {
-              // Shifted Slate Palette for better text contrast
-              gray: {
-                50: '#f8fafc',   // slate-50
-                100: '#f1f5f9',  // slate-100
-                200: '#e2e8f0',  // slate-200
-                300: '#cbd5e1',  // slate-300
-                400: '#94a3b8',  // slate-400
-                500: '#475569',  // Use Slate 600 for 500
-                600: '#334155',  // Use Slate 700 for 600
-                700: '#1e293b',  // Use Slate 800 for 700
-                800: '#0f172a',  // Use Slate 900 for 800
-                900: '#020617',  // Use Slate 950 for 900
-              },
-              'dark': '#f1f5f9', // Light text for dark mode (slate-100)
-              'sidebar': '#020617', // Darkest background for sidebar (slate-950)
+              // New Zinc Palette for a more comfortable, modern dark theme
+              'sidebar': '#09090b',      // zinc-950
+              'background': '#18181b',  // zinc-900
+              'surface': '#27272a',     // zinc-800
+              'border': '#3f3f46',      // zinc-700
+              'dark': '#fafafa',        // zinc-50 (Primary Text)
+              'gray-text': '#a1a1aa',   // zinc-400 (Secondary Text)
+
               'primary': '#4338CA',
               'primary-dark': '#3730A3',
               'primary-light': 'rgba(67, 56, 202, 0.2)',
+              
               'secondary': '#10B981',
               'secondary-dark': '#059669',
               'secondary-light': '#D1FAE5',
+              
               'accent': '#F59E0B',
               'accent-dark': '#D97706',
-              'background': '#0f172a', // Dark background (slate-900)
-              'surface': '#1e293b', // Dark surface for cards (slate-800)
-              'gray-text': '#94a3b8', // Light secondary text (slate-400)
             },
             fontFamily: {
               sans: ['Poppins', 'sans-serif'],
