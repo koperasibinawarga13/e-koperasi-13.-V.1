@@ -2,8 +2,19 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Pengumuman } from '../types';
 import { getPengumuman } from '../services/pengumumanService';
-import { ChevronLeftIcon } from '../components/icons/Icons';
+import { ChevronLeftIcon, DownloadIcon } from '../components/icons/Icons';
 import { Logo } from '../components/icons/Logo';
+
+// Definisi tipe untuk event beforeinstallprompt
+interface BeforeInstallPromptEvent extends Event {
+  readonly platforms: Array<string>;
+  readonly userChoice: Promise<{
+    outcome: 'accepted' | 'dismissed',
+    platform: string,
+  }>;
+  prompt(): Promise<void>;
+}
+
 
 const TRUNCATE_LENGTH = 500; // Character count threshold
 
@@ -11,6 +22,8 @@ const BeritaPage: React.FC = () => {
     const [pengumumanList, setPengumumanList] = useState<Pengumuman[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+    // State untuk event instalasi PWA
+    const [installPromptEvent, setInstallPromptEvent] = useState<BeforeInstallPromptEvent | null>(null);
 
     useEffect(() => {
         const fetchPengumuman = async () => {
@@ -21,6 +34,34 @@ const BeritaPage: React.FC = () => {
         };
         fetchPengumuman();
     }, []);
+
+    // Effect untuk menangani prompt instalasi PWA
+    useEffect(() => {
+        const handleBeforeInstallPrompt = (e: Event) => {
+            e.preventDefault();
+            setInstallPromptEvent(e as BeforeInstallPromptEvent);
+        };
+
+        window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+
+        const handleAppInstalled = () => {
+            setInstallPromptEvent(null);
+        };
+
+        window.addEventListener('appinstalled', handleAppInstalled);
+
+        return () => {
+            window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+            window.removeEventListener('appinstalled', handleAppInstalled);
+        };
+    }, []);
+    
+    const handleInstallClick = () => {
+        if (!installPromptEvent) {
+            return;
+        }
+        installPromptEvent.prompt();
+    };
     
     const toggleExpand = (id: string) => {
         setExpanded(prev => ({ ...prev, [id]: !prev[id] }));
@@ -43,10 +84,22 @@ const BeritaPage: React.FC = () => {
                           <Logo />
                         </div>
                     </div>
-                    <Link to="/login" className="flex items-center gap-2 bg-white/20 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-white/30 transition-colors">
-                        <ChevronLeftIcon className="w-4 h-4" />
-                        <span>Login</span>
-                    </Link>
+                    <div className="flex items-center gap-2">
+                        {installPromptEvent && (
+                            <button 
+                                onClick={handleInstallClick}
+                                className="flex items-center gap-2 bg-secondary text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-secondary-dark transition-colors animate-fade-in-up"
+                                title="Instal aplikasi untuk akses lebih mudah"
+                            >
+                                <DownloadIcon className="w-4 h-4" />
+                                <span>Instal Aplikasi</span>
+                            </button>
+                        )}
+                        <Link to="/login" className="flex items-center gap-2 bg-white/20 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-white/30 transition-colors">
+                            <ChevronLeftIcon className="w-4 h-4" />
+                            <span>Login</span>
+                        </Link>
+                    </div>
                 </div>
             </header>
 
@@ -57,7 +110,7 @@ const BeritaPage: React.FC = () => {
                     <div className="space-y-6">
                         {pengumumanList.map((item) => {
                             const isLong = item.isi.length > TRUNCATE_LENGTH;
-                            const isExpanded = !!expanded[item.id];
+                            const isExpanded = !!expanded[item.id!];
 
                             return (
                                 <div key={item.id} className="bg-surface rounded-xl border border-gray-700 overflow-hidden animate-fade-in-up">
@@ -76,7 +129,7 @@ const BeritaPage: React.FC = () => {
                                         </div>
                                          {isLong && (
                                             <div className="mt-4">
-                                                <button onClick={() => toggleExpand(item.id)} className="text-primary font-semibold hover:underline text-sm">
+                                                <button onClick={() => toggleExpand(item.id!)} className="text-primary font-semibold hover:underline text-sm">
                                                     {isExpanded ? 'Sembunyikan' : 'Baca Selengkapnya...'}
                                                 </button>
                                             </div>
