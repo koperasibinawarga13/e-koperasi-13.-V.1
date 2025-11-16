@@ -12,7 +12,7 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
   const { user } = useAuth();
 
   return (
-    <header className="p-4 rounded-lg mb-6">
+    <header className="py-4 mb-6">
       <div className="flex justify-between items-center">
         <h1 className="text-lg sm:text-xl font-bold text-dark">{title}</h1>
         <div className="flex items-center space-x-3 text-gray-text">

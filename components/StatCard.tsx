@@ -12,7 +12,7 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, icon, iconBgColor }) 
 
   return (
     <div className="bg-surface p-4 sm:p-6 rounded-xl flex items-center space-x-4">
-      <div className={`p-3 rounded-lg text-white ${iconBgColor}`}>
+      <div className={`p-3 rounded-lg text-black ${iconBgColor}`}>
         {icon}
       </div>
       <div>

@@ -182,8 +182,8 @@ export const LoginPage: React.FC = () => {
                 <h2 className="text-2xl font-bold text-dark text-center mb-1">{getTitle()}</h2>
                 <p className="text-center text-gray-text text-sm mb-6">{getSubtitle()}</p>
                 
-                {error && <p className="text-sm text-red-600 text-center font-semibold bg-red-100 p-3 rounded-md mb-4">{error}</p>}
-                {success && <p className="text-sm text-green-600 text-center font-semibold bg-green-100 p-3 rounded-md mb-4">{success}</p>}
+                {error && <p className="text-sm text-red-400 text-center font-semibold bg-red-500/10 p-3 rounded-md mb-4">{error}</p>}
+                {success && <p className="text-sm text-green-400 text-center font-semibold bg-green-500/10 p-3 rounded-md mb-4">{success}</p>}
 
                 {view === 'login' && (
                   <form className="space-y-5" onSubmit={handleLogin}>
@@ -222,7 +222,7 @@ export const LoginPage: React.FC = () => {
                       <input type={showPassword ? "text" : "password"} required className="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 bg-zinc-800 placeholder-zinc-500 text-dark" placeholder="Buat Password Baru" value={activatePassword} onChange={(e) => setActivatePassword(e.target.value)} />
                        <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-0 px-4 flex items-center text-zinc-400 hover:text-zinc-200">{showPassword ? <EyeSlashIcon className="w-5 h-5"/> : <EyeIcon className="w-5 h-5"/>}</button>
                     </div>
-                    <button type="submit" disabled={isLoading} className="w-full py-3 px-4 text-sm font-bold rounded-lg text-white bg-secondary hover:bg-secondary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary transition-colors disabled:bg-zinc-700">{isLoading ? 'MEMPROSES...' : 'AKTIVASI AKUN'}</button>
+                    <button type="submit" disabled={isLoading} className="w-full py-3 px-4 text-sm font-bold rounded-lg text-black bg-secondary hover:bg-secondary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary transition-colors disabled:bg-zinc-700">{isLoading ? 'MEMPROSES...' : 'AKTIVASI AKUN'}</button>
                     <p className="text-center text-sm text-gray-text pt-2">Sudah punya akun?{' '} <button type="button" onClick={() => switchView('login')} className="font-medium text-primary hover:text-primary-dark hover:underline">Login</button></p>
                 </form>
                 )}
@@ -265,7 +265,7 @@ export const LoginPage: React.FC = () => {
                             </div>
                         </div>
 
-                        <button type="submit" disabled={isLoading} className="w-full py-3 px-4 text-sm font-bold rounded-lg text-white bg-secondary hover:bg-secondary-dark disabled:bg-zinc-700">{isLoading ? 'MEMPROSES...' : 'DAFTAR SEBAGAI ANGGOTA BARU'}</button>
+                        <button type="submit" disabled={isLoading} className="w-full py-3 px-4 text-sm font-bold rounded-lg text-black bg-secondary hover:bg-secondary-dark disabled:bg-zinc-700">{isLoading ? 'MEMPROSES...' : 'DAFTAR SEBAGAI ANGGOTA BARU'}</button>
                         <p className="text-center text-sm text-gray-text pt-2">Sudah punya akun?{' '} <button type="button" onClick={() => switchView('login')} className="font-medium text-primary hover:text-primary-dark hover:underline">Login</button></p>
                     </form>
                 )}

@@ -61,31 +61,31 @@ const AnggotaForm: React.FC<AnggotaFormProps> = ({ onSave, initialData }) => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label htmlFor="no_anggota" className="block text-sm font-medium text-gray-text">No. Anggota</label>
-                    <input type="text" name="no_anggota" id="no_anggota" value={formData.no_anggota} onChange={handleChange} required className="mt-1 block w-full bg-slate-100 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary text-dark" />
+                    <input type="text" name="no_anggota" id="no_anggota" value={formData.no_anggota} onChange={handleChange} required className="mt-1 block w-full bg-zinc-800 rounded-md py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary text-dark" />
                 </div>
                  <div>
                     <label htmlFor="nama" className="block text-sm font-medium text-gray-text">Nama Lengkap</label>
-                    <input type="text" name="nama" id="nama" value={formData.nama} onChange={handleChange} required className="mt-1 block w-full bg-slate-100 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary text-dark" />
+                    <input type="text" name="nama" id="nama" value={formData.nama} onChange={handleChange} required className="mt-1 block w-full bg-zinc-800 rounded-md py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary text-dark" />
                 </div>
                  <div>
                     <label htmlFor="password" className="block text-sm font-medium text-gray-text">Password</label>
-                    <input type="password" name="password" id="password" value={formData.password} onChange={handleChange} placeholder={initialData ? 'Isi untuk mengubah' : 'Wajib diisi'} required={!initialData} className="mt-1 block w-full bg-slate-100 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary text-dark" />
+                    <input type="password" name="password" id="password" value={formData.password} onChange={handleChange} placeholder={initialData ? 'Isi untuk mengubah' : 'Wajib diisi'} required={!initialData} className="mt-1 block w-full bg-zinc-800 rounded-md py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary text-dark" />
                 </div>
                 <div>
                     <label htmlFor="nik" className="block text-sm font-medium text-gray-text">NIK</label>
-                    <input type="text" name="nik" id="nik" value={formData.nik} onChange={handleChange} required className="mt-1 block w-full bg-slate-100 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary text-dark" />
+                    <input type="text" name="nik" id="nik" value={formData.nik} onChange={handleChange} required className="mt-1 block w-full bg-zinc-800 rounded-md py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary text-dark" />
                 </div>
                  <div>
                     <label htmlFor="email" className="block text-sm font-medium text-gray-text">Email</label>
-                    <input type="email" name="email" id="email" value={formData.email} onChange={handleChange} required className="mt-1 block w-full bg-slate-100 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary text-dark" />
+                    <input type="email" name="email" id="email" value={formData.email} onChange={handleChange} required className="mt-1 block w-full bg-zinc-800 rounded-md py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary text-dark" />
                 </div>
                 <div>
                     <label htmlFor="no_telepon" className="block text-sm font-medium text-gray-text">No. Telepon</label>
-                    <input type="tel" name="no_telepon" id="no_telepon" value={formData.no_telepon} onChange={handleChange} required className="mt-1 block w-full bg-slate-100 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary text-dark" />
+                    <input type="tel" name="no_telepon" id="no_telepon" value={formData.no_telepon} onChange={handleChange} required className="mt-1 block w-full bg-zinc-800 rounded-md py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary text-dark" />
                 </div>
                 <div>
                     <label htmlFor="status" className="block text-sm font-medium text-gray-text">Status</label>
-                    <select name="status" id="status" value={formData.status} onChange={handleChange} className="mt-1 block w-full bg-slate-100 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary text-dark">
+                    <select name="status" id="status" value={formData.status} onChange={handleChange} className="mt-1 block w-full bg-zinc-800 rounded-md py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary text-dark">
                         <option value="Aktif">Aktif</option>
                         <option value="Tidak Aktif">Tidak Aktif</option>
                     </select>
@@ -93,10 +93,10 @@ const AnggotaForm: React.FC<AnggotaFormProps> = ({ onSave, initialData }) => {
             </div>
              <div>
                 <label htmlFor="alamat" className="block text-sm font-medium text-gray-text">Alamat</label>
-                <textarea name="alamat" id="alamat" value={formData.alamat} onChange={handleChange} required rows={3} className="mt-1 block w-full bg-slate-100 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary text-dark"></textarea>
+                <textarea name="alamat" id="alamat" value={formData.alamat} onChange={handleChange} required rows={3} className="mt-1 block w-full bg-zinc-800 rounded-md py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary text-dark"></textarea>
             </div>
             <div className="flex justify-end pt-4">
-                <button type="submit" className="bg-primary text-white px-4 py-2 rounded-lg font-semibold hover:bg-primary-dark transition-colors">
+                <button type="submit" className="bg-primary text-black px-4 py-2 rounded-lg font-semibold hover:bg-primary-dark transition-colors">
                     Simpan
                 </button>
             </div>

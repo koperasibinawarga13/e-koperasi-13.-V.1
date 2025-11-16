@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from 'recharts';
 import Header from '../../components/Header';
 import StatCard from '../../components/StatCard';
 import { UsersIcon, ChartBarIcon, CreditCardIcon, BuildingOfficeIcon, CheckIcon, XMarkIcon } from '../../components/icons/Icons';
@@ -19,6 +19,9 @@ const AdminDashboard: React.FC = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [pendingLoans, setPendingLoans] = useState<PengajuanPinjaman[]>([]);
     const [isUpdatingLoan, setIsUpdatingLoan] = useState<string | null>(null);
+
+    // Colors for the bar chart, greens for savings, yellows for loans
+    const CHART_COLORS = ['#84cc16', '#a3e635', '#bef264', '#facc15', '#eab308', '#ca8a04'];
 
     useEffect(() => {
         const fetchData = async () => {
@@ -49,6 +52,7 @@ const AdminDashboard: React.FC = () => {
                     acc.wisata += curr.akhir_simpanan_wisata || 0;
                     acc.pinjamanBerjangka += curr.akhir_pinjaman_berjangka || 0;
                     acc.pinjamanKhusus += curr.akhir_pinjaman_khusus || 0;
+                    acc.pinjamanNiaga += curr.akhir_pinjaman_niaga || 0;
                     return acc;
                 }, {
                     wajib: 0,
@@ -56,6 +60,7 @@ const AdminDashboard: React.FC = () => {
                     wisata: 0,
                     pinjamanBerjangka: 0,
                     pinjamanKhusus: 0,
+                    pinjamanNiaga: 0,
                 });
 
                 const aggregatedChartData = [
@@ -64,6 +69,7 @@ const AdminDashboard: React.FC = () => {
                     { name: 'Simpanan Wisata', total: finalBalanceTotals.wisata },
                     { name: 'Pinjaman Berjangka', total: finalBalanceTotals.pinjamanBerjangka },
                     { name: 'Pinjaman Khusus', total: finalBalanceTotals.pinjamanKhusus },
+                    { name: 'Pinjaman Niaga', total: finalBalanceTotals.pinjamanNiaga },
                 ];
                 
                 setChartData(aggregatedChartData);
@@ -114,7 +120,7 @@ const AdminDashboard: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 <StatCard title="Total Anggota" value={stats.totalAnggota.toLocaleString('id-ID')} icon={<UsersIcon className="w-6 h-6" />} iconBgColor="bg-primary" />
                 <StatCard title="Total Simpanan" value={formatCurrency(stats.totalSimpanan)} icon={<CreditCardIcon className="w-6 h-6" />} iconBgColor="bg-secondary" />
-                <StatCard title="Total Pinjaman" value={formatCurrency(stats.totalPinjaman)} icon={<ChartBarIcon className="w-6 h-6" />} iconBgColor="bg-amber-500" />
+                <StatCard title="Total Pinjaman" value={formatCurrency(stats.totalPinjaman)} icon={<ChartBarIcon className="w-6 h-6" />} iconBgColor="bg-accent" />
                 <StatCard title="Saldo Kas" value={formatCurrency(stats.saldoKas)} icon={<BuildingOfficeIcon className="w-6 h-6" />} iconBgColor="bg-rose-500" />
             </div>
             <div className="bg-surface p-6 rounded-xl">
@@ -128,7 +134,11 @@ const AdminDashboard: React.FC = () => {
                                 <YAxis tickFormatter={(tick) => `${(tick / 1000000).toLocaleString('id-ID')} Jt`} tick={{ fill: '#a1a1aa' }}/>
                                 <Tooltip contentStyle={{ backgroundColor: '#18181b', border: '1px solid #3f3f46', color: '#ffffff' }} cursor={{fill: 'rgba(163, 230, 53, 0.1)'}}/>
                                 <Legend wrapperStyle={{ color: '#a1a1aa' }}/>
-                                <Bar dataKey="total" name="Total Saldo Akhir" fill="#a3e635" />
+                                <Bar dataKey="total" name="Total Saldo Akhir">
+                                    {chartData.map((entry, index) => (
+                                        <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+                                    ))}
+                                </Bar>
                             </BarChart>
                         </ResponsiveContainer>
                     </div>
@@ -163,7 +173,7 @@ const AdminDashboard: React.FC = () => {
                                         <td className="px-4 py-4 text-center">
                                             <div className="flex justify-center gap-2">
                                                 <button
-                                                    onClick={() => handleLoanAction(loan.id, 'Disetujui')}
+                                                    onClick={() => handleLoanAction(loan.id!, 'Disetujui')}
                                                     disabled={isUpdatingLoan === loan.id}
                                                     className="p-2 rounded-full bg-green-500/10 text-green-400 hover:bg-green-500/20 disabled:opacity-50"
                                                     title="Setujui"
@@ -171,7 +181,7 @@ const AdminDashboard: React.FC = () => {
                                                     <CheckIcon className="w-4 h-4" />
                                                 </button>
                                                 <button
-                                                    onClick={() => handleLoanAction(loan.id, 'Ditolak')}
+                                                    onClick={() => handleLoanAction(loan.id!, 'Ditolak')}
                                                     disabled={isUpdatingLoan === loan.id}
                                                     className="p-2 rounded-full bg-red-500/10 text-red-400 hover:bg-red-500/20 disabled:opacity-50"
                                                     title="Tolak"

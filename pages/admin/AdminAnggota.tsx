@@ -200,7 +200,7 @@ const AdminAnggota: React.FC = () => {
                   id="newStatus"
                   value={newStatusPrefix}
                   onChange={(e) => setNewStatusPrefix(e.target.value)}
-                  className="mt-1 block w-full bg-slate-100 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary text-dark"
+                  className="mt-1 block w-full bg-zinc-800 rounded-md py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary text-dark"
                 >
                   {statusOptions.map(prefix => (
                     <option key={prefix} value={prefix}>{getPrefixDescription(prefix)}</option>
@@ -208,7 +208,7 @@ const AdminAnggota: React.FC = () => {
                 </select>
               </div>
 
-              <div className="bg-amber-100 text-amber-800 p-3 rounded-lg text-sm mt-4">
+              <div className="bg-amber-500/10 text-amber-300 p-3 rounded-lg text-sm mt-4">
                 <strong>Peringatan:</strong> Tindakan ini akan memigrasikan semua data terkait (keuangan, riwayat transaksi, dan pinjaman) ke kode anggota yang baru. Proses ini tidak dapat dibatalkan.
               </div>
               <div className="mt-6">
@@ -220,20 +220,20 @@ const AdminAnggota: React.FC = () => {
                   id="confirmation"
                   value={confirmationInput}
                   onChange={(e) => setConfirmationInput(e.target.value)}
-                  className="mt-1 block w-full bg-slate-100 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary text-dark"
+                  className="mt-1 block w-full bg-zinc-800 rounded-md py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary text-dark"
                 />
               </div>
               <div className="flex justify-end gap-4 mt-6">
                 <button
                   onClick={handleCloseStatusModal}
-                  className="bg-slate-200 text-slate-700 px-4 py-2 rounded-lg font-semibold hover:bg-slate-300 transition-colors"
+                  className="bg-zinc-700 text-dark px-4 py-2 rounded-lg font-semibold hover:bg-zinc-600 transition-colors"
                 >
                   Batal
                 </button>
                 <button
                   onClick={handleConfirmStatusChange}
                   disabled={isMigrating || confirmationInput !== newNoAnggota || !newNoAnggota}
-                  className="bg-primary text-white px-4 py-2 rounded-lg font-semibold hover:bg-primary-dark transition-colors disabled:bg-slate-400"
+                  className="bg-primary text-black px-4 py-2 rounded-lg font-semibold hover:bg-primary-dark transition-colors disabled:bg-zinc-600 disabled:text-gray-text"
                 >
                   {isMigrating ? 'Memigrasikan...' : 'Konfirmasi & Ubah Status'}
                 </button>
@@ -246,17 +246,17 @@ const AdminAnggota: React.FC = () => {
   return (
     <div>
       <Header title="Data Anggota" />
-      <div className="bg-surface p-6 rounded-xl shadow-md">
+      <div className="bg-surface p-6 rounded-xl">
         <div className="flex flex-wrap justify-between items-center mb-6 gap-4">
             <input
                 type="text"
                 placeholder="Cari anggota (nama, no. anggota, No. HP)..."
-                className="bg-slate-100 rounded-lg px-4 py-2 w-full sm:w-1/3 focus:ring-1 focus:ring-primary focus:border-primary text-dark"
+                className="bg-zinc-800 rounded-lg px-4 py-2 w-full sm:w-1/3 focus:ring-1 focus:ring-primary focus:border-primary text-dark"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
             />
             <div className="flex items-center gap-2">
-                <button onClick={handleAdd} className="bg-primary text-white px-4 py-2 rounded-lg font-semibold hover:bg-primary-dark transition-all transform hover:scale-105 flex items-center gap-2">
+                <button onClick={handleAdd} className="bg-primary text-black px-4 py-2 rounded-lg font-semibold hover:bg-primary-dark transition-all transform hover:scale-105 flex items-center gap-2">
                     <PlusIcon className="w-5 h-5" />
                     Tambah Anggota
                 </button>
@@ -269,9 +269,9 @@ const AdminAnggota: React.FC = () => {
             </div>
         </div>
         <div className="overflow-x-auto">
-          {isLoading ? <p className="text-gray-text">Loading data anggota...</p> : (
+          {isLoading ? <p className="text-gray-text">Memuat data anggota...</p> : (
             <table className="w-full text-sm text-left text-gray-text">
-                <thead className="text-xs text-gray-text uppercase">
+                <thead className="text-xs text-gray-text uppercase border-b border-zinc-800">
                     <tr>
                         <th scope="col" className="px-4 py-4 sm:px-6 font-semibold">No. Anggota</th>
                         <th scope="col" className="px-4 py-4 sm:px-6 font-semibold">Nama</th>
@@ -282,7 +282,7 @@ const AdminAnggota: React.FC = () => {
                 </thead>
                 <tbody>
                     {filteredAnggota.map((anggota) => (
-                        <tr key={anggota.id} className="border-t border-slate-100 hover:bg-slate-50 transition-colors">
+                        <tr key={anggota.id} className="hover:bg-zinc-800/50 transition-colors">
                             <td className="px-4 py-4 sm:px-6 font-medium text-dark">{anggota.no_anggota}</td>
                             <td className="px-4 py-4 sm:px-6 text-dark">{anggota.nama}</td>
                             <td className="px-4 py-4 sm:px-6">{anggota.no_telepon}</td>
@@ -290,7 +290,7 @@ const AdminAnggota: React.FC = () => {
                                 {(() => {
                                     if (anggota.status === 'Tidak Aktif') {
                                         return (
-                                            <span className="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-700">
+                                            <span className="px-2 py-1 text-xs font-semibold rounded-full bg-red-500/10 text-red-400">
                                                 Tidak Aktif
                                             </span>
                                         );
@@ -300,13 +300,13 @@ const AdminAnggota: React.FC = () => {
 
                                     if (hasRegistered) {
                                         return (
-                                            <span className="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-700">
+                                            <span className="px-2 py-1 text-xs font-semibold rounded-full bg-green-500/10 text-green-400">
                                                 Aktif
                                             </span>
                                         );
                                     } else {
                                         return (
-                                            <span className="px-2 py-1 text-xs font-semibold rounded-full bg-amber-100 text-amber-700">
+                                            <span className="px-2 py-1 text-xs font-semibold rounded-full bg-amber-500/10 text-amber-400">
                                                 Belum Registrasi
                                             </span>
                                         );
@@ -332,7 +332,7 @@ const AdminAnggota: React.FC = () => {
 
       <Modal isOpen={isDeleteAllModalOpen} onClose={closeDeleteAllModal} title="Konfirmasi Hapus Semua Anggota">
         <div>
-            <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4" role="alert">
+            <div className="bg-red-500/10 border-l-4 border-red-500 text-red-300 p-4 mb-4" role="alert">
                 <p className="font-bold">Peringatan Keras!</p>
                 <p>Anda akan menghapus <strong>semua data profil anggota</strong> secara permanen.</p>
                 <ul className="list-disc list-inside mt-2 text-sm">
@@ -349,21 +349,21 @@ const AdminAnggota: React.FC = () => {
                 type="text"
                 value={deleteAllConfirmation}
                 onChange={(e) => setDeleteAllConfirmation(e.target.value)}
-                className="w-full bg-slate-100 rounded-md shadow-sm p-2 text-dark"
+                className="w-full bg-zinc-800 rounded-md p-2 text-dark"
                 placeholder="Ketik teks konfirmasi di sini"
             />
             
             <div className="flex justify-end gap-4 mt-6">
                 <button
                     onClick={closeDeleteAllModal}
-                    className="bg-slate-200 text-slate-700 px-4 py-2 rounded-lg font-semibold hover:bg-slate-300 transition-colors"
+                    className="bg-zinc-700 text-dark px-4 py-2 rounded-lg font-semibold hover:bg-zinc-600 transition-colors"
                 >
                     Batal
                 </button>
                 <button
                     onClick={handleDeleteAll}
                     disabled={isDeletingAll || deleteAllConfirmation !== CONFIRMATION_TEXT}
-                    className="bg-red-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-red-700 transition-colors disabled:bg-slate-400 disabled:cursor-not-allowed"
+                    className="bg-red-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-red-700 transition-colors disabled:bg-zinc-600 disabled:cursor-not-allowed"
                 >
                     {isDeletingAll ? 'Menghapus...' : 'Saya Mengerti, Hapus Semua'}
                 </button>

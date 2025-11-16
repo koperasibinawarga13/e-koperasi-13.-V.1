@@ -165,6 +165,31 @@ export const updateAnggota = async (updatedAnggota: Anggota): Promise<Anggota> =
     }
 };
 
+export const updateAnggotaPassword = async (anggotaId: string, oldPassword: string, newPassword: string): Promise<void> => {
+    try {
+        const anggotaDocRef = doc(db, 'anggota', anggotaId);
+        const docSnap = await getDoc(anggotaDocRef);
+
+        if (!docSnap.exists()) {
+            throw new Error("Anggota tidak ditemukan.");
+        }
+
+        const anggotaData = docSnap.data() as Anggota;
+
+        if (anggotaData.password && anggotaData.password !== oldPassword) {
+            throw new Error("Password lama yang Anda masukkan salah.");
+        }
+        
+        await updateDoc(anggotaDocRef, {
+            password: newPassword
+        });
+        
+    } catch (error) {
+        console.error("Error updating member password:", error);
+        throw error;
+    }
+};
+
 export const deleteAnggota = async (id: string): Promise<void> => {
     try {
         const anggotaDoc = doc(db, 'anggota', id);
