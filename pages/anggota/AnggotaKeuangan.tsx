@@ -104,8 +104,12 @@ export const AnggotaKeuangan: React.FC = () => {
                 <div className="flex items-center space-x-3">
                     <h1 className="text-2xl sm:text-3xl font-bold text-dark">Rincian Keuangan</h1>
                     {anggota && (
-                        <div className="hidden md:flex items-center space-x-2 text-gray-text pl-3 ml-1">
-                            <UserCircleIcon className="w-6 h-6 text-slate-400" />
+                        <div className="hidden md:flex items-center space-x-3 text-gray-text pl-3 ml-1">
+                            {anggota.photoURL ? (
+                                <img src={anggota.photoURL} alt={anggota.nama} className="w-8 h-8 rounded-full object-cover" />
+                            ) : (
+                                <UserCircleIcon className="w-8 h-8 text-zinc-400" />
+                            )}
                             <span className="font-medium">{anggota.nama}</span>
                         </div>
                     )}

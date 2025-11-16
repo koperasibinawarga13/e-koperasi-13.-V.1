@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../../components/Header';
 import { Anggota } from '../../types';
-import { PlusIcon, PencilIcon, TrashIcon, UploadIcon, SwitchHorizontalIcon } from '../../components/icons/Icons';
+import { PlusIcon, PencilIcon, TrashIcon, UploadIcon, SwitchHorizontalIcon, UserCircleIcon } from '../../components/icons/Icons';
 import Modal from '../../components/Modal';
 import AnggotaForm from '../../components/AnggotaForm';
 import { getAnggota, addAnggota, updateAnggota, deleteAnggota, migrateAnggotaStatus, deleteAllAnggota } from '../../services/anggotaService';
@@ -273,6 +273,7 @@ const AdminAnggota: React.FC = () => {
             <table className="w-full text-sm text-left text-gray-text">
                 <thead className="text-xs text-gray-text uppercase border-b border-zinc-800">
                     <tr>
+                        <th scope="col" className="px-4 py-4 sm:px-6 font-semibold">Foto</th>
                         <th scope="col" className="px-4 py-4 sm:px-6 font-semibold">No. Anggota</th>
                         <th scope="col" className="px-4 py-4 sm:px-6 font-semibold">Nama</th>
                         <th scope="col" className="px-4 py-4 sm:px-6 font-semibold">No. HP</th>
@@ -283,6 +284,13 @@ const AdminAnggota: React.FC = () => {
                 <tbody>
                     {filteredAnggota.map((anggota) => (
                         <tr key={anggota.id} className="hover:bg-zinc-800/50 transition-colors">
+                            <td className="px-4 py-4 sm:px-6">
+                                {anggota.photoURL ? (
+                                    <img src={anggota.photoURL} alt={anggota.nama} className="w-10 h-10 rounded-full object-cover" />
+                                ) : (
+                                    <UserCircleIcon className="w-10 h-10 text-zinc-600" />
+                                )}
+                            </td>
                             <td className="px-4 py-4 sm:px-6 font-medium text-dark">{anggota.no_anggota}</td>
                             <td className="px-4 py-4 sm:px-6 text-dark">{anggota.nama}</td>
                             <td className="px-4 py-4 sm:px-6">{anggota.no_telepon}</td>

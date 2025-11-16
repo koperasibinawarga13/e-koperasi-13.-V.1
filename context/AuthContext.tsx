@@ -9,6 +9,7 @@ interface AuthContextType {
   login: (username: string, password: string) => Promise<void>;
   logout: () => void;
   loading: boolean;
+  updateAuthUser: (updatedData: Partial<User>) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -54,7 +55,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             anggotaId: anggota.id,
             name: anggota.nama,
             email: anggota.email || '',
-            role: UserRole.ANGGOTA
+            role: UserRole.ANGGOTA,
+            photoURL: anggota.photoURL,
         };
         localStorage.setItem('user', JSON.stringify(anggotaUser));
         setUser(anggotaUser);
@@ -69,13 +71,22 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     localStorage.removeItem('user');
     setUser(null);
   };
+  
+  const updateAuthUser = (updatedData: Partial<User>) => {
+    setUser(prevUser => {
+        if (!prevUser) return null;
+        const newUser = { ...prevUser, ...updatedData };
+        localStorage.setItem('user', JSON.stringify(newUser));
+        return newUser;
+    });
+  };
 
   if (loading) {
       return <div className="flex justify-center items-center h-screen">Loading...</div>; 
   }
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, login, logout, loading, updateAuthUser }}>
       {children}
     </AuthContext.Provider>
   );

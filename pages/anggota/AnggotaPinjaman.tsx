@@ -5,6 +5,7 @@ import { getKeuanganByNoAnggota } from '../../services/keuanganService';
 import { Keuangan, Anggota, PengajuanPinjaman } from '../../types';
 import { getAnggotaById } from '../../services/anggotaService';
 import { addPengajuanPinjaman, getPengajuanPinjamanByNoAnggota, deletePengajuanPinjaman } from '../../services/pinjamanService';
+import { getPengaturanPinjaman } from '../../services/pengaturanService';
 
 interface SimulasiResult {
     pokokPinjaman: number;
@@ -15,6 +16,7 @@ interface SimulasiResult {
     totalBunga: number;
     totalBayar: number;
     tanggalLunas: string;
+    metode_perhitungan: 'Plat Pokok' | 'Plat Total';
     jadwal: Array<{
         bulan: number;
         tanggal: string;
@@ -34,17 +36,19 @@ const AnggotaPinjaman: React.FC = () => {
     
     // State for simulator
     const [pokokPinjaman, setPokokPinjaman] = useState(10000000);
-    const [jangkaWaktu, setJangkaWaktu] = useState(10);
-    const [sukuBunga, setSukuBunga] = useState(2);
+    const [jangkaWaktu, setJangkaWaktu] = useState(12);
+    const [sukuBunga, setSukuBunga] = useState(2); // Default, will be overwritten by settings
     const [tanggalMulai, setTanggalMulai] = useState(new Date().toISOString().split('T')[0]);
     const [simulasi, setSimulasi] = useState<SimulasiResult | null>(null);
+    const [metodePerhitungan, setMetodePerhitungan] = useState<'plat_pokok' | 'plat_total'>('plat_total');
+
 
     // State for Pinjaman Khusus
     const [pokokPinjamanKhusus, setPokokPinjamanKhusus] = useState(0);
     const [keteranganKhusus, setKeteranganKhusus] = useState('');
     
     // General State
-    const [activeTab, setActiveTab] = useState<'berjangka' | 'khusus'>('berjangka');
+    const [activeTab, setActiveTab] = useState<'berjangka' | 'khusus' | 'pelunasan'>('berjangka');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitMessage, setSubmitMessage] = useState({ type: '', text: ''});
     const [isCancelling, setIsCancelling] = useState<string | null>(null);
@@ -52,9 +56,14 @@ const AnggotaPinjaman: React.FC = () => {
 
     useEffect(() => {
         const fetchData = async () => {
-            if (user?.anggotaId) {
-                setIsLoading(true);
-                try {
+            setIsLoading(true);
+            try {
+                 const settings = await getPengaturanPinjaman();
+                if (settings) {
+                    setSukuBunga(settings.sukuBunga);
+                }
+
+                if (user?.anggotaId) {
                     const anggotaData = await getAnggotaById(user.anggotaId);
                     setAnggota(anggotaData);
                     if (anggotaData?.no_anggota) {
@@ -65,12 +74,10 @@ const AnggotaPinjaman: React.FC = () => {
                         setKeuangan(keuanganResult);
                         setRiwayat(riwayatResult);
                     }
-                } catch (error) {
-                    console.error("Failed to fetch loan data:", error);
-                } finally {
-                    setIsLoading(false);
                 }
-            } else {
+            } catch (error) {
+                console.error("Failed to fetch loan data:", error);
+            } finally {
                 setIsLoading(false);
             }
         };
@@ -83,6 +90,7 @@ const AnggotaPinjaman: React.FC = () => {
     };
 
     const formatDate = (dateString: string) => {
+        if (!dateString) return '';
         const date = new Date(dateString);
         return date.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
     }
@@ -95,32 +103,92 @@ const AnggotaPinjaman: React.FC = () => {
             return;
         }
 
-        const angsuranPokokBulan = pokokPinjaman / jangkaWaktu;
-        const bungaPerBulan = sukuBunga / 100;
-        let sisaPinjaman = pokokPinjaman;
-        let totalBunga = 0;
-        const jadwal = [];
-        const startDate = new Date(tanggalMulai);
+        if (metodePerhitungan === 'plat_pokok') {
+            const angsuranPokokBulan = pokokPinjaman / jangkaWaktu;
+            const bungaPerBulanRate = sukuBunga / 100;
+            let sisaPinjaman = pokokPinjaman;
+            let totalBunga = 0;
+            const jadwal = [];
+            const startDate = new Date(tanggalMulai);
 
-        for (let i = 1; i <= jangkaWaktu; i++) {
-            const angsuranBunga = sisaPinjaman * bungaPerBulan;
-            totalBunga += angsuranBunga;
+            for (let i = 1; i <= jangkaWaktu; i++) {
+                const angsuranDate = new Date(startDate);
+                angsuranDate.setMonth(startDate.getMonth() + i);
+                
+                const angsuranBunga = sisaPinjaman * bungaPerBulanRate;
+                totalBunga += angsuranBunga;
+                
+                const sisaPinjamanSebelumAngsuran = sisaPinjaman;
+                sisaPinjaman -= angsuranPokokBulan;
+                
+                // Adjust final principal payment to clear remaining balance due to floating point math
+                const currentAngsuranPokok = (i === jangkaWaktu) ? sisaPinjamanSebelumAngsuran : angsuranPokokBulan;
+                
+                jadwal.push({
+                    bulan: i,
+                    tanggal: angsuranDate.toISOString().split('T')[0],
+                    angsuranPokok: currentAngsuranPokok,
+                    angsuranBunga: angsuranBunga,
+                    totalAngsuran: currentAngsuranPokok + angsuranBunga,
+                    sisaPinjaman: (i === jangkaWaktu) ? 0 : sisaPinjaman,
+                });
+            }
             
-            const angsuranDate = new Date(startDate);
-            angsuranDate.setMonth(startDate.getMonth() + i);
+            setSimulasi({pokokPinjaman, jangkaWaktu, sukuBunga, tanggalMulai, angsuranPokokBulan, totalBunga, totalBayar: pokokPinjaman + totalBunga, tanggalLunas: jadwal[jadwal.length - 1].tanggal, jadwal, metode_perhitungan: 'Plat Pokok' });
 
-            jadwal.push({
-                bulan: i,
-                tanggal: angsuranDate.toISOString().split('T')[0],
-                angsuranPokok: angsuranPokokBulan,
-                angsuranBunga: angsuranBunga,
-                totalAngsuran: angsuranPokokBulan + angsuranBunga,
-                sisaPinjaman: sisaPinjaman - angsuranPokokBulan,
+        } else { // plat_total
+            const bungaPerBulanRate = sukuBunga / 100;
+            const n = jangkaWaktu;
+            const p = pokokPinjaman;
+
+            const totalAngsuranBulanan = p * (bungaPerBulanRate * Math.pow(1 + bungaPerBulanRate, n)) / (Math.pow(1 + bungaPerBulanRate, n) - 1);
+            if (isNaN(totalAngsuranBulanan) || !isFinite(totalAngsuranBulanan)) {
+                alert("Tidak dapat menghitung angsuran. Pastikan bunga dan jangka waktu valid.");
+                return;
+            }
+
+            let sisaPinjaman = p;
+            let totalBunga = 0;
+            const jadwal = [];
+            const startDate = new Date(tanggalMulai);
+
+            for (let i = 1; i <= n; i++) {
+                const angsuranDate = new Date(startDate);
+                angsuranDate.setMonth(startDate.getMonth() + i);
+                
+                const angsuranBunga = sisaPinjaman * bungaPerBulanRate;
+                
+                let angsuranPokok = totalAngsuranBulanan - angsuranBunga;
+                let currentTotalAngsuran = totalAngsuranBulanan;
+
+                // Last payment adjustment to ensure loan is fully paid off
+                if (i === n) {
+                    angsuranPokok = sisaPinjaman;
+                    currentTotalAngsuran = angsuranPokok + angsuranBunga;
+                }
+                
+                totalBunga += angsuranBunga;
+                sisaPinjaman -= angsuranPokok;
+
+                jadwal.push({
+                    bulan: i,
+                    tanggal: angsuranDate.toISOString().split('T')[0],
+                    angsuranPokok: angsuranPokok,
+                    angsuranBunga: angsuranBunga,
+                    totalAngsuran: currentTotalAngsuran,
+                    sisaPinjaman: sisaPinjaman < 0.01 ? 0 : sisaPinjaman, // handle floating point residuals
+                });
+            }
+
+            setSimulasi({
+                pokokPinjaman: p, jangkaWaktu: n, sukuBunga, tanggalMulai, 
+                angsuranPokokBulan: 0, // Not applicable for this method
+                totalBunga: totalBunga, totalBayar: p + totalBunga, 
+                tanggalLunas: jadwal[jadwal.length - 1].tanggal, 
+                jadwal, 
+                metode_perhitungan: 'Plat Total'
             });
-            sisaPinjaman -= angsuranPokokBulan;
         }
-
-        setSimulasi({pokokPinjaman, jangkaWaktu, sukuBunga, tanggalMulai, angsuranPokokBulan, totalBunga, totalBayar: pokokPinjaman + totalBunga, tanggalLunas: jadwal[jadwal.length - 1].tanggal, jadwal });
     };
     
     const handleAjukanPinjamanBerjangka = async () => {
@@ -138,7 +206,8 @@ const AnggotaPinjaman: React.FC = () => {
                 angsuran_pokok_bulan: simulasi.angsuranPokokBulan,
                 total_bunga: simulasi.totalBunga,
                 total_bayar: simulasi.totalBayar,
-                jadwal_angsuran: simulasi.jadwal
+                jadwal_angsuran: simulasi.jadwal,
+                metode_perhitungan: simulasi.metode_perhitungan,
             });
             setSubmitMessage({type: 'success', text: 'Pengajuan pinjaman berjangka berhasil dikirim.'});
             setSimulasi(null);
@@ -217,6 +286,9 @@ const AnggotaPinjaman: React.FC = () => {
         return <span className={`${baseClasses} ${colorClasses}`}>{status}</span>;
     };
 
+    const sisaPokokPinjaman = keuangan?.akhir_pinjaman_berjangka || 0;
+    const bungaBulanIni = sisaPokokPinjaman * (sukuBunga / 100);
+    const totalPelunasan = sisaPokokPinjaman + bungaBulanIni;
 
     return (
         <div>
@@ -242,9 +314,37 @@ const AnggotaPinjaman: React.FC = () => {
 
             <div className="bg-surface rounded-xl">
                 <h2 className="text-lg md:text-xl font-bold text-dark p-4 -m-0">Simulasi & Pengajuan Kredit</h2>
-                 <nav className="flex border-b border-zinc-800">
-                    <button onClick={() => {setActiveTab('berjangka'); setSubmitMessage({type: '', text: ''})}} className={`py-3 px-6 font-semibold text-sm ${activeTab === 'berjangka' ? 'text-primary border-b-2 border-primary' : 'text-gray-text hover:bg-zinc-800/50'}`}>Pinjaman Berjangka (Dengan Simulasi)</button>
-                    <button onClick={() => {setActiveTab('khusus'); setSubmitMessage({type: '', text: ''})}} className={`py-3 px-6 font-semibold text-sm ${activeTab === 'khusus' ? 'text-primary border-b-2 border-primary' : 'text-gray-text hover:bg-zinc-800/50'}`}>Pinjaman Khusus</button>
+                 <nav className="flex border-b border-zinc-800 px-2">
+                    <button 
+                        onClick={() => {setActiveTab('berjangka'); setSubmitMessage({type: '', text: ''})}} 
+                        className={`py-3 px-4 font-semibold text-sm transition-colors duration-200 ${
+                            activeTab === 'berjangka' 
+                            ? 'text-primary border-b-2 border-primary' 
+                            : 'text-gray-text hover:text-dark border-b-2 border-transparent'
+                        }`}
+                    >
+                        Pinjaman Berjangka (Dengan Simulasi)
+                    </button>
+                    <button 
+                        onClick={() => {setActiveTab('khusus'); setSubmitMessage({type: '', text: ''})}} 
+                        className={`py-3 px-4 font-semibold text-sm transition-colors duration-200 ${
+                            activeTab === 'khusus' 
+                            ? 'text-primary border-b-2 border-primary' 
+                            : 'text-gray-text hover:text-dark border-b-2 border-transparent'
+                        }`}
+                    >
+                        Pinjaman Khusus
+                    </button>
+                     <button 
+                        onClick={() => {setActiveTab('pelunasan'); setSubmitMessage({type: '', text: ''})}} 
+                        className={`py-3 px-4 font-semibold text-sm transition-colors duration-200 ${
+                            activeTab === 'pelunasan' 
+                            ? 'text-primary border-b-2 border-primary' 
+                            : 'text-gray-text hover:text-dark border-b-2 border-transparent'
+                        }`}
+                    >
+                        Pelunasan Pinjaman
+                    </button>
                  </nav>
 
                 {activeTab === 'berjangka' ? (
@@ -260,14 +360,27 @@ const AnggotaPinjaman: React.FC = () => {
                             </div>
                              <div>
                                 <label htmlFor="bunga" className="block text-sm font-medium text-gray-text">Bunga per Bulan (%)</label>
-                                <input type="number" step="0.1" id="bunga" value={sukuBunga} readOnly disabled className="mt-1 block w-full bg-zinc-800 rounded-md py-2 px-3 text-gray-text cursor-not-allowed" />
+                                <input type="number" step="0.1" id="bunga" value={sukuBunga} readOnly disabled className="mt-1 block w-full bg-zinc-700 rounded-md py-2 px-3 text-gray-text cursor-not-allowed" />
                             </div>
-                            <div>
-                                <button type="submit" className="w-full bg-primary text-black py-2 px-4 rounded-lg font-semibold hover:bg-primary-dark">Hitung Simulasi</button>
-                            </div>
-                             <div className="md:col-span-2 lg:col-span-4">
+                            <div className="md:col-span-2 lg:col-span-1">
                                 <label htmlFor="tanggal" className="block text-sm font-medium text-gray-text">Tanggal Mulai</label>
-                                <input type="date" id="tanggal" value={tanggalMulai} onChange={e => setTanggalMulai(e.target.value)} className="mt-1 block w-full md:w-1/4 bg-zinc-800 rounded-md py-2 px-3 text-dark" />
+                                <input type="date" id="tanggal" value={tanggalMulai} onChange={e => setTanggalMulai(e.target.value)} className="mt-1 block w-full bg-zinc-800 rounded-md py-2 px-3 text-dark" />
+                            </div>
+                             <div className="md:col-span-2 lg:col-span-3">
+                                <label className="block text-sm font-medium text-gray-text">Metode Perhitungan</label>
+                                <div className="mt-2 flex items-center space-x-6 bg-zinc-800 p-2 rounded-lg">
+                                    <label className={`flex-1 text-center py-1.5 rounded-md text-sm cursor-pointer transition-colors font-semibold ${metodePerhitungan === 'plat_total' ? 'text-primary' : 'text-gray-text'}`}>
+                                        <input type="radio" name="metode" value="plat_total" checked={metodePerhitungan === 'plat_total'} onChange={() => { setMetodePerhitungan('plat_total'); setSimulasi(null); }} className="sr-only"/>
+                                        Plat Total Angsuran
+                                    </label>
+                                    <label className={`flex-1 text-center py-1.5 rounded-md text-sm cursor-pointer transition-colors font-semibold ${metodePerhitungan === 'plat_pokok' ? 'text-primary' : 'text-gray-text'}`}>
+                                        <input type="radio" name="metode" value="plat_pokok" checked={metodePerhitungan === 'plat_pokok'} onChange={() => { setMetodePerhitungan('plat_pokok'); setSimulasi(null); }} className="sr-only"/>
+                                        Plat Pokok Angsuran
+                                    </label>
+                                </div>
+                            </div>
+                            <div className="md:col-span-2 lg:col-span-4">
+                                <button type="submit" className="w-full bg-primary text-black py-2.5 px-4 rounded-lg font-semibold hover:bg-primary-dark">Hitung Simulasi</button>
                             </div>
                         </form>
                         {simulasi && (
@@ -278,7 +391,7 @@ const AnggotaPinjaman: React.FC = () => {
                         </div>
                         )}
                     </div>
-                ) : (
+                ) : activeTab === 'khusus' ? (
                     <div className="p-6">
                          <form onSubmit={handleAjukanPinjamanKhusus} className="space-y-4">
                              <div>
@@ -296,6 +409,30 @@ const AnggotaPinjaman: React.FC = () => {
                              </div>
                          </form>
                     </div>
+                ) : ( // Pelunasan Tab
+                     <div className="p-6">
+                        <h3 className="text-lg font-bold text-dark mb-4">Simulasi Pelunasan Pinjaman Berjangka</h3>
+                        {sisaPokokPinjaman > 0 ? (
+                            <div className="space-y-4">
+                                <div className="bg-zinc-800 p-4 rounded-lg">
+                                    <InfoItem label="Sisa Pokok Pinjaman" value={formatCurrency(sisaPokokPinjaman)} />
+                                    <InfoItem label={`Bunga Bulan Ini (${sukuBunga}%)`} value={formatCurrency(bungaBulanIni)} />
+                                    <InfoItem 
+                                        label="Total yang Harus Dibayar" 
+                                        value={formatCurrency(totalPelunasan)}
+                                        className="font-bold text-base md:text-lg bg-amber-500/10 text-amber-400 -mx-4 px-4"
+                                    />
+                                </div>
+                                <p className="text-sm text-gray-text text-center italic">
+                                    Ini adalah simulasi pelunasan untuk bulan ini. Hubungi admin untuk konfirmasi jumlah akhir dan proses pelunasan.
+                                </p>
+                            </div>
+                        ) : (
+                            <div className="text-center py-8 text-gray-text">
+                                <p>Anda tidak memiliki pinjaman berjangka aktif untuk dilunasi.</p>
+                            </div>
+                        )}
+                    </div>
                 )}
                  {submitMessage.text && (
                     <p className={`pb-4 text-center text-sm font-semibold ${submitMessage.type === 'success' ? 'text-green-400' : 'text-red-400'}`}>
@@ -311,13 +448,22 @@ const AnggotaPinjaman: React.FC = () => {
                              </div>
                              <div>
                                 <h3 className="font-bold text-base md:text-lg text-dark mb-2">Informasi Angsuran Anda</h3>
-                                <div className="bg-zinc-800 p-4 rounded-lg"><InfoItem label="Angsuran Pokok / Bulan" value={formatCurrency(simulasi.angsuranPokokBulan)} /><InfoItem label="Total Bunga" value={formatCurrency(simulasi.totalBunga)} /><InfoItem label="Total yang Dibayarkan" value={formatCurrency(simulasi.totalBayar)} className="font-bold text-base md:text-lg bg-amber-500/10 text-amber-400 -mx-4 px-4" /><InfoItem label="Tanggal Lunas" value={formatDate(simulasi.tanggalLunas)} /></div>
+                                <div className="bg-zinc-800 p-4 rounded-lg">
+                                    <InfoItem label="Metode" value={simulasi.metode_perhitungan} />
+                                    {simulasi.metode_perhitungan === 'Plat Pokok' ? 
+                                        <InfoItem label="Angsuran Pokok / Bulan" value={formatCurrency(simulasi.angsuranPokokBulan)} /> :
+                                        <InfoItem label="Total Angsuran / Bulan" value={formatCurrency(simulasi.jadwal[0]?.totalAngsuran)} />
+                                    }
+                                    <InfoItem label="Total Bunga" value={formatCurrency(simulasi.totalBunga)} />
+                                    <InfoItem label="Total yang Dibayarkan" value={formatCurrency(simulasi.totalBayar)} className="font-bold text-base md:text-lg bg-amber-500/10 text-amber-400 -mx-4 px-4" />
+                                    <InfoItem label="Tanggal Lunas" value={formatDate(simulasi.tanggalLunas)} />
+                                </div>
                              </div>
                         </div>
                         <div className="mt-8 overflow-x-auto">
-                             <h3 className="font-bold text-base md:text-lg text-dark mb-4">Tabel Angsuran Kredit Anda</h3>
+                             <h3 className="font-bold text-base md:text-lg text-dark mb-4">Tabel Angsuran Kredit Anda (IDR)</h3>
                             <table className="w-full text-sm text-left text-gray-text">
-                                <thead className="text-xs text-gray-text uppercase border-b border-zinc-800"><tr><th className="px-4 py-3">#</th><th className="px-4 py-3">Tanggal</th><th className="px-4 py-3 text-right">Angsuran Pokok</th><th className="px-4 py-3 text-right">Angsuran Bunga</th><th className="px-4 py-3 text-right">Total Angsuran</th><th className="px-4 py-3 text-right">Saldo Pinjaman</th></tr></thead>
+                                <thead className="text-xs text-gray-text uppercase border-b border-zinc-800"><tr><th className="px-4 py-3">#</th><th className="px-4 py-3">Tanggal</th><th className="px-4 py-3 text-right">Angsuran Pokok</th><th className="px-4 py-3 text-right">Angsuran Bunga</th><th className="px-4 py-3 text-right">Total Angsuran/Bln</th><th className="px-4 py-3 text-right">Saldo Pinjaman</th></tr></thead>
                                 <tbody>
                                     {simulasi.jadwal.map(row => (<tr key={row.bulan} className="hover:bg-zinc-800/50"><td className="px-4 py-3 font-medium text-dark">{row.bulan}</td><td className="px-4 py-3">{formatDate(row.tanggal)}</td><td className="px-4 py-3 text-right">{formatCurrency(row.angsuranPokok)}</td><td className="px-4 py-3 text-right">{formatCurrency(row.angsuranBunga)}</td><td className="px-4 py-3 text-right font-semibold">{formatCurrency(row.totalAngsuran)}</td><td className="px-4 py-3 text-right font-bold text-dark">{formatCurrency(row.sisaPinjaman)}</td></tr>))}
                                 </tbody>

@@ -16,7 +16,11 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
       <div className="flex justify-between items-center">
         <h1 className="text-lg sm:text-xl font-bold text-dark">{title}</h1>
         <div className="flex items-center space-x-3 text-gray-text">
-          <UserCircleIcon className="w-8 h-8 text-zinc-400" />
+          {user?.photoURL ? (
+              <img src={user.photoURL} alt="Profil" className="w-8 h-8 rounded-full object-cover" />
+          ) : (
+              <UserCircleIcon className="w-8 h-8 text-zinc-400" />
+          )}
           <span className="font-medium">{user?.name}</span>
         </div>
       </div>

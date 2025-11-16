@@ -75,7 +75,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar, isMobileO
               icon: <CogIcon />,
               children: [
                 { to: '/admin/pengaturan-admin', label: 'Akun Admin', icon: <UsersIcon className="w-5 h-5"/> },
-                { to: '/admin/pengaturan-kewajiban', label: 'Kewajiban Anggota', icon: <CreditCardIcon className="w-5 h-5"/> }
+                { to: '/admin/pengaturan-kewajiban', label: 'Kewajiban Anggota', icon: <CreditCardIcon className="w-5 h-5"/> },
+                { to: '/admin/pengaturan-pinjaman', label: 'Suku Bunga Pinjaman', icon: <ReceiptPercentIcon className="w-5 h-5"/> }
               ]
             });
         }

@@ -10,6 +10,7 @@ export interface User {
   email: string;
   role: UserRole;
   anggotaId?: string; // To link session with Anggota document
+  photoURL?: string;
 }
 
 export interface AdminUser {
@@ -33,6 +34,7 @@ export interface Anggota {
   email?: string;
   tanggal_bergabung?: string;
   status: 'Aktif' | 'Tidak Aktif';
+  photoURL?: string;
 }
 
 export interface Transaction {
@@ -137,6 +139,7 @@ export interface PengajuanPinjaman {
   total_bayar?: number;
   jadwal_angsuran?: Array<any>;
   jenis_pinjaman: 'Berjangka' | 'Khusus';
+  metode_perhitungan?: 'Plat Pokok' | 'Plat Total';
   keterangan?: string;
   catatan_admin?: string;
 }
@@ -147,4 +150,8 @@ export interface Pengumuman {
   isi: string;
   tanggal: string; // ISO String
   penulis: string;
+}
+
+export interface PengaturanPinjaman {
+  sukuBunga: number; // Disimpan sebagai persen, misal 2 untuk 2%
 }

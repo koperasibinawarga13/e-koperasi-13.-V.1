@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../../components/Header';
 import { useAuth } from '../../context/AuthContext';
-import { UserCircleIcon } from '../../components/icons/Icons';
+import { UserCircleIcon, PencilIcon } from '../../components/icons/Icons';
 import { Anggota } from '../../types';
 import { getAnggotaById, updateAnggota, updateAnggotaPassword } from '../../services/anggotaService';
 
@@ -27,7 +27,7 @@ const EditableField: React.FC<{
 );
 
 const AnggotaProfil: React.FC = () => {
-  const { user } = useAuth();
+  const { user, updateAuthUser } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [profileData, setProfileData] = useState<Anggota | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -45,6 +45,10 @@ const AnggotaProfil: React.FC = () => {
   });
   const [isSavingPassword, setIsSavingPassword] = useState(false);
   const [passwordMessage, setPasswordMessage] = useState<{type: 'success' | 'error', text: string} | null>(null);
+    
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
       const fetchProfile = async () => {
@@ -109,6 +113,74 @@ const AnggotaProfil: React.FC = () => {
     }
   };
 
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const MAX_WIDTH = 256;
+            const MAX_HEIGHT = 256;
+            let width = img.width;
+            let height = img.height;
+
+            if (width > height) {
+                if (width > MAX_WIDTH) {
+                    height *= MAX_WIDTH / width;
+                    width = MAX_WIDTH;
+                }
+            } else {
+                if (height > MAX_HEIGHT) {
+                    width *= MAX_HEIGHT / height;
+                    height = MAX_HEIGHT;
+                }
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx?.drawImage(img, 0, 0, width, height);
+            
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+            setImagePreview(dataUrl);
+        };
+        img.src = event.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+};
+
+const handleCancelPhoto = () => {
+    setImagePreview(null);
+    if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+    }
+};
+
+const handleSavePhoto = async () => {
+    if (!profileData || !imagePreview) return;
+    
+    setIsUploading(true);
+    try {
+        const updatedProfile = { ...profileData, photoURL: imagePreview };
+        await updateAnggota(updatedProfile);
+        setProfileData(updatedProfile);
+        if (user) {
+            updateAuthUser({ photoURL: imagePreview });
+        }
+        setImagePreview(null);
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+        }
+    } catch (error) {
+        console.error("Gagal mengunggah foto", error);
+    } finally {
+        setIsUploading(false);
+    }
+};
+
   const ProfileInfoRow: React.FC<{ label: string; value: string | undefined | null; fullWidth?: boolean }> = ({ label, value, fullWidth = false }) => (
     <div className={`py-3 sm:grid sm:grid-cols-3 sm:gap-4 ${fullWidth ? 'sm:col-span-2' : ''}`}>
         <dt className="text-sm font-medium text-gray-text">{label}</dt>
@@ -129,11 +201,55 @@ const AnggotaProfil: React.FC = () => {
       <Header title="Profil Anggota" />
       <div className="bg-surface p-6 rounded-xl">
         <div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6 pb-6 mb-6">
-          <UserCircleIcon className="w-24 h-24 text-zinc-400 flex-shrink-0" />
-          <div className="text-center sm:text-left">
-            <h2 className="text-xl sm:text-2xl font-bold text-dark">{profileData.nama}</h2>
-            <p className="text-gray-text">No. Anggota: {profileData.no_anggota}</p>
-          </div>
+            <div className="relative flex-shrink-0">
+                {imagePreview || profileData.photoURL ? (
+                    <img 
+                        src={imagePreview || profileData.photoURL}
+                        alt="Foto Profil" 
+                        className="w-24 h-24 rounded-full object-cover border-2 border-zinc-700"
+                    />
+                ) : (
+                    <UserCircleIcon className="w-24 h-24 text-zinc-400" />
+                )}
+                {!imagePreview && (
+                    <button
+                        onClick={() => fileInputRef.current?.click()}
+                        className="absolute bottom-0 right-0 bg-primary text-black p-2 rounded-full hover:bg-primary-dark transition-colors"
+                        title="Ubah foto profil"
+                    >
+                        <PencilIcon className="w-4 h-4" />
+                    </button>
+                )}
+                <input 
+                    type="file" 
+                    ref={fileInputRef} 
+                    onChange={handleImageSelect}
+                    className="hidden" 
+                    accept="image/png, image/jpeg"
+                />
+            </div>
+            
+            <div className="text-center sm:text-left flex-grow">
+                <h2 className="text-xl sm:text-2xl font-bold text-dark">{profileData.nama}</h2>
+                <p className="text-gray-text">No. Anggota: {profileData.no_anggota}</p>
+                {imagePreview && (
+                    <div className="mt-4 flex justify-center sm:justify-start gap-3">
+                        <button 
+                            onClick={handleSavePhoto}
+                            disabled={isUploading}
+                            className="bg-secondary text-white px-4 py-1.5 rounded-lg text-sm font-semibold hover:bg-secondary-dark disabled:bg-zinc-600"
+                        >
+                            {isUploading ? 'Menyimpan...' : 'Simpan Foto'}
+                        </button>
+                         <button 
+                            onClick={handleCancelPhoto}
+                            className="bg-zinc-700 text-dark px-4 py-1.5 rounded-lg text-sm font-semibold hover:bg-zinc-600"
+                        >
+                            Batal
+                        </button>
+                    </div>
+                )}
+            </div>
         </div>
         
         {isEditing ? (
