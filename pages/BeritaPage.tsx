@@ -52,7 +52,7 @@ const BeritaPage: React.FC = () => {
 
             <main className="container mx-auto p-4 md:p-8">
                 {isLoading ? (
-                    <p className="text-center text-gray-500 py-10">Memuat pengumuman...</p>
+                    <p className="text-center text-gray-400 py-10">Memuat pengumuman...</p>
                 ) : pengumumanList.length > 0 ? (
                     <div className="space-y-6">
                         {pengumumanList.map((item) => {
@@ -60,18 +60,18 @@ const BeritaPage: React.FC = () => {
                             const isExpanded = !!expanded[item.id];
 
                             return (
-                                <div key={item.id} className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden animate-fade-in-up">
+                                <div key={item.id} className="bg-surface rounded-xl border border-gray-700 overflow-hidden animate-fade-in-up">
                                     <div className="p-6">
                                         <h2 className="text-xl md:text-2xl font-bold text-dark mb-2">{item.judul}</h2>
-                                        <div className="flex items-center text-xs text-gray-500 mb-4">
+                                        <div className="flex items-center text-xs text-gray-400 mb-4">
                                             <span>Diterbitkan oleh {item.penulis}</span>
                                             <span className="mx-2">&bull;</span>
                                             <span>{formatDate(item.tanggal)}</span>
                                         </div>
-                                        <div className={`prose max-w-none text-gray-700 leading-relaxed transition-all duration-300 ${isLong && !isExpanded ? 'max-h-48 overflow-hidden relative' : ''}`}>
+                                        <div className={`prose max-w-none text-gray-300 leading-relaxed transition-all duration-300 ${isLong && !isExpanded ? 'max-h-48 overflow-hidden relative' : ''}`}>
                                             <div dangerouslySetInnerHTML={{ __html: item.isi }} />
                                             {isLong && !isExpanded && (
-                                                <div className="absolute bottom-0 left-0 w-full h-16 bg-gradient-to-t from-white to-transparent"></div>
+                                                <div className="absolute bottom-0 left-0 w-full h-16 bg-gradient-to-t from-surface to-transparent"></div>
                                             )}
                                         </div>
                                          {isLong && (
@@ -88,8 +88,8 @@ const BeritaPage: React.FC = () => {
                     </div>
                 ) : (
                     <div className="text-center py-20">
-                        <h2 className="text-2xl font-bold text-gray-700">Belum Ada Pengumuman</h2>
-                        <p className="text-gray-500 mt-2">Saat ini belum ada berita atau pengumuman yang diterbitkan.</p>
+                        <h2 className="text-2xl font-bold text-gray-300">Belum Ada Pengumuman</h2>
+                        <p className="text-gray-400 mt-2">Saat ini belum ada berita atau pengumuman yang diterbitkan.</p>
                     </div>
                 )}
             </main>
@@ -97,7 +97,9 @@ const BeritaPage: React.FC = () => {
                 .prose ul { list-style-type: disc; margin-left: 1.5rem; }
                 .prose ol { list-style-type: decimal; margin-left: 1.5rem; }
                 .prose li { margin-bottom: 0.25rem; }
-                .prose p { margin-bottom: 1em; margin-top: 1em; }
+                .prose p { margin-bottom: 1em; margin-top: 1em; color: #d1d5db; } /* gray-300 */
+                .prose h1, .prose h2, .prose h3, .prose strong { color: #f9fafb; } /* gray-50 */
+                .prose a { color: #60a5fa; } /* blue-400 */
                 .prose img { 
                     border-radius: 0.5rem; 
                     margin-top: 1em; 

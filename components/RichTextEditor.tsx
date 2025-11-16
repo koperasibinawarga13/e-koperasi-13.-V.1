@@ -115,15 +115,15 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange }) => {
             type="button"
             onMouseDown={onClick} // use onMouseDown to prevent losing focus on editor
             title={title}
-            className="p-2 rounded text-gray-600 hover:bg-gray-200 hover:text-dark focus:outline-none focus:ring-2 focus:ring-primary"
+            className="p-2 rounded text-gray-300 hover:bg-gray-600 hover:text-dark focus:outline-none focus:ring-2 focus:ring-primary"
         >
             {children}
         </button>
     );
 
     return (
-        <div className="border border-gray-300 rounded-md shadow-sm">
-            <div className="flex items-center flex-wrap gap-1 p-2 border-b bg-gray-50 rounded-t-md">
+        <div className="border border-gray-600 rounded-md">
+            <div className="flex items-center flex-wrap gap-1 p-2 border-b border-gray-600 bg-gray-700 rounded-t-md">
                 <ToolbarButton onClick={(e) => handleFormat(e, 'bold')} title="Bold">
                     <BoldIcon />
                 </ToolbarButton>
@@ -133,30 +133,30 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange }) => {
                 <ToolbarButton onClick={(e) => handleFormat(e, 'underline')} title="Underline">
                     <UnderlineIcon />
                 </ToolbarButton>
-                <div className="w-px h-6 bg-gray-300 mx-2"></div>
+                <div className="w-px h-6 bg-gray-500 mx-2"></div>
                 <ToolbarButton onClick={(e) => handleFormat(e, 'insertUnorderedList')} title="Bullet List">
                     <ListBulletIcon />
                 </ToolbarButton>
                 <ToolbarButton onClick={(e) => handleFormat(e, 'insertOrderedList')} title="Numbered List">
                     <ListOrderedIcon />
                 </ToolbarButton>
-                <div className="w-px h-6 bg-gray-300 mx-2"></div>
+                <div className="w-px h-6 bg-gray-500 mx-2"></div>
                 <ToolbarButton onClick={handleImageButtonClick} title="Sisipkan Gambar">
                     <ImageIcon />
                 </ToolbarButton>
                 
                 {selectedImage && (
                     <>
-                        <div className="w-px h-6 bg-gray-300 mx-2"></div>
-                        <span className="text-xs font-semibold text-gray-500 mr-2">Gambar:</span>
+                        <div className="w-px h-6 bg-gray-500 mx-2"></div>
+                        <span className="text-xs font-semibold text-gray-400 mr-2">Gambar:</span>
                         <ToolbarButton onClick={() => handleImageStyle({ float: 'left' })} title="Rata Kiri"><AlignLeftIcon /></ToolbarButton>
                         <ToolbarButton onClick={() => handleImageStyle({ display: 'block' })} title="Rata Tengah"><AlignCenterIcon /></ToolbarButton>
                         <ToolbarButton onClick={() => handleImageStyle({ float: 'right' })} title="Rata Kanan"><AlignRightIcon /></ToolbarButton>
-                        <div className="w-px h-6 bg-gray-300 mx-2"></div>
-                         <button onClick={() => handleImageStyle({ width: '25%' })} className="text-xs px-2 py-1 rounded hover:bg-gray-200">25%</button>
-                         <button onClick={() => handleImageStyle({ width: '50%' })} className="text-xs px-2 py-1 rounded hover:bg-gray-200">50%</button>
-                         <button onClick={() => handleImageStyle({ width: '75%' })} className="text-xs px-2 py-1 rounded hover:bg-gray-200">75%</button>
-                         <button onClick={() => handleImageStyle({ width: '100%' })} className="text-xs px-2 py-1 rounded hover:bg-gray-200">100%</button>
+                        <div className="w-px h-6 bg-gray-500 mx-2"></div>
+                         <button onClick={() => handleImageStyle({ width: '25%' })} className="text-xs px-2 py-1 rounded hover:bg-gray-600 text-gray-300">25%</button>
+                         <button onClick={() => handleImageStyle({ width: '50%' })} className="text-xs px-2 py-1 rounded hover:bg-gray-600 text-gray-300">50%</button>
+                         <button onClick={() => handleImageStyle({ width: '75%' })} className="text-xs px-2 py-1 rounded hover:bg-gray-600 text-gray-300">75%</button>
+                         <button onClick={() => handleImageStyle({ width: '100%' })} className="text-xs px-2 py-1 rounded hover:bg-gray-600 text-gray-300">100%</button>
                     </>
                 )}
             </div>
@@ -170,7 +170,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange }) => {
                         setSelectedImage(selection.anchorNode as HTMLImageElement);
                      }
                 }}
-                className="prose min-h-[200px] w-full max-w-none p-3 focus:outline-none"
+                className="prose min-h-[200px] w-full max-w-none p-3 focus:outline-none text-dark"
             />
             <input
                 type="file"
@@ -179,6 +179,12 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange }) => {
                 accept="image/png, image/jpeg, image/gif"
                 style={{ display: 'none' }}
             />
+             <style>{`
+                .prose p { color: #d1d5db; } /* gray-300 */
+                .prose h1, .prose h2, .prose h3, .prose strong { color: #f9fafb; } /* gray-50 */
+                .prose a { color: #60a5fa; } /* blue-400 */
+                .prose ul, .prose ol { color: #d1d5db; }
+            `}</style>
         </div>
     );
 };

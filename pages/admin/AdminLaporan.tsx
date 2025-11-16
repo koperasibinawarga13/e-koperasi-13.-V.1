@@ -201,7 +201,7 @@ const AdminLaporan: React.FC = () => {
 
     const CurrencyCell: React.FC<{ amount: number; defaultColor?: string; className?: string }> = ({ amount, defaultColor = 'text-dark', className = '' }) => {
         const isNegative = amount < 0;
-        const colorClass = isNegative ? 'text-red-600' : defaultColor;
+        const colorClass = isNegative ? 'text-red-400' : defaultColor;
         return (
             <td className={`px-4 py-4 sm:px-6 text-right ${colorClass} ${className}`}>
                 {formatCurrency(amount)}
@@ -226,25 +226,25 @@ const AdminLaporan: React.FC = () => {
             <Header title="Laporan Keuangan" />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                <StatCard title="Total Simpanan Keseluruhan" value={formatCurrency(summaryData.totalSimpanan)} icon={<CreditCardIcon className="w-6 h-6 text-white" />} color="bg-green-500" />
-                <StatCard title="Total Pinjaman Keseluruhan" value={formatCurrency(summaryData.totalPinjaman)} icon={<ChartBarIcon className="w-6 h-6 text-white" />} color="bg-yellow-500" />
+                <StatCard title="Total Simpanan Keseluruhan" value={formatCurrency(summaryData.totalSimpanan)} icon={<CreditCardIcon className="w-6 h-6" />} color="bg-green-500" />
+                <StatCard title="Total Pinjaman Keseluruhan" value={formatCurrency(summaryData.totalPinjaman)} icon={<ChartBarIcon className="w-6 h-6" />} color="bg-yellow-500" />
             </div>
 
-            <div className="bg-white p-6 rounded-xl border border-gray-200">
+            <div className="bg-surface p-6 rounded-xl border border-gray-700">
                 <div className="flex flex-wrap justify-between items-center mb-6 gap-4">
                     <h2 className="text-lg md:text-xl font-bold text-dark">Rincian Keuangan Anggota</h2>
                     <div className="flex flex-wrap items-center gap-4">
                         <input
                             type="text"
                             placeholder="Cari (nama, no. anggota)..."
-                            className="border border-gray-300 rounded-lg px-4 py-2 w-full sm:w-auto focus:ring-1 focus:ring-primary focus:border-primary"
+                            className="bg-gray-800 border border-gray-600 rounded-lg px-4 py-2 w-full sm:w-auto focus:ring-1 focus:ring-primary focus:border-primary"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                          <select
                             value={sortOption}
                             onChange={(e) => setSortOption(e.target.value)}
-                            className="border border-gray-300 rounded-lg px-4 py-2 w-full sm:w-auto focus:ring-1 focus:ring-primary focus:border-primary bg-surface"
+                            className="bg-gray-800 border border-gray-600 rounded-lg px-4 py-2 w-full sm:w-auto focus:ring-1 focus:ring-primary focus:border-primary"
                         >
                             <option value="no_anggota_asc">Urutkan No. Anggota (A-Z)</option>
                             <option value="no_anggota_desc">Urutkan No. Anggota (Z-A)</option>
@@ -258,7 +258,7 @@ const AdminLaporan: React.FC = () => {
                         <select
                             value={selectedMonth}
                             onChange={(e) => setSelectedMonth(e.target.value)}
-                            className="border border-gray-300 rounded-lg px-4 py-2 w-full sm:w-auto focus:ring-1 focus:ring-primary focus:border-primary bg-surface"
+                            className="bg-gray-800 border border-gray-600 rounded-lg px-4 py-2 w-full sm:w-auto focus:ring-1 focus:ring-primary focus:border-primary"
                             disabled={isLoading}
                         >
                              {availableMonths.length > 0 ? availableMonths.map(renderMonthOption) : <option>Memuat...</option>}
@@ -275,20 +275,20 @@ const AdminLaporan: React.FC = () => {
                 </div>
                 <div className="overflow-x-auto">
                     {isLoading ? <p>Memuat data laporan...</p> : (
-                        <table className="w-full text-sm text-left text-gray-600">
-                            <thead className="text-xs text-gray-500 uppercase">
+                        <table className="w-full text-sm text-left text-gray-400">
+                            <thead className="text-xs text-gray-400 uppercase">
                                 <tr>
-                                    <th scope="col" className="px-4 py-4 sm:px-6 font-semibold border-b-2 border-gray-200">No. Anggota</th>
-                                    <th scope="col" className="px-4 py-4 sm:px-6 font-semibold border-b-2 border-gray-200">Nama</th>
-                                    <th scope="col" className="px-4 py-4 sm:px-6 font-semibold border-b-2 border-gray-200 text-right">Simpanan Pokok</th>
-                                    <th scope="col" className="px-4 py-4 sm:px-6 font-semibold border-b-2 border-gray-200 text-right">Simpanan Wajib</th>
-                                    <th scope="col" className="px-4 py-4 sm:px-6 font-semibold border-b-2 border-gray-200 text-right">Total Simpanan</th>
-                                    <th scope="col" className="px-4 py-4 sm:px-6 font-semibold border-b-2 border-gray-200 text-right">Total Pinjaman</th>
+                                    <th scope="col" className="px-4 py-4 sm:px-6 font-semibold border-b-2 border-gray-700">No. Anggota</th>
+                                    <th scope="col" className="px-4 py-4 sm:px-6 font-semibold border-b-2 border-gray-700">Nama</th>
+                                    <th scope="col" className="px-4 py-4 sm:px-6 font-semibold border-b-2 border-gray-700 text-right">Simpanan Pokok</th>
+                                    <th scope="col" className="px-4 py-4 sm:px-6 font-semibold border-b-2 border-gray-700 text-right">Simpanan Wajib</th>
+                                    <th scope="col" className="px-4 py-4 sm:px-6 font-semibold border-b-2 border-gray-700 text-right">Total Simpanan</th>
+                                    <th scope="col" className="px-4 py-4 sm:px-6 font-semibold border-b-2 border-gray-700 text-right">Total Pinjaman</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-gray-100">
+                            <tbody className="divide-y divide-gray-700">
                                 {filteredKeuangan.length > 0 ? filteredKeuangan.map((item) => (
-                                    <tr key={item.no_anggota} className="hover:bg-primary-light transition-colors">
+                                    <tr key={item.no_anggota} className="hover:bg-primary/20 transition-colors">
                                         <td className="px-4 py-4 sm:px-6 font-medium text-dark">
                                             <Link to={`/admin/keuangan/${item.no_anggota}`} className="text-primary hover:underline">
                                                 {item.no_anggota}
@@ -297,12 +297,12 @@ const AdminLaporan: React.FC = () => {
                                         <td className="px-4 py-4 sm:px-6">{item.nama_angota}</td>
                                         <CurrencyCell amount={item.akhir_simpanan_pokok} />
                                         <CurrencyCell amount={item.akhir_simpanan_wajib} />
-                                        <CurrencyCell amount={item.jumlah_total_simpanan} defaultColor="text-green-600" className="font-semibold" />
-                                        <CurrencyCell amount={item.jumlah_total_pinjaman} defaultColor="text-yellow-600" className="font-semibold" />
+                                        <CurrencyCell amount={item.jumlah_total_simpanan} defaultColor="text-green-400" className="font-semibold" />
+                                        <CurrencyCell amount={item.jumlah_total_pinjaman} defaultColor="text-yellow-400" className="font-semibold" />
                                     </tr>
                                 )) : (
                                     <tr>
-                                        <td colSpan={6} className="text-center py-10 text-gray-500">
+                                        <td colSpan={6} className="text-center py-10 text-gray-400">
                                             Tidak ada data keuangan yang cocok dengan pencarian Anda.
                                         </td>
                                     </tr>

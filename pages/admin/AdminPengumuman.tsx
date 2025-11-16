@@ -76,7 +76,7 @@ const AdminPengumuman: React.FC = () => {
     return (
         <div>
             <Header title="Kelola Pengumuman & Berita Produk" />
-            <div className="bg-white p-6 rounded-xl border border-gray-200">
+            <div className="bg-surface p-6 rounded-xl border border-gray-700">
                 <div className="flex justify-end mb-6">
                     <button onClick={() => openModal()} className="bg-primary text-white px-4 py-2 rounded-lg font-semibold hover:bg-primary-dark transition-colors flex items-center gap-2">
                         <PlusIcon className="w-5 h-5" />
@@ -84,25 +84,25 @@ const AdminPengumuman: React.FC = () => {
                     </button>
                 </div>
                 <div className="overflow-x-auto">
-                    {isLoading ? <p>Memuat data pengumuman...</p> : (
-                        <table className="w-full text-sm text-left text-gray-600">
-                            <thead className="text-xs text-gray-500 uppercase">
+                    {isLoading ? <p className="text-gray-400">Memuat data pengumuman...</p> : (
+                        <table className="w-full text-sm text-left text-gray-400">
+                            <thead className="text-xs text-gray-400 uppercase">
                                 <tr>
-                                    <th className="px-6 py-3">Judul</th>
-                                    <th className="px-6 py-3">Tanggal Terbit</th>
-                                    <th className="px-6 py-3">Penulis</th>
-                                    <th className="px-6 py-3">Aksi</th>
+                                    <th className="px-6 py-3 border-b-2 border-gray-700">Judul</th>
+                                    <th className="px-6 py-3 border-b-2 border-gray-700">Tanggal Terbit</th>
+                                    <th className="px-6 py-3 border-b-2 border-gray-700">Penulis</th>
+                                    <th className="px-6 py-3 border-b-2 border-gray-700">Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody className="divide-y divide-gray-700">
                                 {pengumumanList.map((item) => (
-                                    <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
-                                        <td className="px-6 py-4 font-medium text-gray-900">{item.judul}</td>
+                                    <tr key={item.id} className="hover:bg-gray-600">
+                                        <td className="px-6 py-4 font-medium text-dark">{item.judul}</td>
                                         <td className="px-6 py-4">{new Date(item.tanggal).toLocaleDateString('id-ID')}</td>
                                         <td className="px-6 py-4">{item.penulis}</td>
                                         <td className="px-6 py-4 flex gap-4">
-                                            <button onClick={() => openModal(item)} className="text-blue-600 hover:text-blue-800"><PencilIcon className="w-5 h-5"/></button>
-                                            <button onClick={() => handleDelete(item.id)} className="text-red-600 hover:text-red-800"><TrashIcon className="w-5 h-5"/></button>
+                                            <button onClick={() => openModal(item)} className="text-blue-400 hover:text-blue-300"><PencilIcon className="w-5 h-5"/></button>
+                                            <button onClick={() => handleDelete(item.id)} className="text-red-400 hover:text-red-300"><TrashIcon className="w-5 h-5"/></button>
                                         </td>
                                     </tr>
                                 ))}
@@ -115,25 +115,25 @@ const AdminPengumuman: React.FC = () => {
             <Modal isOpen={isModalOpen} onClose={closeModal} title={selectedPengumuman ? 'Edit Konten' : 'Buat Konten Baru'}>
                 <form onSubmit={handleSave} className="space-y-4">
                     <div>
-                        <label htmlFor="judul" className="block text-sm font-medium text-gray-700">Judul</label>
+                        <label htmlFor="judul" className="block text-sm font-medium text-gray-300">Judul</label>
                         <input
                             id="judul"
                             type="text"
                             value={formData.judul}
                             onChange={(e) => setFormData({ ...formData, judul: e.target.value })}
                             required
-                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3"
+                            className="mt-1 block w-full bg-gray-800 border border-gray-600 rounded-md py-2 px-3 text-dark"
                         />
                     </div>
                     <div>
-                        <label htmlFor="isi" className="block text-sm font-medium text-gray-700">Isi Konten</label>
+                        <label htmlFor="isi" className="block text-sm font-medium text-gray-300">Isi Konten</label>
                         <RichTextEditor
                             value={formData.isi}
                             onChange={(html) => setFormData({ ...formData, isi: html })}
                         />
                     </div>
                     <div className="flex justify-end gap-4 pt-4">
-                         <button type="button" onClick={closeModal} className="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg font-semibold hover:bg-gray-300">
+                         <button type="button" onClick={closeModal} className="bg-gray-600 text-gray-200 px-4 py-2 rounded-lg font-semibold hover:bg-gray-500">
                             Batal
                         </button>
                         <button type="submit" className="bg-primary text-white px-4 py-2 rounded-lg font-semibold hover:bg-primary-dark">

@@ -17,7 +17,7 @@ const FormField: React.FC<{
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }> = ({ label, name, value, onChange }) => (
     <div>
-        <label htmlFor={name} className="block text-sm font-medium text-gray-700">{label}</label>
+        <label htmlFor={name} className="block text-sm font-medium text-gray-300">{label}</label>
         <input
             type="text"
             inputMode="numeric"
@@ -25,7 +25,7 @@ const FormField: React.FC<{
             name={name}
             value={value === 0 ? '' : new Intl.NumberFormat('id-ID').format(value)}
             onChange={onChange}
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary text-right"
+            className="mt-1 block w-full bg-gray-800 border border-gray-600 rounded-md py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary text-right text-dark"
             placeholder="0"
         />
     </div>
@@ -74,7 +74,7 @@ const AdminPengaturanKewajiban: React.FC = () => {
         return (
             <div>
                 <Header title="Pengaturan Kewajiban Anggota Baru" />
-                <p className="text-center p-10">Memuat pengaturan...</p>
+                <p className="text-center p-10 text-gray-400">Memuat pengaturan...</p>
             </div>
         );
     }
@@ -82,14 +82,14 @@ const AdminPengaturanKewajiban: React.FC = () => {
     return (
         <div>
             <Header title="Pengaturan Kewajiban Anggota Baru" />
-            <div className="bg-white p-6 rounded-xl shadow-md max-w-2xl mx-auto">
+            <div className="bg-surface p-6 rounded-xl border border-gray-700 max-w-2xl mx-auto">
                 <form onSubmit={handleSave} className="space-y-6">
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-gray-400">
                         Ubah nilai-nilai di bawah ini untuk memperbarui informasi yang ditampilkan pada halaman pendaftaran anggota baru.
                     </p>
                     
                      {message && (
-                        <div className={`p-3 rounded-md text-sm ${message.type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                        <div className={`p-3 rounded-md text-sm ${message.type === 'success' ? 'bg-green-900/50 text-green-300' : 'bg-red-900/50 text-red-300'}`}>
                             {message.text}
                         </div>
                     )}

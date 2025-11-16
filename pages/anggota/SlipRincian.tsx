@@ -41,13 +41,13 @@ const SlipRincian: React.FC = () => {
     };
 
     if (isLoading) {
-        return <div className="flex justify-center items-center h-screen">Memuat slip...</div>;
+        return <div className="flex justify-center items-center h-screen text-dark">Memuat slip...</div>;
     }
 
     if (!keuangan || !anggota) {
         return (
-            <div className="p-8 text-center">
-                <h2 className="text-xl font-bold text-red-600">Gagal Memuat Data</h2>
+            <div className="p-8 text-center text-dark">
+                <h2 className="text-xl font-bold text-red-400">Gagal Memuat Data</h2>
                 <p>Data keuangan atau anggota tidak ditemukan.</p>
                 <button onClick={() => navigate(-1)} className="mt-4 inline-flex items-center gap-2 text-primary hover:underline">
                     <ChevronLeftIcon className="w-4 h-4" />
@@ -77,7 +77,7 @@ const SlipRincian: React.FC = () => {
                 <span className="text-gray-700 mr-2">- {label}</span>
                 <div className="flex items-baseline flex-shrink-0">
                     <span className="text-gray-500 mr-1">Rp</span>
-                    <span className={`text-right w-24 font-semibold ${isNegative ? 'text-red-600' : 'text-dark'}`}>{formattedValue}</span>
+                    <span className={`text-right w-24 font-semibold ${isNegative ? 'text-red-600' : 'text-gray-800'}`}>{formattedValue}</span>
                 </div>
             </div>
         );
@@ -102,11 +102,11 @@ const SlipRincian: React.FC = () => {
         <div className="bg-background min-h-screen font-sans">
             <div className="max-w-4xl mx-auto p-4 print:hidden">
                  <div className="flex justify-between items-center mb-4">
-                    <button onClick={() => navigate(-1)} className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-sm hover:bg-gray-50">
+                    <button onClick={() => navigate(-1)} className="flex items-center gap-2 bg-surface px-4 py-2 rounded-lg border border-gray-600 hover:bg-gray-700 text-dark">
                         <ChevronLeftIcon className="w-5 h-5" />
                         Kembali
                     </button>
-                    <button onClick={() => window.print()} className="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg shadow-sm hover:bg-primary-dark">
+                    <button onClick={() => window.print()} className="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-dark">
                         <PrintIcon className="w-5 h-5" />
                         Cetak
                     </button>
@@ -115,7 +115,7 @@ const SlipRincian: React.FC = () => {
 
             <div id="slip-content" className="max-w-4xl mx-auto bg-white p-4 md:p-6 rounded-lg shadow-lg print:shadow-none print:p-2">
                 <div className="border-b-2 border-black pb-2 mb-4">
-                    <h2 className="text-lg font-bold">Nama Anggota: {anggota.nama}</h2>
+                    <h2 className="text-lg font-bold text-gray-800">Nama Anggota: {anggota.nama}</h2>
                     <p className="text-sm text-gray-500">No. Anggota: {anggota.no_anggota}</p>
                 </div>
 

@@ -79,8 +79,8 @@ const AnggotaKeuangan: React.FC = () => {
     };
 
     const DetailCard: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => (
-        <div className="bg-white p-6 rounded-xl shadow-md mb-8">
-            <h3 className="text-lg sm:text-xl font-bold text-dark border-b pb-3 mb-4">{title}</h3>
+        <div className="bg-surface p-6 rounded-xl border border-gray-700 mb-8">
+            <h3 className="text-lg sm:text-xl font-bold text-dark border-b border-gray-600 pb-3 mb-4">{title}</h3>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-4">
                 {children}
             </div>
@@ -91,8 +91,8 @@ const AnggotaKeuangan: React.FC = () => {
         const isNegative = typeof value === 'number' && value < 0;
         return (
             <div>
-                <p className="text-sm text-gray-500">{label}</p>
-                <p className={`font-semibold ${isNegative ? 'text-red-600' : 'text-dark'}`}>{isCurrency ? formatCurrency(value as number) : value}</p>
+                <p className="text-sm text-gray-400">{label}</p>
+                <p className={`font-semibold ${isNegative ? 'text-red-400' : 'text-dark'}`}>{isCurrency ? formatCurrency(value as number) : value}</p>
             </div>
         );
     };
@@ -100,11 +100,11 @@ const AnggotaKeuangan: React.FC = () => {
     return (
         <div>
             {/* Custom Header Section */}
-            <div className="bg-white shadow-sm p-6 rounded-lg mb-8 flex flex-wrap items-center justify-between gap-4">
+            <div className="bg-surface p-6 rounded-lg mb-8 flex flex-wrap items-center justify-between gap-4">
                 <div className="flex items-center space-x-3">
                     <h1 className="text-2xl sm:text-3xl font-bold text-dark">Rincian Keuangan</h1>
                     {anggota && (
-                        <div className="hidden md:flex items-center space-x-2 text-gray-600 border-l pl-3 ml-1">
+                        <div className="hidden md:flex items-center space-x-2 text-gray-400 border-l border-gray-600 pl-3 ml-1">
                             <UserCircleIcon className="w-6 h-6 text-gray-400" />
                             <span className="font-medium">{anggota.nama}</span>
                         </div>
@@ -116,7 +116,7 @@ const AnggotaKeuangan: React.FC = () => {
                             id="month-select"
                             value={selectedMonth}
                             onChange={(e) => setSelectedMonth(e.target.value)}
-                            className="w-48 bg-white border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary"
+                            className="w-48 bg-gray-800 border border-gray-600 rounded-md py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary text-dark"
                             disabled={isLoading || availableMonths.length <= 1}
                         >
                            {(availableMonths.length > 0) ? 
@@ -128,21 +128,21 @@ const AnggotaKeuangan: React.FC = () => {
                     <Link 
                         to="/anggota/slip" 
                         state={{ slipData: data }} 
-                        className={`inline-flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-sm hover:bg-gray-50 transition-colors ${!data ? 'pointer-events-none opacity-50' : ''}`}
+                        className={`inline-flex items-center gap-2 bg-gray-700 px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors ${!data ? 'pointer-events-none opacity-50' : ''}`}
                         aria-disabled={!data}
                     >
-                        <PrintIcon className="w-5 h-5 text-gray-600" />
-                        Cetak Slip
+                        <PrintIcon className="w-5 h-5 text-gray-300" />
+                        <span className="text-dark">Cetak Slip</span>
                     </Link>
                  </div>
             </div>
 
             {isLoading && (
-                 <p className="text-center p-10">Memuat rincian keuangan...</p>
+                 <p className="text-center p-10 text-gray-400">Memuat rincian keuangan...</p>
             )}
             
             {!isLoading && !data && (
-                <p className="text-center p-10">Data keuangan tidak ditemukan. Silakan hubungi admin jika terjadi kesalahan.</p>
+                <p className="text-center p-10 text-gray-400">Data keuangan tidak ditemukan. Silakan hubungi admin jika terjadi kesalahan.</p>
             )}
 
             {!isLoading && data && (

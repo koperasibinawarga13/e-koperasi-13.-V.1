@@ -5,8 +5,8 @@ const STATIC_ASSETS = [
   '/',                // app shell
   '/index.html',
   '/manifest.json',
-  '/assets/icon-192x192.png',
-  '/assets/icon-512x512.png'
+  '/icon-192x192.png',
+  '/icon-512x512.png'
 ];
 
 // Install & Cache Shell
@@ -64,7 +64,7 @@ self.addEventListener('fetch', event => {
           .catch(() => {
             // Optional: Offline fallback image
             if (req.destination === 'image') {
-              return caches.match('/assets/icon-192x192.png');
+              return caches.match('/icon-192x192.png');
             }
           })
       );

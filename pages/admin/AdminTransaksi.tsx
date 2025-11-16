@@ -35,7 +35,7 @@ const FormField: React.FC<{
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }> = React.memo(({ label, name, value, onChange }) => (
     <div>
-        <label htmlFor={name} className="block text-sm font-medium text-gray-700">{label}</label>
+        <label htmlFor={name} className="block text-sm font-medium text-gray-300">{label}</label>
         <input
             type="text"
             inputMode="numeric"
@@ -43,7 +43,7 @@ const FormField: React.FC<{
             name={name}
             value={value === 0 ? '' : new Intl.NumberFormat('id-ID').format(value)}
             onChange={onChange}
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary text-right"
+            className="mt-1 block w-full bg-gray-800 border border-gray-600 rounded-md py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary text-right text-dark"
             placeholder="0"
             autoComplete="off"
         />
@@ -52,7 +52,7 @@ const FormField: React.FC<{
 
 const Section: React.FC<{ title: string, children: React.ReactNode }> = ({ title, children }) => (
     <div className="mt-8">
-        <h3 className="text-lg font-medium leading-6 text-gray-900 border-b pb-2 mb-4">{title}</h3>
+        <h3 className="text-lg font-medium leading-6 text-dark border-b border-gray-700 pb-2 mb-4">{title}</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {children}
         </div>
@@ -188,7 +188,7 @@ const AdminTransaksi: React.FC = () => {
     
     const DetailItem: React.FC<{label: string; value: string | number}> = ({ label, value }) => (
         <div className="flex justify-between py-1">
-            <span className="text-gray-600">{label}:</span>
+            <span className="text-gray-400">{label}:</span>
             <span className="font-semibold text-dark">{typeof value === 'number' ? new Intl.NumberFormat('id-ID').format(value) : value}</span>
         </div>
     );
@@ -199,19 +199,19 @@ const AdminTransaksi: React.FC = () => {
     return (
         <div>
             <Header title={formTitle} />
-            <div className="bg-white p-6 rounded-xl shadow-md">
+            <div className="bg-surface p-6 rounded-xl border border-gray-700">
                 {lastSuccessfulTx ? (
                     <div className="py-8 text-center">
-                        <div className="mb-6 p-4 rounded-md text-sm bg-green-100 text-green-800">
+                        <div className="mb-6 p-4 rounded-md text-sm bg-green-900/50 text-green-300">
                            {message?.text}
                         </div>
                         <h3 className="text-lg font-bold text-dark mb-4">Rincian Transaksi Tersimpan</h3>
-                         <div className="max-w-md mx-auto bg-gray-50 p-4 rounded-lg border text-left">
+                         <div className="max-w-md mx-auto bg-gray-800 p-4 rounded-lg border border-gray-700 text-left">
                             <DetailItem label="No. Anggota" value={lastSuccessfulTx.no_anggota} />
                             <DetailItem label="Nama" value={lastSuccessfulTx.nama_angota || ''} />
-                            <div className="mt-4 p-3 rounded-md bg-blue-100 flex justify-between items-center">
-                                <span className="font-bold text-blue-800">TOTAL SETORAN</span>
-                                <span className="font-bold text-blue-800 text-lg">{new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(lastSuccessfulTx.Jumlah_setoran)}</span>
+                            <div className="mt-4 p-3 rounded-md bg-blue-900/50 flex justify-between items-center">
+                                <span className="font-bold text-blue-300">TOTAL SETORAN</span>
+                                <span className="font-bold text-blue-200 text-lg">{new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(lastSuccessfulTx.Jumlah_setoran)}</span>
                             </div>
                         </div>
                         <div className="flex justify-center gap-4 mt-8">
@@ -223,32 +223,32 @@ const AdminTransaksi: React.FC = () => {
                 ) : (
                     <form onSubmit={handleSubmit}>
                         {message && (
-                             <div className={`mb-4 p-4 rounded-md text-sm ${message.type === 'success' ? 'bg-blue-100 text-blue-800' : 'bg-red-100 text-red-800'}`}>
+                             <div className={`mb-4 p-4 rounded-md text-sm ${message.type === 'success' ? 'bg-blue-900/50 text-blue-300' : 'bg-red-900/50 text-red-300'}`}>
                                 {message.text}
                             </div>
                         )}
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div>
-                                <label htmlFor="noAnggota" className="block text-sm font-medium text-gray-700">Nomor Anggota</label>
+                                <label htmlFor="noAnggota" className="block text-sm font-medium text-gray-300">Nomor Anggota</label>
                                 <input
                                     type="text" id="noAnggota" value={noAnggota} onChange={(e) => setNoAnggota(e.target.value)} required disabled={!!editLogId}
-                                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 disabled:bg-gray-100"
+                                    className="mt-1 block w-full bg-gray-800 border border-gray-600 rounded-md py-2 px-3 text-dark disabled:bg-gray-700"
                                 />
                                 <div className="mt-1 min-h-[20px] text-sm font-semibold">
-                                    {isAnggotaLoading && <span className="text-gray-500">Mencari...</span>}
-                                    {namaAnggota && (<span className={namaAnggota.includes('ditemukan') || namaAnggota.includes('Gagal') ? 'text-red-600' : 'text-green-600'}>{namaAnggota}</span>)}
+                                    {isAnggotaLoading && <span className="text-gray-400">Mencari...</span>}
+                                    {namaAnggota && (<span className={namaAnggota.includes('ditemukan') || namaAnggota.includes('Gagal') ? 'text-red-400' : 'text-green-400'}>{namaAnggota}</span>)}
                                 </div>
                             </div>
                             <div>
-                                <label htmlFor="periode" className="block text-sm font-medium text-gray-700">Periode Laporan</label>
+                                <label htmlFor="periode" className="block text-sm font-medium text-gray-300">Periode Laporan</label>
                                 <input
                                     type="month" id="periode" value={periode} onChange={(e) => setPeriode(e.target.value)} required disabled={!!editLogId}
-                                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 disabled:bg-gray-100"
+                                    className="mt-1 block w-full bg-gray-800 border border-gray-600 rounded-md py-2 px-3 text-dark disabled:bg-gray-700"
                                 />
                             </div>
                             <div>
-                                <label htmlFor="tanggalTransaksi" className="block text-sm font-medium text-gray-700">Tanggal Input Transaksi</label>
-                                <input type="date" id="tanggalTransaksi" value={tanggalTransaksi} onChange={(e) => setTanggalTransaksi(e.target.value)} required className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3"/>
+                                <label htmlFor="tanggalTransaksi" className="block text-sm font-medium text-gray-300">Tanggal Input Transaksi</label>
+                                <input type="date" id="tanggalTransaksi" value={tanggalTransaksi} onChange={(e) => setTanggalTransaksi(e.target.value)} required className="mt-1 block w-full bg-gray-800 border border-gray-600 rounded-md py-2 px-3 text-dark"/>
                             </div>
                         </div>
                         
@@ -269,10 +269,10 @@ const AdminTransaksi: React.FC = () => {
                         </Section>
                         
                         <div className="mt-8">
-                            <h3 className="text-lg font-medium text-gray-900 border-b pb-2 mb-4">Total Setoran</h3>
-                            <div className="bg-blue-50 p-4 rounded-lg text-center">
-                                <p className="text-sm text-blue-800">Total Setoran Bulan Ini</p>
-                                <p className="text-2xl font-bold text-blue-900">{new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(jumlahSetoran)}</p>
+                            <h3 className="text-lg font-medium text-dark border-b border-gray-700 pb-2 mb-4">Total Setoran</h3>
+                            <div className="bg-blue-900/50 p-4 rounded-lg text-center">
+                                <p className="text-sm text-blue-300">Total Setoran Bulan Ini</p>
+                                <p className="text-2xl font-bold text-blue-200">{new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(jumlahSetoran)}</p>
                             </div>
                         </div>
                         
@@ -289,9 +289,9 @@ const AdminTransaksi: React.FC = () => {
                             <FormField label="Penambahan Pinj. Niaga" name="transaksi_penambahan_pinjaman_niaga" value={transaksiData.transaksi_penambahan_pinjaman_niaga} onChange={handleInputChange} />
                         </Section>
                         
-                        <div className="mt-8 border-t pt-5">
+                        <div className="mt-8 border-t border-gray-700 pt-5">
                             <div className="flex justify-end gap-4">
-                                <button type="button" onClick={handleReset} className="bg-gray-200 text-gray-800 py-2 px-4 rounded-md text-sm font-medium hover:bg-gray-300">
+                                <button type="button" onClick={handleReset} className="bg-gray-600 text-gray-200 py-2 px-4 rounded-md text-sm font-medium hover:bg-gray-500">
                                    {editLogId ? 'Batalkan Edit' : 'Reset Form'}
                                 </button>
                                 <button type="submit" disabled={isSubmitting || !namaAnggota || namaAnggota === 'Anggota tidak ditemukan'} className="bg-primary text-white py-2 px-4 rounded-md text-sm font-medium hover:bg-primary-dark disabled:bg-gray-400">

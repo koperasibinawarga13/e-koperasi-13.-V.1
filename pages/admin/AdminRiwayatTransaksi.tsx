@@ -109,13 +109,13 @@ const AdminRiwayatTransaksi: React.FC = () => {
     return (
         <div>
             <Header title="Riwayat Transaksi Manual" />
-            <div className="bg-white p-6 rounded-xl shadow-md">
+            <div className="bg-surface p-6 rounded-xl border border-gray-700">
                 <div className="flex justify-between items-start mb-4">
                     <form onSubmit={handleSearch} className="flex items-center gap-2">
                         <input
                             type="text"
                             placeholder="Masukkan Nomor Anggota (e.g., AK-101)"
-                            className="border border-gray-300 rounded-lg px-4 py-2 w-full sm:w-64"
+                            className="bg-gray-800 border border-gray-600 rounded-lg px-4 py-2 w-full sm:w-64 text-dark"
                             value={searchNoAnggota}
                             onChange={(e) => setSearchNoAnggota(e.target.value)}
                         />
@@ -127,27 +127,27 @@ const AdminRiwayatTransaksi: React.FC = () => {
                          <button onClick={handleSync} disabled={isSyncing} className="bg-green-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-600 disabled:bg-gray-400">
                             {isSyncing ? 'Menyinkronkan...' : 'Sinkronisasi Riwayat'}
                         </button>
-                        <p className="text-xs text-gray-500 mt-1">Gunakan jika riwayat transaksi tidak muncul.</p>
+                        <p className="text-xs text-gray-400 mt-1">Gunakan jika riwayat transaksi tidak muncul.</p>
                     </div>
                 </div>
                  {syncMessage && (
-                    <div className="mb-4 p-3 rounded-md text-sm bg-blue-100 text-blue-800 text-center">
+                    <div className="mb-4 p-3 rounded-md text-sm bg-blue-900/50 text-blue-300 text-center">
                         {syncMessage}
                     </div>
                 )}
                 <div className="overflow-x-auto">
-                    <table className="w-full text-sm text-left text-gray-600">
-                        <thead className="text-xs text-gray-500 uppercase">
+                    <table className="w-full text-sm text-left text-gray-400">
+                        <thead className="text-xs text-gray-400 uppercase">
                             <tr>
-                                <th className="px-4 py-3">WAKTU LOG</th>
-                                <th className="px-4 py-3">PERIODE</th>
-                                <th className="px-4 py-3">ADMIN</th>
-                                <th className="px-4 py-3">JENIS</th>
-                                <th className="px-4 py-3 text-right">TOTAL SETORAN</th>
-                                <th className="px-4 py-3 text-center">AKSI</th>
+                                <th className="px-4 py-3 border-b-2 border-gray-700">WAKTU LOG</th>
+                                <th className="px-4 py-3 border-b-2 border-gray-700">PERIODE</th>
+                                <th className="px-4 py-3 border-b-2 border-gray-700">ADMIN</th>
+                                <th className="px-4 py-3 border-b-2 border-gray-700">JENIS</th>
+                                <th className="px-4 py-3 border-b-2 border-gray-700 text-right">TOTAL SETORAN</th>
+                                <th className="px-4 py-3 border-b-2 border-gray-700 text-center">AKSI</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-100">
+                        <tbody className="divide-y divide-gray-700">
                             {isLoading ? (
                                 <tr><td colSpan={6} className="text-center py-10">Memuat data...</td></tr>
                             ) : searchedMember && combinedHistory.length === 0 ? (
@@ -163,12 +163,12 @@ const AdminRiwayatTransaksi: React.FC = () => {
                                     if (item.type === 'log') {
                                         const log = data as TransaksiLog;
                                         return (
-                                            <tr key={log.id} className="hover:bg-gray-50">
+                                            <tr key={log.id} className="hover:bg-gray-600">
                                                 <td className="px-4 py-3">{new Date(log.log_time).toLocaleString('id-ID')}</td>
                                                 <td className="px-4 py-3">{log.periode}</td>
                                                 <td className="px-4 py-3">{log.admin_nama}</td>
                                                 <td className="px-4 py-3">
-                                                    <span className={`px-2 py-1 text-xs font-semibold rounded-full ${log.type === 'EDIT' ? 'bg-amber-100 text-amber-800' : 'bg-green-100 text-green-800'}`}>
+                                                    <span className={`px-2 py-1 text-xs font-semibold rounded-full ${log.type === 'EDIT' ? 'bg-amber-900/50 text-amber-300' : 'bg-green-900/50 text-green-300'}`}>
                                                         {log.type}
                                                     </span>
                                                 </td>
@@ -176,7 +176,7 @@ const AdminRiwayatTransaksi: React.FC = () => {
                                                 <td className="px-4 py-3 text-center">
                                                     <button 
                                                         onClick={() => navigate(`/admin/transaksi?editLogId=${log.id}`)}
-                                                        className="text-blue-600 hover:text-blue-800 disabled:text-gray-400"
+                                                        className="text-blue-400 hover:text-blue-300 disabled:text-gray-500"
                                                         title="Edit Transaksi"
                                                         disabled={log.admin_nama !== user?.name && user?.email !== 'admin@koperasi13.com'}
                                                     >
@@ -188,12 +188,12 @@ const AdminRiwayatTransaksi: React.FC = () => {
                                     } else { // type === 'history'
                                         const history = data as Keuangan;
                                         return (
-                                            <tr key={history.id} className="bg-yellow-50 hover:bg-yellow-100">
+                                            <tr key={history.id} className="bg-yellow-900/30 hover:bg-yellow-900/40">
                                                 <td className="px-4 py-3 italic text-gray-500">Belum ada Log</td>
                                                 <td className="px-4 py-3">{history.periode}</td>
                                                 <td className="px-4 py-3 italic">{history.admin_nama || 'Sistem'}</td>
                                                 <td className="px-4 py-3">
-                                                    <span className="px-2 py-1 text-xs font-semibold rounded-full bg-gray-200 text-gray-800">
+                                                    <span className="px-2 py-1 text-xs font-semibold rounded-full bg-gray-600 text-gray-200">
                                                        TRANSAKSI
                                                     </span>
                                                 </td>
@@ -201,7 +201,7 @@ const AdminRiwayatTransaksi: React.FC = () => {
                                                 <td className="px-4 py-3 text-center">
                                                      <button 
                                                         onClick={() => handleCreateAndEdit(history)}
-                                                        className="text-green-600 hover:text-green-800 flex items-center gap-1 text-xs font-bold"
+                                                        className="text-green-400 hover:text-green-300 flex items-center gap-1 text-xs font-bold"
                                                         title="Buat Riwayat & Edit"
                                                     >
                                                         <PlusIcon className="w-4 h-4" /> BUAT & EDIT

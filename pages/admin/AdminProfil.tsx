@@ -89,18 +89,18 @@ const AdminProfil: React.FC = () => {
         disabled?: boolean;
     }> = ({ label, name, value, onChange, type = 'text', isTextarea = false, placeholder, disabled = false }) => (
         <div>
-            <label htmlFor={name} className="block text-sm font-medium text-gray-700">{label}</label>
+            <label htmlFor={name} className="block text-sm font-medium text-gray-300">{label}</label>
             {isTextarea ? (
                 <textarea 
                     id={name} name={name} value={value} onChange={onChange} 
                     rows={3} disabled={disabled}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary disabled:bg-gray-100" 
+                    className="mt-1 block w-full bg-gray-800 border border-gray-600 rounded-md py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary disabled:bg-gray-700 text-dark" 
                 />
             ) : (
                 <input 
                     type={type} id={name} name={name} value={value} onChange={onChange} 
                     placeholder={placeholder} disabled={disabled}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary disabled:bg-gray-100" 
+                    className="mt-1 block w-full bg-gray-800 border border-gray-600 rounded-md py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary disabled:bg-gray-700 disabled:cursor-not-allowed text-dark" 
                 />
             )}
         </div>
@@ -111,7 +111,7 @@ const AdminProfil: React.FC = () => {
         return (
             <div>
                 <Header title="Profil Admin" />
-                <p className="text-center p-10">Memuat profil...</p>
+                <p className="text-center p-10 text-gray-400">Memuat profil...</p>
             </div>
         );
     }
@@ -120,7 +120,7 @@ const AdminProfil: React.FC = () => {
         return (
             <div>
                 <Header title="Profil Admin" />
-                <p className="text-center p-10 text-red-600">Gagal memuat profil admin.</p>
+                <p className="text-center p-10 text-red-400">Gagal memuat profil admin.</p>
             </div>
         );
     }
@@ -128,31 +128,31 @@ const AdminProfil: React.FC = () => {
     return (
         <div>
             <Header title="Profil Admin" />
-            <div className="bg-white p-6 rounded-xl shadow-md max-w-2xl mx-auto">
+            <div className="bg-surface p-6 rounded-xl border border-gray-700 max-w-2xl mx-auto">
                 <form onSubmit={handleSave} className="space-y-6">
-                    <h3 className="text-lg font-medium text-dark border-b pb-3">Informasi Akun</h3>
+                    <h3 className="text-lg font-medium text-dark border-b border-gray-600 pb-3">Informasi Akun</h3>
                     
                     {message && (
-                        <div className={`p-3 rounded-md text-sm ${message.type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                        <div className={`p-3 rounded-md text-sm ${message.type === 'success' ? 'bg-green-900/50 text-green-300' : 'bg-red-900/50 text-red-300'}`}>
                             {message.text}
                         </div>
                     )}
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                          <div>
-                            <label className="block text-sm font-medium text-gray-700">Nama Lengkap (Tidak dapat diubah)</label>
+                            <label className="block text-sm font-medium text-gray-300">Nama Lengkap (Tidak dapat diubah)</label>
                             <input 
                                 type="text"
                                 value={profile.nama}
                                 disabled
-                                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 bg-gray-100 cursor-not-allowed" 
+                                className="mt-1 block w-full bg-gray-800 border border-gray-600 rounded-md py-2 px-3 bg-gray-700 cursor-not-allowed text-dark" 
                                 title="Nama tidak dapat diubah untuk menjaga integritas data transaksi."
                             />
                          </div>
                         <FormField label="Email" name="email" value={formData.email} onChange={handleChange} type="email" />
                     </div>
                     
-                    <h3 className="text-lg font-medium text-dark border-b pb-3 pt-4">Ubah Password</h3>
+                    <h3 className="text-lg font-medium text-dark border-b border-gray-600 pb-3 pt-4">Ubah Password</h3>
                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <FormField label="Password Baru" name="password" value={formData.password} onChange={handleChange} type="password" placeholder="Isi untuk mengubah" />
                         <FormField label="Konfirmasi Password Baru" name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} type="password" placeholder="Ketik ulang password baru" />
