@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import Header from '../../components/Header';
 import { Keuangan } from '../../types';
 import { getKeuanganByNoAnggota, getAvailableLaporanMonths, getLaporanBulanan } from '../../services/keuanganService';
 import { ChevronLeftIcon } from '../../components/icons/Icons';
@@ -65,8 +66,8 @@ const AdminKeuanganDetail: React.FC = () => {
 
 
     const DetailCard: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => (
-        <div className="bg-surface p-6 rounded-xl shadow-md mb-8 border border-border">
-            <h3 className="text-xl font-bold text-dark border-b border-border pb-3 mb-4">{title}</h3>
+        <div className="bg-surface p-6 rounded-xl border border-slate-200 mb-8">
+            <h3 className="text-xl font-bold text-dark border-b border-slate-200 pb-3 mb-4">{title}</h3>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-4">
                 {children}
             </div>
@@ -84,18 +85,20 @@ const AdminKeuanganDetail: React.FC = () => {
     };
     
     if (isLoading && !data) { // Show initial loading screen
-        return <div className="p-8 text-center">Memuat rincian keuangan...</div>;
+        return <div className="p-8 text-center text-gray-text">Memuat rincian keuangan...</div>;
     }
 
     if (!data) {
         return (
-             <div className="p-8 text-center">
-                <h1 className="text-xl font-bold text-dark mb-4">Data Tidak Ditemukan</h1>
-                <p className="text-gray-text">Data keuangan untuk anggota dengan nomor {no_anggota} tidak dapat ditemukan.</p>
-                <Link to="/admin/laporan" className="mt-4 inline-flex items-center gap-2 text-primary hover:underline">
-                    <ChevronLeftIcon className="w-4 h-4" />
-                    Kembali ke Laporan
-                </Link>
+             <div>
+                <Header title="Data Tidak Ditemukan" />
+                <div className="p-8 text-center text-gray-text">
+                    <p>Data keuangan untuk anggota dengan nomor {no_anggota} tidak dapat ditemukan.</p>
+                    <Link to="/admin/laporan" className="mt-4 inline-flex items-center gap-2 text-primary hover:underline">
+                        <ChevronLeftIcon className="w-4 h-4" />
+                        Kembali ke Laporan
+                    </Link>
+                </div>
             </div>
         );
     }
@@ -109,7 +112,7 @@ const AdminKeuanganDetail: React.FC = () => {
                         id="month-select"
                         value={selectedMonth}
                         onChange={(e) => setSelectedMonth(e.target.value)}
-                        className="w-48 bg-zinc-800 border border-border rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary"
+                        className="w-48 bg-slate-50 border border-slate-300 rounded-md py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary text-dark"
                         disabled={isLoading || availableMonths.length <= 1}
                     >
                         {(availableMonths.length > 0) ? 
@@ -117,14 +120,14 @@ const AdminKeuanganDetail: React.FC = () => {
                             : <option>Memuat...</option>
                         }
                     </select>
-                    <Link to="/admin/laporan" className="inline-flex items-center gap-2 text-sm font-medium bg-zinc-700 px-4 py-2 rounded-lg hover:bg-zinc-600 transition-colors">
+                    <Link to="/admin/laporan" className="inline-flex items-center gap-2 text-sm font-medium bg-slate-200 px-4 py-2 rounded-lg hover:bg-slate-300 transition-colors text-slate-700">
                         <ChevronLeftIcon className="w-5 h-5" />
                         Kembali
                     </Link>
                 </div>
             </div>
 
-            {isLoading ? <div className="text-center p-10">Memuat data periode...</div> : (
+            {isLoading ? <div className="text-center p-10 text-gray-text">Memuat data periode...</div> : (
             <>
                 <DetailCard title="Saldo Awal">
                     <InfoItem label="Simpanan Pokok" value={data.awal_simpanan_pokok} />

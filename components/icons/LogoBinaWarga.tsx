@@ -23,7 +23,7 @@ export const LogoBinaWarga: React.FC<React.SVGProps<SVGSVGElement>> = (props) =>
       fontFamily="Poppins, sans-serif" 
       fontWeight="600" 
       fontSize="34" 
-      fill="white"
+      fill="currentColor"
       letterSpacing="1"
     >
       KOPERASI
@@ -35,7 +35,7 @@ export const LogoBinaWarga: React.FC<React.SVGProps<SVGSVGElement>> = (props) =>
       fontFamily="Poppins, sans-serif" 
       fontWeight="700" 
       fontSize="44" 
-      fill="white"
+      fill="currentColor"
       letterSpacing="1"
     >
       BINA WARGA

@@ -106,7 +106,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar, isMobileO
       ></div>
       
       <div 
-        className={`bg-sidebar text-white flex flex-col h-screen fixed z-40 transform transition-transform duration-300 ease-in-out md:translate-x-0 ${
+        className={`bg-sidebar text-dark flex flex-col h-screen fixed z-40 transform transition-transform duration-300 ease-in-out md:translate-x-0 border-r border-slate-200 ${
           isCollapsed ? 'w-20 p-2' : 'w-64 p-4'
         } ${
           isMobileOpen ? 'translate-x-0' : '-translate-x-full'
@@ -120,7 +120,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar, isMobileO
           <ChevronLeftIcon className={`w-4 h-4 transition-transform duration-300 ${isCollapsed ? 'rotate-180' : ''}`} />
         </button>
 
-        <div className={`flex items-center justify-center mb-10 transition-all duration-300 ${isCollapsed ? 'h-12' : 'h-16 px-2'}`}>
+        <div className={`flex items-center justify-center mb-10 transition-all duration-300 text-dark ${isCollapsed ? 'h-12' : 'h-16 px-2'}`}>
             <Logo className="h-full w-auto object-contain" />
         </div>
 
@@ -132,9 +132,9 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar, isMobileO
                   <>
                     <button 
                       onClick={() => handleSubMenuToggle(item.label)}
-                      className={`flex items-center justify-between w-full text-zinc-400 hover:bg-zinc-800 hover:text-dark rounded-lg transition-colors duration-200 ${
+                      className={`flex items-center justify-between w-full text-gray-text hover:bg-primary-light hover:text-primary rounded-lg transition-colors duration-200 ${
                         isCollapsed ? 'p-3 justify-center' : 'px-4 py-3'
-                      } ${isChildActive(item.children) ? 'bg-zinc-800 text-dark' : ''}`}
+                      } ${isChildActive(item.children) ? 'bg-primary-light text-primary font-semibold' : ''}`}
                     >
                       <div className="flex items-center">
                         <div className="flex-shrink-0">{item.icon}</div>
@@ -146,7 +146,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar, isMobileO
                       <ul className="pl-8 pt-2 space-y-2">
                         {item.children.map(child => (
                            <li key={child.to}>
-                            <NavLink to={child.to!} className={({isActive}) => `flex items-center gap-3 text-sm text-zinc-400 hover:text-dark ${isActive ? 'font-bold text-dark' : ''}`}>
+                            <NavLink to={child.to!} className={({isActive}) => `flex items-center gap-3 text-sm text-gray-400 hover:text-dark ${isActive ? 'font-bold text-primary' : ''}`}>
                               {child.icon}
                               <span>{child.label}</span>
                             </NavLink>
@@ -157,7 +157,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar, isMobileO
                   </>
                 ) : (
                   <NavLink to={item.to!} className={({isActive}) =>
-                    `flex items-center w-full text-zinc-400 hover:bg-zinc-800 hover:text-dark rounded-lg transition-colors duration-200 relative ${
+                    `flex items-center w-full text-gray-text hover:bg-primary-light hover:text-primary rounded-lg transition-colors duration-200 relative ${
                       isCollapsed ? 'p-3 justify-center' : 'px-4 py-3'
                     } ${
                       isActive ? 'bg-primary font-semibold text-white' : ''
@@ -168,7 +168,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar, isMobileO
                   </NavLink>
                 )}
                 {isCollapsed && (
-                  <div className="absolute left-full top-1/2 -translate-y-1/2 ml-4 px-2 py-1 bg-sidebar text-white text-xs rounded-md shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap z-20">
+                  <div className="absolute left-full top-1/2 -translate-y-1/2 ml-4 px-2 py-1 bg-slate-800 text-white text-xs rounded-md shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap z-20">
                     {item.label}
                   </div>
                 )}
@@ -177,16 +177,16 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar, isMobileO
           </ul>
         </nav>
 
-        <div className="group relative border-t border-white/10 pt-2">
+        <div className="group relative border-t border-slate-200 pt-2">
           <button
             onClick={handleLogout}
-            className={`flex items-center w-full text-zinc-400 hover:bg-zinc-800 hover:text-dark rounded-lg transition-colors duration-200 ${isCollapsed ? 'p-3 justify-center' : 'px-4 py-3'}`}
+            className={`flex items-center w-full text-gray-text hover:bg-primary-light hover:text-primary rounded-lg transition-colors duration-200 ${isCollapsed ? 'p-3 justify-center' : 'px-4 py-3'}`}
           >
             <div className="flex-shrink-0"><LogoutIcon /></div>
             <span className={`ml-4 whitespace-nowrap overflow-hidden transition-all duration-300 ${isCollapsed ? 'w-0 opacity-0' : 'w-auto opacity-100'}`}>Logout</span>
           </button>
           {isCollapsed && (
-            <div className="absolute left-full top-1/2 -translate-y-1/2 ml-4 px-2 py-1 bg-sidebar text-white text-xs rounded-md shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap z-20">
+            <div className="absolute left-full top-1/2 -translate-y-1/2 ml-4 px-2 py-1 bg-slate-800 text-white text-xs rounded-md shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap z-20">
               Logout
             </div>
           )}

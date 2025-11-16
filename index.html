@@ -12,7 +12,7 @@
     <link rel="icon" type="image/png" href="/icon-192x192.png" />
     <link rel="apple-touch-icon" href="/icon-192x192.png">
     
-    <meta name="theme-color" content="#18181b" />
+    <meta name="theme-color" content="#0ea5e9" />
 
 
     <!-- Import Map (React 18 for compatibility) -->
@@ -48,24 +48,23 @@
         theme: {
           extend: {
             colors: {
-              // New Zinc Palette for a more comfortable, modern dark theme
-              'sidebar': '#09090b',      // zinc-950
-              'background': '#18181b',  // zinc-900
-              'surface': '#27272a',     // zinc-800
-              'border': '#3f3f46',      // zinc-700
-              'dark': '#fafafa',        // zinc-50 (Primary Text)
-              'gray-text': '#a1a1aa',   // zinc-400 (Secondary Text)
-
-              'primary': '#4338CA',
-              'primary-dark': '#3730A3',
-              'primary-light': 'rgba(67, 56, 202, 0.2)',
+              // Light Theme Color Palette - Sky Blue
+              'background': '#f8fafc',    // slate-50
+              'surface': '#ffffff',       // white
+              'sidebar': '#ffffff',       // white
+              'dark': '#334155',           // slate-700 (for main text)
+              'gray-text': '#64748b',     // slate-500 (for secondary text)
               
-              'secondary': '#10B981',
-              'secondary-dark': '#059669',
-              'secondary-light': '#D1FAE5',
+              'primary': '#0ea5e9',        // sky-500
+              'primary-dark': '#0284c7',   // sky-600
+              'primary-light': 'rgba(14, 165, 233, 0.1)', // sky-500 with 10% opacity
               
-              'accent': '#F59E0B',
-              'accent-dark': '#D97706',
+              'secondary': '#14b8a6',      // teal-500
+              'secondary-dark': '#0d9488', // teal-600
+              'secondary-light': 'rgba(20, 184, 166, 0.1)',
+              
+              'accent': '#f59e0b',        // amber-500
+              'accent-dark': '#d97706',   // amber-600
             },
             fontFamily: {
               sans: ['Poppins', 'sans-serif'],

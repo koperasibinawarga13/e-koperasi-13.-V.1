@@ -194,8 +194,8 @@ const AnggotaPinjaman: React.FC = () => {
     };
     
     const InfoItem: React.FC<{ label: string; value: string; className?: string }> = ({ label, value, className = '' }) => (
-        <div className={`flex justify-between items-center py-2 border-b border-gray-700 ${className}`}>
-            <span className="text-gray-400">{label}</span>
+        <div className={`flex justify-between items-center py-2 border-b border-slate-200 ${className}`}>
+            <span className="text-gray-text">{label}</span>
             <span className="font-semibold text-dark">{value}</span>
         </div>
     );
@@ -210,9 +210,9 @@ const AnggotaPinjaman: React.FC = () => {
         const baseClasses = 'px-2 py-1 text-xs font-semibold rounded-full';
         let colorClasses = '';
         switch (status) {
-            case 'Menunggu Persetujuan': colorClasses = 'bg-amber-900/50 text-amber-300'; break;
-            case 'Disetujui': colorClasses = 'bg-green-900/50 text-green-300'; break;
-            case 'Ditolak': colorClasses = 'bg-red-900/50 text-red-300'; break;
+            case 'Menunggu Persetujuan': colorClasses = 'bg-amber-100 text-amber-700'; break;
+            case 'Disetujui': colorClasses = 'bg-green-100 text-green-700'; break;
+            case 'Ditolak': colorClasses = 'bg-red-100 text-red-700'; break;
         }
         return <span className={`${baseClasses} ${colorClasses}`}>{status}</span>;
     };
@@ -222,57 +222,57 @@ const AnggotaPinjaman: React.FC = () => {
         <div>
             <Header title="Pengajuan Pinjaman Anggota" />
             
-            <div className="bg-surface rounded-xl border border-gray-700 mb-8">
-                <h2 className="text-lg md:text-xl font-bold text-dark bg-gray-700/50 p-4 rounded-t-xl -m-0 mb-6">Sisa Pinjaman Anda</h2>
-                 <div className="px-6 pb-6">
-                    {isLoading ? <p className="text-gray-400">Memuat data sisa pinjaman...</p> : keuangan ? (
+            <div className="bg-surface rounded-xl border border-slate-200 mb-8 p-6">
+                <h2 className="text-lg md:text-xl font-bold text-dark mb-4">Sisa Pinjaman Anda</h2>
+                 <div className="px-0 pb-0">
+                    {isLoading ? <p className="text-gray-text">Memuat data sisa pinjaman...</p> : keuangan ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div className="bg-yellow-900/50 p-4 rounded-lg">
-                                <p className="text-sm text-yellow-300 font-medium">Sisa Pinjaman Berjangka</p>
-                                <p className="text-xl md:text-2xl font-bold text-yellow-200">{formatCurrency(keuangan.akhir_pinjaman_berjangka)}</p>
+                            <div className="bg-amber-100 p-4 rounded-lg">
+                                <p className="text-sm text-amber-700 font-medium">Sisa Pinjaman Berjangka</p>
+                                <p className="text-xl md:text-2xl font-bold text-amber-800">{formatCurrency(keuangan.akhir_pinjaman_berjangka)}</p>
                             </div>
-                            <div className="bg-orange-900/50 p-4 rounded-lg">
-                                <p className="text-sm text-orange-300 font-medium">Sisa Pinjaman Khusus</p>
-                                <p className="text-xl md:text-2xl font-bold text-orange-200">{formatCurrency(keuangan.akhir_pinjaman_khusus)}</p>
+                            <div className="bg-orange-100 p-4 rounded-lg">
+                                <p className="text-sm text-orange-700 font-medium">Sisa Pinjaman Khusus</p>
+                                <p className="text-xl md:text-2xl font-bold text-orange-800">{formatCurrency(keuangan.akhir_pinjaman_khusus)}</p>
                             </div>
                         </div>
-                    ) : <p className="text-gray-400">Data pinjaman tidak ditemukan.</p>}
+                    ) : <p className="text-gray-text">Data pinjaman tidak ditemukan.</p>}
                 </div>
             </div>
 
-            <div className="bg-surface rounded-xl border border-gray-700">
-                <h2 className="text-lg md:text-xl font-bold text-dark bg-gray-700/50 p-4 rounded-t-xl -m-0">Simulasi & Pengajuan Kredit</h2>
-                 <nav className="flex border-b border-gray-700">
-                    <button onClick={() => {setActiveTab('berjangka'); setSubmitMessage({type: '', text: ''})}} className={`py-3 px-6 font-semibold text-sm ${activeTab === 'berjangka' ? 'text-primary border-b-2 border-primary' : 'text-gray-400 hover:bg-gray-700'}`}>Pinjaman Berjangka (Dengan Simulasi)</button>
-                    <button onClick={() => {setActiveTab('khusus'); setSubmitMessage({type: '', text: ''})}} className={`py-3 px-6 font-semibold text-sm ${activeTab === 'khusus' ? 'text-primary border-b-2 border-primary' : 'text-gray-400 hover:bg-gray-700'}`}>Pinjaman Khusus</button>
+            <div className="bg-surface rounded-xl border border-slate-200">
+                <h2 className="text-lg md:text-xl font-bold text-dark bg-slate-100 p-4 rounded-t-xl -m-0">Simulasi & Pengajuan Kredit</h2>
+                 <nav className="flex border-b border-slate-200">
+                    <button onClick={() => {setActiveTab('berjangka'); setSubmitMessage({type: '', text: ''})}} className={`py-3 px-6 font-semibold text-sm ${activeTab === 'berjangka' ? 'text-primary border-b-2 border-primary' : 'text-gray-text hover:bg-slate-100'}`}>Pinjaman Berjangka (Dengan Simulasi)</button>
+                    <button onClick={() => {setActiveTab('khusus'); setSubmitMessage({type: '', text: ''})}} className={`py-3 px-6 font-semibold text-sm ${activeTab === 'khusus' ? 'text-primary border-b-2 border-primary' : 'text-gray-text hover:bg-slate-100'}`}>Pinjaman Khusus</button>
                  </nav>
 
                 {activeTab === 'berjangka' ? (
                     <div className="p-6">
                         <form onSubmit={handleCalculate} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-end">
                             <div>
-                                <label htmlFor="pokok" className="block text-sm font-medium text-gray-300">Pokok Pinjaman (IDR)</label>
-                                <input type="text" inputMode="numeric" id="pokok" value={new Intl.NumberFormat('id-ID').format(pokokPinjaman)} onChange={handleCurrencyChange(setPokokPinjaman)} className="mt-1 block w-full bg-gray-800 border border-gray-600 rounded-md py-2 px-3 text-dark"/>
+                                <label htmlFor="pokok" className="block text-sm font-medium text-gray-text">Pokok Pinjaman (IDR)</label>
+                                <input type="text" inputMode="numeric" id="pokok" value={new Intl.NumberFormat('id-ID').format(pokokPinjaman)} onChange={handleCurrencyChange(setPokokPinjaman)} className="mt-1 block w-full bg-slate-50 border border-slate-300 rounded-md py-2 px-3 text-dark"/>
                             </div>
                              <div>
-                                <label htmlFor="jangka" className="block text-sm font-medium text-gray-300">Jangka Waktu (Bulan)</label>
-                                <input type="number" id="jangka" value={jangkaWaktu} onChange={e => setJangkaWaktu(Number(e.target.value))} className="mt-1 block w-full bg-gray-800 border border-gray-600 rounded-md py-2 px-3 text-dark" />
+                                <label htmlFor="jangka" className="block text-sm font-medium text-gray-text">Jangka Waktu (Bulan)</label>
+                                <input type="number" id="jangka" value={jangkaWaktu} onChange={e => setJangkaWaktu(Number(e.target.value))} className="mt-1 block w-full bg-slate-50 border border-slate-300 rounded-md py-2 px-3 text-dark" />
                             </div>
                              <div>
-                                <label htmlFor="bunga" className="block text-sm font-medium text-gray-300">Bunga per Bulan (%)</label>
-                                <input type="number" step="0.1" id="bunga" value={sukuBunga} onChange={e => setSukuBunga(Number(e.target.value))} className="mt-1 block w-full bg-gray-800 border border-gray-600 rounded-md py-2 px-3 text-dark" />
+                                <label htmlFor="bunga" className="block text-sm font-medium text-gray-text">Bunga per Bulan (%)</label>
+                                <input type="number" step="0.1" id="bunga" value={sukuBunga} onChange={e => setSukuBunga(Number(e.target.value))} className="mt-1 block w-full bg-slate-50 border border-slate-300 rounded-md py-2 px-3 text-dark" />
                             </div>
                             <div>
                                 <button type="submit" className="w-full bg-primary text-white py-2 px-4 rounded-lg font-semibold hover:bg-primary-dark">Hitung Simulasi</button>
                             </div>
                              <div className="md:col-span-2 lg:col-span-4">
-                                <label htmlFor="tanggal" className="block text-sm font-medium text-gray-300">Tanggal Mulai</label>
-                                <input type="date" id="tanggal" value={tanggalMulai} onChange={e => setTanggalMulai(e.target.value)} className="mt-1 block w-full md:w-1/4 bg-gray-800 border border-gray-600 rounded-md py-2 px-3 text-dark" />
+                                <label htmlFor="tanggal" className="block text-sm font-medium text-gray-text">Tanggal Mulai</label>
+                                <input type="date" id="tanggal" value={tanggalMulai} onChange={e => setTanggalMulai(e.target.value)} className="mt-1 block w-full md:w-1/4 bg-slate-50 border border-slate-300 rounded-md py-2 px-3 text-dark" />
                             </div>
                         </form>
                         {simulasi && (
-                        <div className="mt-8 text-center border-t border-gray-700 pt-6">
-                            <button onClick={handleAjukanPinjamanBerjangka} disabled={isSubmitting} className="bg-secondary text-white py-3 px-8 rounded-lg font-bold text-base md:text-lg hover:bg-secondary-dark disabled:bg-gray-400">
+                        <div className="mt-8 text-center border-t border-slate-200 pt-6">
+                            <button onClick={handleAjukanPinjamanBerjangka} disabled={isSubmitting} className="bg-secondary text-white py-3 px-8 rounded-lg font-bold text-base md:text-lg hover:bg-secondary-dark disabled:bg-slate-400">
                                 {isSubmitting ? 'Mengirim...' : 'Yakin & Ajukan Pinjaman Ini'}
                             </button>
                         </div>
@@ -282,15 +282,15 @@ const AnggotaPinjaman: React.FC = () => {
                     <div className="p-6">
                          <form onSubmit={handleAjukanPinjamanKhusus} className="space-y-4">
                              <div>
-                                <label htmlFor="pokokKhusus" className="block text-sm font-medium text-gray-300">Jumlah Pinjaman (IDR)</label>
-                                <input type="text" inputMode="numeric" id="pokokKhusus" value={new Intl.NumberFormat('id-ID').format(pokokPinjamanKhusus)} onChange={handleCurrencyChange(setPokokPinjamanKhusus)} className="mt-1 block w-full bg-gray-800 border border-gray-600 rounded-md py-2 px-3 text-dark" required />
+                                <label htmlFor="pokokKhusus" className="block text-sm font-medium text-gray-text">Jumlah Pinjaman (IDR)</label>
+                                <input type="text" inputMode="numeric" id="pokokKhusus" value={new Intl.NumberFormat('id-ID').format(pokokPinjamanKhusus)} onChange={handleCurrencyChange(setPokokPinjamanKhusus)} className="mt-1 block w-full bg-slate-50 border border-slate-300 rounded-md py-2 px-3 text-dark" required />
                             </div>
                              <div>
-                                <label htmlFor="keterangan" className="block text-sm font-medium text-gray-300">Keterangan / Tujuan Pinjaman</label>
-                                <textarea id="keterangan" value={keteranganKhusus} onChange={e => setKeteranganKhusus(e.target.value)} rows={3} className="mt-1 block w-full bg-gray-800 border border-gray-600 rounded-md py-2 px-3 text-dark" required></textarea>
+                                <label htmlFor="keterangan" className="block text-sm font-medium text-gray-text">Keterangan / Tujuan Pinjaman</label>
+                                <textarea id="keterangan" value={keteranganKhusus} onChange={e => setKeteranganKhusus(e.target.value)} rows={3} className="mt-1 block w-full bg-slate-50 border border-slate-300 rounded-md py-2 px-3 text-dark" required></textarea>
                             </div>
                              <div className="text-center pt-2">
-                                 <button type="submit" disabled={isSubmitting} className="bg-secondary text-white py-2 px-6 rounded-lg font-semibold hover:bg-secondary-dark disabled:bg-gray-400">
+                                 <button type="submit" disabled={isSubmitting} className="bg-secondary text-white py-2 px-6 rounded-lg font-semibold hover:bg-secondary-dark disabled:bg-slate-400">
                                      {isSubmitting ? 'Mengirim...' : 'Ajukan Pinjaman Khusus'}
                                  </button>
                              </div>
@@ -298,40 +298,40 @@ const AnggotaPinjaman: React.FC = () => {
                     </div>
                 )}
                  {submitMessage.text && (
-                    <p className={`pb-4 text-center text-sm font-semibold ${submitMessage.type === 'success' ? 'text-green-400' : 'text-red-400'}`}>
+                    <p className={`pb-4 text-center text-sm font-semibold ${submitMessage.type === 'success' ? 'text-green-600' : 'text-red-600'}`}>
                         {submitMessage.text}
                     </p>
                 )}
                 {simulasi && activeTab === 'berjangka' && (
-                    <div className="mt-8 border-t border-gray-700 pt-6 px-6 pb-6">
+                    <div className="mt-8 border-t border-slate-200 pt-6 px-6 pb-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
                              <div>
                                 <h3 className="font-bold text-base md:text-lg text-dark mb-2">Informasi Pinjaman Anda</h3>
-                                <div className="bg-gray-800 p-4 rounded-lg"><InfoItem label="Pokok Pinjaman" value={formatCurrency(simulasi.pokokPinjaman)} /><InfoItem label="Jangka Waktu" value={`${simulasi.jangkaWaktu} Bulan`} /><InfoItem label="Bunga per Bulan" value={`${simulasi.sukuBunga} %`} /><InfoItem label="Tanggal Mulai" value={formatDate(simulasi.tanggalMulai)} /></div>
+                                <div className="bg-slate-100 p-4 rounded-lg"><InfoItem label="Pokok Pinjaman" value={formatCurrency(simulasi.pokokPinjaman)} /><InfoItem label="Jangka Waktu" value={`${simulasi.jangkaWaktu} Bulan`} /><InfoItem label="Bunga per Bulan" value={`${simulasi.sukuBunga} %`} /><InfoItem label="Tanggal Mulai" value={formatDate(simulasi.tanggalMulai)} /></div>
                              </div>
                              <div>
                                 <h3 className="font-bold text-base md:text-lg text-dark mb-2">Informasi Angsuran Anda</h3>
-                                <div className="bg-gray-800 p-4 rounded-lg"><InfoItem label="Angsuran Pokok / Bulan" value={formatCurrency(simulasi.angsuranPokokBulan)} /><InfoItem label="Total Bunga" value={formatCurrency(simulasi.totalBunga)} /><InfoItem label="Total yang Dibayarkan" value={formatCurrency(simulasi.totalBayar)} className="font-bold text-base md:text-lg bg-yellow-900/50 text-yellow-300 -mx-4 px-4" /><InfoItem label="Tanggal Lunas" value={formatDate(simulasi.tanggalLunas)} /></div>
+                                <div className="bg-slate-100 p-4 rounded-lg"><InfoItem label="Angsuran Pokok / Bulan" value={formatCurrency(simulasi.angsuranPokokBulan)} /><InfoItem label="Total Bunga" value={formatCurrency(simulasi.totalBunga)} /><InfoItem label="Total yang Dibayarkan" value={formatCurrency(simulasi.totalBayar)} className="font-bold text-base md:text-lg bg-amber-100 text-amber-800 -mx-4 px-4" /><InfoItem label="Tanggal Lunas" value={formatDate(simulasi.tanggalLunas)} /></div>
                              </div>
                         </div>
                         <div className="mt-8 overflow-x-auto">
                              <h3 className="font-bold text-base md:text-lg text-dark mb-4">Tabel Angsuran Kredit Anda</h3>
-                            <table className="w-full text-sm text-left text-gray-400">
-                                <thead className="text-xs text-gray-400 uppercase bg-gray-700"><tr><th className="px-4 py-3">#</th><th className="px-4 py-3">Tanggal</th><th className="px-4 py-3 text-right">Angsuran Pokok</th><th className="px-4 py-3 text-right">Angsuran Bunga</th><th className="px-4 py-3 text-right">Total Angsuran</th><th className="px-4 py-3 text-right">Saldo Pinjaman</th></tr></thead>
+                            <table className="w-full text-sm text-left text-gray-text">
+                                <thead className="text-xs text-gray-text uppercase bg-slate-100"><tr><th className="px-4 py-3">#</th><th className="px-4 py-3">Tanggal</th><th className="px-4 py-3 text-right">Angsuran Pokok</th><th className="px-4 py-3 text-right">Angsuran Bunga</th><th className="px-4 py-3 text-right">Total Angsuran</th><th className="px-4 py-3 text-right">Saldo Pinjaman</th></tr></thead>
                                 <tbody>
-                                    {simulasi.jadwal.map(row => (<tr key={row.bulan} className="border-b border-gray-700 hover:bg-gray-600"><td className="px-4 py-3 font-medium text-dark">{row.bulan}</td><td className="px-4 py-3">{formatDate(row.tanggal)}</td><td className="px-4 py-3 text-right">{formatCurrency(row.angsuranPokok)}</td><td className="px-4 py-3 text-right">{formatCurrency(row.angsuranBunga)}</td><td className="px-4 py-3 text-right font-semibold">{formatCurrency(row.totalAngsuran)}</td><td className="px-4 py-3 text-right font-bold text-dark">{formatCurrency(row.sisaPinjaman)}</td></tr>))}
+                                    {simulasi.jadwal.map(row => (<tr key={row.bulan} className="border-b border-slate-200 hover:bg-slate-50"><td className="px-4 py-3 font-medium text-dark">{row.bulan}</td><td className="px-4 py-3">{formatDate(row.tanggal)}</td><td className="px-4 py-3 text-right">{formatCurrency(row.angsuranPokok)}</td><td className="px-4 py-3 text-right">{formatCurrency(row.angsuranBunga)}</td><td className="px-4 py-3 text-right font-semibold">{formatCurrency(row.totalAngsuran)}</td><td className="px-4 py-3 text-right font-bold text-dark">{formatCurrency(row.sisaPinjaman)}</td></tr>))}
                                 </tbody>
                             </table>
                         </div>
                     </div>
                 )}
             </div>
-            <div className="mt-8 bg-surface p-6 rounded-xl border border-gray-700">
+            <div className="mt-8 bg-surface p-6 rounded-xl border border-slate-200">
                  <h2 className="text-lg md:text-xl font-bold text-dark mb-4">Riwayat Pengajuan Pinjaman</h2>
                  <div className="overflow-x-auto">
-                     {isLoading ? <p className="text-gray-400">Memuat riwayat...</p> : riwayat.length > 0 ? (
-                         <table className="w-full text-sm text-left text-gray-400">
-                            <thead className="text-xs text-gray-400 uppercase bg-gray-700">
+                     {isLoading ? <p className="text-gray-text">Memuat riwayat...</p> : riwayat.length > 0 ? (
+                         <table className="w-full text-sm text-left text-gray-text">
+                            <thead className="text-xs text-gray-text uppercase bg-slate-100">
                                 <tr>
                                     <th className="px-4 py-3">Tanggal</th>
                                     <th className="px-4 py-3">Jenis Pinjaman</th>
@@ -341,9 +341,9 @@ const AnggotaPinjaman: React.FC = () => {
                                     <th className="px-4 py-3 text-center">Aksi</th>
                                 </tr>
                             </thead>
-                             <tbody className="divide-y divide-gray-700">
+                             <tbody className="divide-y divide-slate-200">
                                  {riwayat.map(p => (
-                                     <tr key={p.id} className="hover:bg-gray-600">
+                                     <tr key={p.id} className="hover:bg-slate-50">
                                          <td className="px-4 py-3">{formatDate(p.tanggal_pengajuan)}</td>
                                          <td className="px-4 py-3 font-medium text-dark">{p.jenis_pinjaman}</td>
                                          <td className="px-4 py-3 text-right">{formatCurrency(p.pokok_pinjaman)}</td>
@@ -354,7 +354,7 @@ const AnggotaPinjaman: React.FC = () => {
                                                 <button
                                                     onClick={() => handleCancelPengajuan(p.id!)}
                                                     disabled={isCancelling === p.id}
-                                                    className="text-red-400 hover:text-red-300 text-xs font-semibold disabled:text-gray-500"
+                                                    className="text-red-600 hover:text-red-700 text-xs font-semibold disabled:text-slate-400"
                                                 >
                                                     {isCancelling === p.id ? 'Membatalkan...' : 'Batalkan'}
                                                 </button>
@@ -366,7 +366,7 @@ const AnggotaPinjaman: React.FC = () => {
                                  ))}
                              </tbody>
                          </table>
-                     ) : <p className="text-center text-gray-400 py-6">Anda belum pernah mengajukan pinjaman.</p>}
+                     ) : <p className="text-center text-gray-text py-6">Anda belum pernah mengajukan pinjaman.</p>}
                  </div>
             </div>
         </div>

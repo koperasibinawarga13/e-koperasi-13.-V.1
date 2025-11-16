@@ -201,7 +201,7 @@ const AdminLaporan: React.FC = () => {
 
     const CurrencyCell: React.FC<{ amount: number; defaultColor?: string; className?: string }> = ({ amount, defaultColor = 'text-dark', className = '' }) => {
         const isNegative = amount < 0;
-        const colorClass = isNegative ? 'text-red-400' : defaultColor;
+        const colorClass = isNegative ? 'text-red-500' : defaultColor;
         return (
             <td className={`px-4 py-4 sm:px-6 text-right ${colorClass} ${className}`}>
                 {formatCurrency(amount)}
@@ -226,25 +226,25 @@ const AdminLaporan: React.FC = () => {
             <Header title="Laporan Keuangan" />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                <StatCard title="Total Simpanan Keseluruhan" value={formatCurrency(summaryData.totalSimpanan)} icon={<CreditCardIcon className="w-6 h-6" />} iconBgColor="bg-emerald-600" />
+                <StatCard title="Total Simpanan Keseluruhan" value={formatCurrency(summaryData.totalSimpanan)} icon={<CreditCardIcon className="w-6 h-6" />} iconBgColor="bg-teal-500" />
                 <StatCard title="Total Pinjaman Keseluruhan" value={formatCurrency(summaryData.totalPinjaman)} icon={<ChartBarIcon className="w-6 h-6" />} iconBgColor="bg-amber-500" />
             </div>
 
-            <div className="bg-surface p-6 rounded-xl border border-border">
+            <div className="bg-surface p-6 rounded-xl border border-slate-200">
                 <div className="flex flex-wrap justify-between items-center mb-6 gap-4">
                     <h2 className="text-lg md:text-xl font-bold text-dark">Rincian Keuangan Anggota</h2>
                     <div className="flex flex-wrap items-center gap-4">
                         <input
                             type="text"
                             placeholder="Cari (nama, no. anggota)..."
-                            className="bg-zinc-800 border border-border rounded-lg px-4 py-2 w-full sm:w-auto focus:ring-1 focus:ring-primary focus:border-primary"
+                            className="bg-slate-50 border border-slate-300 rounded-lg px-4 py-2 w-full sm:w-auto focus:ring-1 focus:ring-primary focus:border-primary text-dark"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                          <select
                             value={sortOption}
                             onChange={(e) => setSortOption(e.target.value)}
-                            className="bg-zinc-800 border border-border rounded-lg px-4 py-2 w-full sm:w-auto focus:ring-1 focus:ring-primary focus:border-primary"
+                            className="bg-slate-50 border border-slate-300 rounded-lg px-4 py-2 w-full sm:w-auto focus:ring-1 focus:ring-primary focus:border-primary text-dark"
                         >
                             <option value="no_anggota_asc">Urutkan No. Anggota (A-Z)</option>
                             <option value="no_anggota_desc">Urutkan No. Anggota (Z-A)</option>
@@ -258,7 +258,7 @@ const AdminLaporan: React.FC = () => {
                         <select
                             value={selectedMonth}
                             onChange={(e) => setSelectedMonth(e.target.value)}
-                            className="bg-zinc-800 border border-border rounded-lg px-4 py-2 w-full sm:w-auto focus:ring-1 focus:ring-primary focus:border-primary"
+                            className="bg-slate-50 border border-slate-300 rounded-lg px-4 py-2 w-full sm:w-auto focus:ring-1 focus:ring-primary focus:border-primary text-dark"
                             disabled={isLoading}
                         >
                              {availableMonths.length > 0 ? availableMonths.map(renderMonthOption) : <option>Memuat...</option>}
@@ -266,7 +266,7 @@ const AdminLaporan: React.FC = () => {
                          <button
                             onClick={handleDownload}
                             disabled={isDownloading || isLoading}
-                            className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+                            className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-700 transition-colors disabled:bg-slate-400 disabled:cursor-not-allowed"
                         >
                             <DownloadIcon className="w-5 h-5" />
                             {isDownloading ? 'Menyiapkan...' : 'Download Laporan'}
@@ -278,17 +278,17 @@ const AdminLaporan: React.FC = () => {
                         <table className="w-full text-sm text-left text-gray-text">
                             <thead className="text-xs text-gray-text uppercase">
                                 <tr>
-                                    <th scope="col" className="px-4 py-4 sm:px-6 font-semibold border-b-2 border-border">No. Anggota</th>
-                                    <th scope="col" className="px-4 py-4 sm:px-6 font-semibold border-b-2 border-border">Nama</th>
-                                    <th scope="col" className="px-4 py-4 sm:px-6 font-semibold border-b-2 border-border text-right">Simpanan Pokok</th>
-                                    <th scope="col" className="px-4 py-4 sm:px-6 font-semibold border-b-2 border-border text-right">Simpanan Wajib</th>
-                                    <th scope="col" className="px-4 py-4 sm:px-6 font-semibold border-b-2 border-border text-right">Total Simpanan</th>
-                                    <th scope="col" className="px-4 py-4 sm:px-6 font-semibold border-b-2 border-border text-right">Total Pinjaman</th>
+                                    <th scope="col" className="px-4 py-4 sm:px-6 font-semibold border-b-2 border-slate-200">No. Anggota</th>
+                                    <th scope="col" className="px-4 py-4 sm:px-6 font-semibold border-b-2 border-slate-200">Nama</th>
+                                    <th scope="col" className="px-4 py-4 sm:px-6 font-semibold border-b-2 border-slate-200 text-right">Simpanan Pokok</th>
+                                    <th scope="col" className="px-4 py-4 sm:px-6 font-semibold border-b-2 border-slate-200 text-right">Simpanan Wajib</th>
+                                    <th scope="col" className="px-4 py-4 sm:px-6 font-semibold border-b-2 border-slate-200 text-right">Total Simpanan</th>
+                                    <th scope="col" className="px-4 py-4 sm:px-6 font-semibold border-b-2 border-slate-200 text-right">Total Pinjaman</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-border">
+                            <tbody className="divide-y divide-slate-200">
                                 {filteredKeuangan.length > 0 ? filteredKeuangan.map((item) => (
-                                    <tr key={item.no_anggota} className="hover:bg-primary/20 transition-colors">
+                                    <tr key={item.no_anggota} className="hover:bg-primary-light/50 transition-colors">
                                         <td className="px-4 py-4 sm:px-6 font-medium text-dark">
                                             <Link to={`/admin/keuangan/${item.no_anggota}`} className="text-primary hover:underline">
                                                 {item.no_anggota}
@@ -297,8 +297,8 @@ const AdminLaporan: React.FC = () => {
                                         <td className="px-4 py-4 sm:px-6">{item.nama_angota}</td>
                                         <CurrencyCell amount={item.akhir_simpanan_pokok} />
                                         <CurrencyCell amount={item.akhir_simpanan_wajib} />
-                                        <CurrencyCell amount={item.jumlah_total_simpanan} defaultColor="text-green-400" className="font-semibold" />
-                                        <CurrencyCell amount={item.jumlah_total_pinjaman} defaultColor="text-yellow-400" className="font-semibold" />
+                                        <CurrencyCell amount={item.jumlah_total_simpanan} defaultColor="text-green-600" className="font-semibold" />
+                                        <CurrencyCell amount={item.jumlah_total_pinjaman} defaultColor="text-amber-600" className="font-semibold" />
                                     </tr>
                                 )) : (
                                     <tr>
