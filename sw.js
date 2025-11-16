@@ -1,4 +1,4 @@
-const CACHE_NAME = 'e-koperasi-cache-v30'; // Incremented version
+const CACHE_NAME = 'e-koperasi-cache-v32'; // Incremented version
 const urlsToCache = [
   // App Shell
   '/',
@@ -16,8 +16,8 @@ const urlsToCache = [
   'https://aistudiocdn.com/react-dom@19.2.0/client',
   'https://esm.sh/react-router-dom@6.23.1',
   'https://esm.sh/recharts@2.12.7',
-  'https://aistudiocdn.com/firebase@12.6.0/app',
-  'https://aistudiocdn.com/firebase@12.6.0/firestore',
+  'https://esm.sh/firebase@10.12.2/app',
+  'https://esm.sh/firebase@10.12.2/firestore',
   'https://esm.sh/react-dropzone@14.2.3',
   'https://esm.sh/xlsx@0.18.5'
 ];

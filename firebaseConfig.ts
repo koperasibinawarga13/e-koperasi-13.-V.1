@@ -1,9 +1,6 @@
 import { initializeApp } from "firebase/app";
-// FIX: Add a side-effect import for 'firebase/firestore' to ensure the Firestore service is registered with the Firebase app before it's used. This resolves the "Service firestore is not available" error.
-import "firebase/firestore";
 import { getFirestore } from "firebase/firestore";
 
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyDNFHn1AffQHEtMxjYcmOWMV3xyNv_9nHU",
   authDomain: "e-koperasi13.firebaseapp.com",
@@ -14,9 +11,10 @@ const firebaseConfig = {
   measurementId: "G-B96R2RRHPW"
 };
 
+// Inisialisasi Firebase. This creates the default app instance.
+initializeApp(firebaseConfig);
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-export { db };
+// Dapatkan referensi ke layanan database.
+// By not passing an app instance, getFirestore() uses the default instance.
+// This can prevent initialization issues in some environments.
+export const db = getFirestore();

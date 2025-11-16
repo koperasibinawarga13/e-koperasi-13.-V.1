@@ -6,11 +6,11 @@
     <title>Koperasi Bina 13 Warga</title>
 
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="/icon-192x192.png" />
-    <link rel="apple-touch-icon" href="/icon-512x512.png" />
+    <link rel="icon" type="image/png" href="icon-192x192.png" />
+    <link rel="apple-touch-icon" href="icon-512x512.png" />
 
     <!-- PWA Manifest -->
-    <link rel="manifest" href="/manifest.json" />
+    <link rel="manifest" href="manifest.json" />
     <meta name="theme-color" content="#4338CA" />
 
     <!-- Import Map (React 19 + Safe for AI Studio) -->
@@ -27,18 +27,53 @@
         "xlsx": "https://esm.sh/xlsx@0.18.5",
         "react-dropzone": "https://esm.sh/react-dropzone@14.2.3",
 
-        "firebase/app": "https://aistudiocdn.com/firebase@12.6.0/app",
-        "firebase/firestore": "https://aistudiocdn.com/firebase@12.6.0/firestore",
+        "firebase/app": "https://esm.sh/firebase@10.12.2/app",
+        "firebase/firestore": "https://esm.sh/firebase@10.12.2/firestore",
 
-        "firebase/": "https://aistudiocdn.com/firebase@12.6.0/",
+        "firebase/": "https://esm.sh/firebase@10.12.2/",
         "react/": "https://aistudiocdn.com/react@19.2.0/",
         "react-dom/": "https://aistudiocdn.com/react-dom@19.2.0/"
       }
     }
     </script>
 
-    <!-- Tailwind CSS -->
+    <!-- Tailwind CSS Config -->
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              'dark': '#1E293B',
+              'primary': '#4338CA',
+              'primary-dark': '#3730A3',
+              'primary-light': '#F5F3FF',
+              'secondary': '#10B981',
+              'secondary-dark': '#059669',
+              'secondary-light': '#D1FAE5',
+              'accent': '#F59E0B',
+              'accent-dark': '#D97706',
+              'background': '#F1F5F9',
+              'surface': '#FFFFFF',
+              'gray-text': '#64748B',
+            },
+            fontFamily: {
+              sans: ['Poppins', 'sans-serif'],
+            },
+            animation: {
+              'fade-in-up': 'fade-in-up 0.5s ease-out forwards',
+            },
+            keyframes: {
+              'fade-in-up': {
+                'from': { opacity: '0', transform: 'translateY(20px)' },
+                'to': { opacity: '1', transform: 'translateY(0)' },
+              },
+            }
+          }
+        }
+      }
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
+
 
     <!-- Google Fonts -->
     <link
@@ -51,6 +86,19 @@
     <div id="root"></div>
 
     <!-- ENTRY POINT -->
-    <script type="module" src="./index.tsx"></script>
+    <script type="module" src="index.tsx"></script>
+
+    <!-- PWA Service Worker Registration -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').then(registration => {
+            console.log('Service Worker registered: ', registration);
+          }).catch(registrationError => {
+            console.log('Service Worker registration failed: ', registrationError);
+          });
+        });
+      }
+    </script>
   </body>
 </html>
