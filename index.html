@@ -6,11 +6,11 @@
     <title>Koperasi Bina 13 Warga</title>
 
     <!-- PWA Manifest -->
-    <link rel="manifest" href="/manifest.json" />
+    <link rel="manifest" href="./manifest.json" />
 
     <!-- Favicon and Apple Touch Icon -->
-    <link rel="icon" type="image/png" href="/icon-192x192.png" />
-    <link rel="apple-touch-icon" href="/icon-192x192.png">
+    <link rel="icon" type="image/png" href="./icon-192x192.png" />
+    <link rel="apple-touch-icon" href="./icon-192x192.png">
     
     <meta name="theme-color" content="#000000" />
 
@@ -95,13 +95,13 @@
     <div id="root"></div>
 
     <!-- ENTRY POINT -->
-    <script type="module" src="index.tsx"></script>
+    <script type="module" src="./index.tsx"></script>
 
     <!-- Service Worker Registration -->
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js')
+          navigator.serviceWorker.register('./sw.js')
             .then(registration => {
               console.log('ServiceWorker registration successful with scope: ', registration.scope);
             })

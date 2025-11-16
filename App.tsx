@@ -1,6 +1,7 @@
 import React from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { PWAProvider } from './context/PWAContext'; // Import PWAProvider
 // FIX: Changed import to be a named import to fix module resolution error.
 import { LoginPage } from './pages/LoginPage';
 import AdminLayout from './pages/admin/AdminLayout';
@@ -30,11 +31,13 @@ import AdminPengaturanKewajiban from './pages/admin/AdminPengaturanKewajiban';
 
 const App: React.FC = () => {
   return (
-    <AuthProvider>
-      <HashRouter>
-        <AppRoutes />
-      </HashRouter>
-    </AuthProvider>
+    <PWAProvider>
+      <AuthProvider>
+        <HashRouter>
+          <AppRoutes />
+        </HashRouter>
+      </AuthProvider>
+    </PWAProvider>
   );
 };
 

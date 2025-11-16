@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { usePWA } from '../context/PWAContext'; // Import usePWA
 import { DownloadIcon, EyeIcon, EyeSlashIcon, ChevronDownIcon } from '../components/icons/Icons';
 import { registerAnggota, generateNewAnggotaNo, registerNewAnggota, getAnggotaByNo } from '../services/anggotaService';
 import { Logo } from '../components/icons/Logo';
@@ -38,6 +39,7 @@ export const LoginPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isKewajibanVisible, setIsKewajibanVisible] = useState(false);
   const { login } = useAuth();
+  const { installPromptEvent, triggerInstallPrompt } = usePWA(); // Get PWA install functions
 
   // Fetch kewajiban settings
   useEffect(() => {
@@ -172,6 +174,18 @@ export const LoginPage: React.FC = () => {
                 <Logo className="h-16 w-auto text-dark" />
             </div>
             
+            {installPromptEvent && view === 'login' && (
+                <div className="mb-6 animate-fade-in-up">
+                    <button 
+                        onClick={triggerInstallPrompt}
+                        className="w-full flex items-center justify-center gap-3 bg-secondary text-white px-4 py-3 rounded-lg text-sm font-semibold hover:bg-secondary-dark transition-colors"
+                    >
+                        <DownloadIcon className="w-5 h-5" />
+                        <span>Download Aplikasi</span>
+                    </button>
+                </div>
+            )}
+
             <div className="flex justify-center mb-6">
                 <span className="bg-primary-light text-primary text-sm font-semibold px-5 py-2 rounded-full">
                     {welcomeMessage}
