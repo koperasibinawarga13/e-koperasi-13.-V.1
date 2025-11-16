@@ -235,9 +235,9 @@ const LoginPage: React.FC = () => {
                 <Logo />
             </div>
             <div className="relative z-20 w-full max-w-md">
-                <p className="text-base sm:text-lg text-indigo-200 -mt-2">Sistem Informasi Koperasi Karyawan SMPN 13 Tasikmalaya</p>
+                <p className="text-base sm:text-lg text-white/90 -mt-2">Sistem Informasi Koperasi Karyawan SMPN 13 Tasikmalaya</p>
                 <div className="mt-4 transition-all duration-300 min-h-[28px] flex items-center justify-center">
-                    <p className="text-base sm:text-lg font-bold bg-slate-200 text-dark px-4 py-1 rounded-full">
+                    <p className="text-base sm:text-lg font-bold bg-slate-100 text-slate-700 px-4 py-1 rounded-full">
                       {getHeaderName() || 'Selamat Datang'}
                     </p>
                 </div>
