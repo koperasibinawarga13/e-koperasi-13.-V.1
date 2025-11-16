@@ -1,5 +1,5 @@
 
-const CACHE_NAME = 'e-koperasi-cache-v43';
+const CACHE_NAME = 'e-koperasi-cache-v44';
 
 const STATIC_ASSETS = [
   '/',                // app shell
