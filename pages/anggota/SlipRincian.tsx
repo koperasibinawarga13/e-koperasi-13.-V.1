@@ -47,7 +47,7 @@ const SlipRincian: React.FC = () => {
     if (!keuangan || !anggota) {
         return (
             <div className="p-8 text-center text-dark">
-                <h2 className="text-xl font-bold text-red-400">Gagal Memuat Data</h2>
+                <h2 className="text-xl font-bold text-red-500">Gagal Memuat Data</h2>
                 <p>Data keuangan atau anggota tidak ditemukan.</p>
                 <button onClick={() => navigate(-1)} className="mt-4 inline-flex items-center gap-2 text-primary hover:underline">
                     <ChevronLeftIcon className="w-4 h-4" />
@@ -102,7 +102,7 @@ const SlipRincian: React.FC = () => {
         <div className="bg-background min-h-screen font-sans">
             <div className="max-w-4xl mx-auto p-4 print:hidden">
                  <div className="flex justify-between items-center mb-4">
-                    <button onClick={() => navigate(-1)} className="flex items-center gap-2 bg-surface px-4 py-2 rounded-lg border border-gray-600 hover:bg-gray-700 text-dark">
+                    <button onClick={() => navigate(-1)} className="flex items-center gap-2 bg-surface px-4 py-2 rounded-lg shadow-sm hover:bg-slate-100 text-dark">
                         <ChevronLeftIcon className="w-5 h-5" />
                         Kembali
                     </button>

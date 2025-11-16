@@ -11,8 +11,8 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, icon, iconBgColor }) 
   const isNegative = value.includes('(') || value.includes('-');
 
   return (
-    <div className="bg-surface p-4 sm:p-6 rounded-xl border border-slate-200 flex items-center space-x-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-primary/10">
-      <div className={`p-3 rounded-lg text-white shadow-lg ${iconBgColor}`}>
+    <div className="bg-surface p-4 sm:p-6 rounded-xl flex items-center space-x-4">
+      <div className={`p-3 rounded-lg text-white ${iconBgColor}`}>
         {icon}
       </div>
       <div>

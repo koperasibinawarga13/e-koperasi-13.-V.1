@@ -17,11 +17,11 @@ const EditableField: React.FC<{
     fullWidth?: boolean;
 }> = ({ label, name, value, onChange, type = 'text', isTextarea = false, fullWidth = false }) => (
     <div className={`py-2 ${fullWidth ? 'sm:col-span-2' : 'sm:col-span-1'}`}>
-        <label htmlFor={name} className="block text-sm font-medium text-gray-300">{label}</label>
+        <label htmlFor={name} className="block text-sm font-medium text-gray-text">{label}</label>
         {isTextarea ? (
-            <textarea id={name} name={name} value={value} onChange={onChange} rows={3} className="mt-1 block w-full bg-gray-800 border border-gray-600 rounded-md py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary text-dark" />
+            <textarea id={name} name={name} value={value} onChange={onChange} rows={3} className="mt-1 block w-full bg-slate-100 rounded-md py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary text-dark" />
         ) : (
-            <input type={type} id={name} name={name} value={value} onChange={onChange} className="mt-1 block w-full bg-gray-800 border border-gray-600 rounded-md py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary text-dark" />
+            <input type={type} id={name} name={name} value={value} onChange={onChange} className="mt-1 block w-full bg-slate-100 rounded-md py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary text-dark" />
         )}
     </div>
 );
@@ -73,7 +73,7 @@ const AnggotaProfil: React.FC = () => {
 
   const ProfileInfoRow: React.FC<{ label: string; value: string | undefined | null; fullWidth?: boolean }> = ({ label, value, fullWidth = false }) => (
     <div className={`py-3 sm:grid sm:grid-cols-3 sm:gap-4 ${fullWidth ? 'sm:col-span-2' : ''}`}>
-        <dt className="text-sm font-medium text-gray-400">{label}</dt>
+        <dt className="text-sm font-medium text-gray-text">{label}</dt>
         <dd className="mt-1 text-md text-dark sm:mt-0 sm:col-span-2">{value || '-'}</dd>
     </div>
   );
@@ -89,12 +89,12 @@ const AnggotaProfil: React.FC = () => {
   return (
     <div>
       <Header title="Profil Anggota" />
-      <div className="bg-surface p-6 rounded-xl border border-gray-700">
-        <div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6 border-b border-gray-600 pb-6 mb-6">
-          <UserCircleIcon className="w-24 h-24 text-gray-500 flex-shrink-0" />
+      <div className="bg-surface p-6 rounded-xl shadow-md">
+        <div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6 pb-6 mb-6">
+          <UserCircleIcon className="w-24 h-24 text-slate-400 flex-shrink-0" />
           <div className="text-center sm:text-left">
             <h2 className="text-xl sm:text-2xl font-bold text-dark">{profileData.nama}</h2>
-            <p className="text-gray-400">No. Anggota: {profileData.no_anggota}</p>
+            <p className="text-gray-text">No. Anggota: {profileData.no_anggota}</p>
           </div>
         </div>
         
@@ -105,7 +105,7 @@ const AnggotaProfil: React.FC = () => {
                 <EditableField label="Alamat" name="alamat" value={editableData.alamat} onChange={handleInputChange} isTextarea={true} fullWidth={true} />
             </div>
         ) : (
-            <dl className="divide-y divide-gray-600">
+            <dl>
                 <div className="grid grid-cols-1 sm:grid-cols-2">
                     <ProfileInfoRow label="NIK" value={profileData.nik} />
                     <ProfileInfoRow label="Tanggal Bergabung" value={profileData.tanggal_bergabung ? new Date(profileData.tanggal_bergabung).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '-'} />
@@ -119,11 +119,11 @@ const AnggotaProfil: React.FC = () => {
         <div className="mt-8 flex justify-end gap-4">
             {isEditing ? (
                 <>
-                    <button onClick={() => setIsEditing(false)} className="bg-gray-600 text-gray-200 px-4 py-2 rounded-lg font-semibold hover:bg-gray-500 transition-colors">Batal</button>
+                    <button onClick={() => setIsEditing(false)} className="bg-slate-200 text-slate-700 px-4 py-2 rounded-lg font-semibold hover:bg-slate-300 transition-colors">Batal</button>
                     <button onClick={handleSave} className="bg-primary text-white px-4 py-2 rounded-lg font-semibold hover:bg-primary-dark transition-colors">Simpan Perubahan</button>
                 </>
             ) : (
-                <button onClick={() => setIsEditing(true)} className="bg-secondary text-white px-4 py-2 rounded-lg font-semibold hover:bg-emerald-600 transition-colors">Ubah Profil</button>
+                <button onClick={() => setIsEditing(true)} className="bg-secondary text-white px-4 py-2 rounded-lg font-semibold hover:bg-secondary-dark transition-colors">Ubah Profil</button>
             )}
         </div>
       </div>

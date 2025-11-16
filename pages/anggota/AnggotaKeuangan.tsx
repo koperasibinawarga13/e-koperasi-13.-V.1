@@ -6,7 +6,7 @@ import { getAnggotaById } from '../../services/anggotaService';
 import { getLaporanBulanan, getAvailableLaporanMonths, getKeuanganByNoAnggota } from '../../services/keuanganService';
 import { PrintIcon, UserCircleIcon } from '../../components/icons/Icons';
 
-const AnggotaKeuangan: React.FC = () => {
+export const AnggotaKeuangan: React.FC = () => {
     const { user } = useAuth();
     const [data, setData] = useState<Keuangan | null>(null);
     const [anggota, setAnggota] = useState<Anggota | null>(null);
@@ -79,8 +79,8 @@ const AnggotaKeuangan: React.FC = () => {
     };
 
     const DetailCard: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => (
-        <div className="bg-surface p-6 rounded-xl border border-slate-200 mb-8">
-            <h3 className="text-lg sm:text-xl font-bold text-dark border-b border-slate-200 pb-3 mb-4">{title}</h3>
+        <div className="bg-surface p-6 rounded-xl shadow-md mb-8">
+            <h3 className="text-lg sm:text-xl font-bold text-dark pb-3 mb-4">{title}</h3>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-4">
                 {children}
             </div>
@@ -100,11 +100,11 @@ const AnggotaKeuangan: React.FC = () => {
     return (
         <div>
             {/* Custom Header Section */}
-            <div className="bg-surface p-6 rounded-lg mb-8 flex flex-wrap items-center justify-between gap-4">
+            <div className="bg-surface p-6 rounded-lg mb-8 flex flex-wrap items-center justify-between gap-4 shadow-sm">
                 <div className="flex items-center space-x-3">
                     <h1 className="text-2xl sm:text-3xl font-bold text-dark">Rincian Keuangan</h1>
                     {anggota && (
-                        <div className="hidden md:flex items-center space-x-2 text-gray-text border-l border-slate-200 pl-3 ml-1">
+                        <div className="hidden md:flex items-center space-x-2 text-gray-text pl-3 ml-1">
                             <UserCircleIcon className="w-6 h-6 text-slate-400" />
                             <span className="font-medium">{anggota.nama}</span>
                         </div>
@@ -116,7 +116,7 @@ const AnggotaKeuangan: React.FC = () => {
                             id="month-select"
                             value={selectedMonth}
                             onChange={(e) => setSelectedMonth(e.target.value)}
-                            className="w-48 bg-slate-50 border border-slate-300 rounded-md py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary text-dark"
+                            className="w-48 bg-slate-100 rounded-md py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary text-dark"
                             disabled={isLoading || availableMonths.length <= 1}
                         >
                            {(availableMonths.length > 0) ? 
@@ -192,10 +192,8 @@ const AnggotaKeuangan: React.FC = () => {
                     <InfoItem label="Total Simpanan" value={data.jumlah_total_simpanan} />
                     <InfoItem label="Total Pinjaman" value={data.jumlah_total_pinjaman} />
                 </DetailCard>
-             </>
+            </>
             )}
         </div>
     );
 };
-
-export default AnggotaKeuangan;

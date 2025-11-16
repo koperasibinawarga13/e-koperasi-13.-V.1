@@ -63,26 +63,26 @@ const AdminRekapTransaksiManual: React.FC = () => {
             <Header title="Rekapitulasi Transaksi Manual" />
 
             {/* Filter Section */}
-            <div className="bg-surface p-6 rounded-xl border border-gray-700 mb-8 print:hidden">
+            <div className="bg-surface p-6 rounded-xl shadow-md mb-8 print:hidden">
                 <form onSubmit={handleGenerateReport} className="flex flex-wrap items-end gap-4">
                     <div>
-                        <label htmlFor="periode" className="block text-sm font-medium text-gray-300">Periode Laporan</label>
+                        <label htmlFor="periode" className="block text-sm font-medium text-gray-text">Periode Laporan</label>
                         <select
                             id="periode"
                             value={selectedPeriod}
                             onChange={(e) => setSelectedPeriod(e.target.value)}
-                            className="mt-1 block w-full bg-gray-800 border-gray-600 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md border text-dark py-2 pl-3 pr-10"
+                            className="mt-1 block w-full bg-slate-100 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md text-dark py-2 pl-3 pr-10"
                         >
                             {availablePeriods.map(p => <option key={p} value={p}>{formatPeriod(p)}</option>)}
                         </select>
                     </div>
                      <div>
-                        <label htmlFor="admin" className="block text-sm font-medium text-gray-300">Nama Admin</label>
+                        <label htmlFor="admin" className="block text-sm font-medium text-gray-text">Nama Admin</label>
                         <select
                             id="admin"
                             value={selectedAdmin}
                             onChange={(e) => setSelectedAdmin(e.target.value)}
-                            className="mt-1 block w-full bg-gray-800 border-gray-600 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md border text-dark py-2 pl-3 pr-10"
+                            className="mt-1 block w-full bg-slate-100 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md text-dark py-2 pl-3 pr-10"
                         >
                             <option value="">-- Pilih Admin --</option>
                             {admins.map(admin => <option key={admin.id} value={admin.nama}>{admin.nama}</option>)}
@@ -91,7 +91,7 @@ const AdminRekapTransaksiManual: React.FC = () => {
                     <button
                         type="submit"
                         disabled={isLoading}
-                        className="bg-primary text-white px-6 py-2 rounded-lg font-semibold hover:bg-primary-dark disabled:bg-gray-400"
+                        className="bg-primary text-white px-6 py-2 rounded-lg font-semibold hover:bg-primary-dark disabled:bg-slate-400"
                     >
                         {isLoading ? 'Memuat...' : 'Tampilkan Rekap'}
                     </button>
@@ -100,43 +100,43 @@ const AdminRekapTransaksiManual: React.FC = () => {
 
             {/* Report Section */}
             {rekapData && (
-                <div id="rekap-content" className="bg-surface p-6 rounded-xl border border-gray-700">
+                <div id="rekap-content" className="bg-surface p-6 rounded-xl shadow-md">
                     <div className="flex justify-between items-start mb-6">
                         <div>
                             <h2 className="text-xl font-bold text-dark">Rekapitulasi Transaksi Manual</h2>
-                            <p className="text-gray-400">
+                            <p className="text-gray-text">
                                 <strong>Admin:</strong> {selectedAdmin} <br />
                                 <strong>Periode:</strong> {formatPeriod(selectedPeriod)}
                             </p>
                         </div>
-                        <button onClick={handlePrint} className="flex items-center gap-2 bg-gray-700 text-gray-200 px-4 py-2 rounded-lg font-semibold hover:bg-gray-600 print:hidden">
+                        <button onClick={handlePrint} className="flex items-center gap-2 bg-slate-200 text-slate-700 px-4 py-2 rounded-lg font-semibold hover:bg-slate-300 print:hidden">
                             <PrintIcon className="w-5 h-5" /> Cetak
                         </button>
                     </div>
 
-                    <div className="bg-blue-900/50 border border-blue-500/50 p-4 rounded-lg mb-6 text-center">
-                        <p className="text-sm font-medium text-blue-300">TOTAL SETORAN TUNAI PERIODE INI</p>
-                        <p className="text-3xl font-bold text-blue-200">{formatCurrency(totalSetoran)}</p>
+                    <div className="bg-primary-light p-4 rounded-lg mb-6 text-center">
+                        <p className="text-sm font-medium text-sky-700">TOTAL SETORAN TUNAI PERIODE INI</p>
+                        <p className="text-3xl font-bold text-sky-800">{formatCurrency(totalSetoran)}</p>
                     </div>
 
                     <h3 className="text-lg font-semibold text-dark mb-4">Rincian Transaksi</h3>
                     <div className="overflow-x-auto">
-                        <table className="w-full text-sm text-left text-gray-400">
-                            <thead className="text-xs text-gray-400 uppercase">
+                        <table className="w-full text-sm text-left text-gray-text">
+                            <thead className="text-xs text-gray-text uppercase">
                                 <tr>
-                                    <th className="px-4 py-3 border-b-2 border-gray-700">Tanggal Input</th>
-                                    <th className="px-4 py-3 border-b-2 border-gray-700">No. Anggota</th>
-                                    <th className="px-4 py-3 border-b-2 border-gray-700">Nama Anggota</th>
-                                    <th className="px-4 py-3 border-b-2 border-gray-700 text-right">Jumlah Setoran</th>
+                                    <th className="px-4 py-3">Tanggal Input</th>
+                                    <th className="px-4 py-3">No. Anggota</th>
+                                    <th className="px-4 py-3">Nama Anggota</th>
+                                    <th className="px-4 py-3 text-right">Jumlah Setoran</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-gray-700">
+                            <tbody>
                                 {rekapData.map(log => (
-                                    <tr key={log.id} className="hover:bg-gray-600">
+                                    <tr key={log.id} className="border-t border-slate-100 hover:bg-slate-50">
                                         <td className="px-4 py-3">{formatDate(log.log_time)}</td>
                                         <td className="px-4 py-3">{log.no_anggota}</td>
                                         <td className="px-4 py-3 font-medium text-dark">{log.nama_angota}</td>
-                                        <td className="px-4 py-3 text-right font-semibold">{formatCurrency(log.Jumlah_setoran)}</td>
+                                        <td className="px-4 py-3 text-right font-semibold text-dark">{formatCurrency(log.Jumlah_setoran)}</td>
                                     </tr>
                                 ))}
                             </tbody>
@@ -145,14 +145,14 @@ const AdminRekapTransaksiManual: React.FC = () => {
                 </div>
             )}
              {!rekapData && !isLoading && (
-                <div className="text-center py-10 text-gray-400">
+                <div className="text-center py-10 text-gray-text">
                     <p>Silakan pilih periode dan admin untuk menampilkan rekapitulasi setoran.</p>
                 </div>
              )}
              
             <style>{`
                 @media print {
-                    body, #root {
+                    body, #root, .bg-background {
                         background-color: white !important;
                     }
                     .print\\:hidden {
@@ -161,13 +161,15 @@ const AdminRekapTransaksiManual: React.FC = () => {
                     #rekap-content {
                         box-shadow: none !important;
                         border: 1px solid #ccc;
-                        color: black !important;
                     }
-                     #rekap-content * {
+                    #rekap-content, #rekap-content * {
                         color: black !important;
                     }
                     #rekap-content thead {
                         background-color: #f3f4f6 !important;
+                    }
+                     .bg-primary-light {
+                        background-color: #e0f2fe !important; /* sky-100 */
                     }
                 }
             `}</style>

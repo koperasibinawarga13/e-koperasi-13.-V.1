@@ -109,45 +109,45 @@ const AdminRiwayatTransaksi: React.FC = () => {
     return (
         <div>
             <Header title="Riwayat Transaksi Manual" />
-            <div className="bg-surface p-6 rounded-xl border border-gray-700">
+            <div className="bg-surface p-6 rounded-xl shadow-md">
                 <div className="flex justify-between items-start mb-4">
                     <form onSubmit={handleSearch} className="flex items-center gap-2">
                         <input
                             type="text"
                             placeholder="Masukkan Nomor Anggota (e.g., AK-101)"
-                            className="bg-gray-800 border border-gray-600 rounded-lg px-4 py-2 w-full sm:w-64 text-dark"
+                            className="bg-slate-100 rounded-lg px-4 py-2 w-full sm:w-64 text-dark"
                             value={searchNoAnggota}
                             onChange={(e) => setSearchNoAnggota(e.target.value)}
                         />
-                        <button type="submit" disabled={isLoading} className="bg-primary text-white px-6 py-2 rounded-lg font-semibold hover:bg-primary-dark disabled:bg-gray-400">
+                        <button type="submit" disabled={isLoading} className="bg-primary text-white px-6 py-2 rounded-lg font-semibold hover:bg-primary-dark disabled:bg-slate-400">
                            {isLoading ? 'Mencari...' : 'Cari'}
                         </button>
                     </form>
                     <div className="text-right">
-                         <button onClick={handleSync} disabled={isSyncing} className="bg-green-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-600 disabled:bg-gray-400">
+                         <button onClick={handleSync} disabled={isSyncing} className="bg-green-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-600 disabled:bg-slate-400">
                             {isSyncing ? 'Menyinkronkan...' : 'Sinkronisasi Riwayat'}
                         </button>
-                        <p className="text-xs text-gray-400 mt-1">Gunakan jika riwayat transaksi tidak muncul.</p>
+                        <p className="text-xs text-gray-text mt-1">Gunakan jika riwayat transaksi tidak muncul.</p>
                     </div>
                 </div>
                  {syncMessage && (
-                    <div className="mb-4 p-3 rounded-md text-sm bg-blue-900/50 text-blue-300 text-center">
+                    <div className="mb-4 p-3 rounded-md text-sm bg-sky-100 text-sky-800 text-center">
                         {syncMessage}
                     </div>
                 )}
                 <div className="overflow-x-auto">
-                    <table className="w-full text-sm text-left text-gray-400">
-                        <thead className="text-xs text-gray-400 uppercase">
+                    <table className="w-full text-sm text-left text-gray-text">
+                        <thead className="text-xs text-gray-text uppercase">
                             <tr>
-                                <th className="px-4 py-3 border-b-2 border-gray-700">WAKTU LOG</th>
-                                <th className="px-4 py-3 border-b-2 border-gray-700">PERIODE</th>
-                                <th className="px-4 py-3 border-b-2 border-gray-700">ADMIN</th>
-                                <th className="px-4 py-3 border-b-2 border-gray-700">JENIS</th>
-                                <th className="px-4 py-3 border-b-2 border-gray-700 text-right">TOTAL SETORAN</th>
-                                <th className="px-4 py-3 border-b-2 border-gray-700 text-center">AKSI</th>
+                                <th className="px-4 py-3">WAKTU LOG</th>
+                                <th className="px-4 py-3">PERIODE</th>
+                                <th className="px-4 py-3">ADMIN</th>
+                                <th className="px-4 py-3">JENIS</th>
+                                <th className="px-4 py-3 text-right">TOTAL SETORAN</th>
+                                <th className="px-4 py-3 text-center">AKSI</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-700">
+                        <tbody>
                             {isLoading ? (
                                 <tr><td colSpan={6} className="text-center py-10">Memuat data...</td></tr>
                             ) : searchedMember && combinedHistory.length === 0 ? (
@@ -163,20 +163,20 @@ const AdminRiwayatTransaksi: React.FC = () => {
                                     if (item.type === 'log') {
                                         const log = data as TransaksiLog;
                                         return (
-                                            <tr key={log.id} className="hover:bg-gray-600">
+                                            <tr key={log.id} className="border-t border-slate-100 hover:bg-slate-50">
                                                 <td className="px-4 py-3">{new Date(log.log_time).toLocaleString('id-ID')}</td>
                                                 <td className="px-4 py-3">{log.periode}</td>
-                                                <td className="px-4 py-3">{log.admin_nama}</td>
+                                                <td className="px-4 py-3 text-dark">{log.admin_nama}</td>
                                                 <td className="px-4 py-3">
-                                                    <span className={`px-2 py-1 text-xs font-semibold rounded-full ${log.type === 'EDIT' ? 'bg-amber-900/50 text-amber-300' : 'bg-green-900/50 text-green-300'}`}>
+                                                    <span className={`px-2 py-1 text-xs font-semibold rounded-full ${log.type === 'EDIT' ? 'bg-amber-100 text-amber-700' : 'bg-green-100 text-green-700'}`}>
                                                         {log.type}
                                                     </span>
                                                 </td>
-                                                <td className="px-4 py-3 text-right font-semibold">{formatCurrency(log.Jumlah_setoran)}</td>
+                                                <td className="px-4 py-3 text-right font-semibold text-dark">{formatCurrency(log.Jumlah_setoran)}</td>
                                                 <td className="px-4 py-3 text-center">
                                                     <button 
                                                         onClick={() => navigate(`/admin/transaksi?editLogId=${log.id}`)}
-                                                        className="text-blue-400 hover:text-blue-300 disabled:text-gray-500"
+                                                        className="text-primary hover:text-primary-dark disabled:text-slate-400"
                                                         title="Edit Transaksi"
                                                         disabled={log.admin_nama !== user?.name && user?.email !== 'admin@koperasi13.com'}
                                                     >
@@ -188,20 +188,20 @@ const AdminRiwayatTransaksi: React.FC = () => {
                                     } else { // type === 'history'
                                         const history = data as Keuangan;
                                         return (
-                                            <tr key={history.id} className="bg-yellow-900/30 hover:bg-yellow-900/40">
-                                                <td className="px-4 py-3 italic text-gray-500">Belum ada Log</td>
+                                            <tr key={history.id} className="bg-amber-50 hover:bg-amber-100 border-t border-amber-200">
+                                                <td className="px-4 py-3 italic text-slate-400">Belum ada Log</td>
                                                 <td className="px-4 py-3">{history.periode}</td>
-                                                <td className="px-4 py-3 italic">{history.admin_nama || 'Sistem'}</td>
+                                                <td className="px-4 py-3 italic text-dark">{history.admin_nama || 'Sistem'}</td>
                                                 <td className="px-4 py-3">
-                                                    <span className="px-2 py-1 text-xs font-semibold rounded-full bg-gray-600 text-gray-200">
+                                                    <span className="px-2 py-1 text-xs font-semibold rounded-full bg-slate-200 text-slate-600">
                                                        TRANSAKSI
                                                     </span>
                                                 </td>
-                                                <td className="px-4 py-3 text-right font-semibold">{formatCurrency(history.Jumlah_setoran)}</td>
+                                                <td className="px-4 py-3 text-right font-semibold text-dark">{formatCurrency(history.Jumlah_setoran)}</td>
                                                 <td className="px-4 py-3 text-center">
                                                      <button 
                                                         onClick={() => handleCreateAndEdit(history)}
-                                                        className="text-green-400 hover:text-green-300 flex items-center gap-1 text-xs font-bold"
+                                                        className="text-green-600 hover:text-green-700 flex items-center gap-1 text-xs font-bold"
                                                         title="Buat Riwayat & Edit"
                                                     >
                                                         <PlusIcon className="w-4 h-4" /> BUAT & EDIT

@@ -83,14 +83,14 @@ const UploadSection: React.FC<{
     }
 
     return (
-        <div className={`bg-surface p-6 ${hideTitle ? 'pt-0 rounded-b-xl border-t-0' : 'rounded-xl'} border border-gray-700 mb-8`}>
+        <div className={`bg-surface p-6 ${hideTitle ? 'pt-0 rounded-b-xl' : 'rounded-xl'} shadow-md mb-8`}>
             {!hideTitle && (
                 <div className="flex flex-wrap justify-between items-center gap-2 mb-4">
                     <h2 className="text-lg md:text-xl font-bold text-dark">{title}</h2>
                     {templateType && onDownloadTemplate && (
                         <button 
                             onClick={() => onDownloadTemplate(templateType)}
-                            className="flex items-center gap-2 bg-green-900/50 text-green-300 px-3 py-1.5 rounded-lg text-sm font-semibold hover:bg-green-800/50 transition-colors"
+                            className="flex items-center gap-2 bg-green-100 text-green-700 px-3 py-1.5 rounded-lg text-sm font-semibold hover:bg-green-200 transition-colors"
                         >
                             <DownloadIcon className="w-4 h-4" />
                             <span>Download Template</span>
@@ -98,30 +98,30 @@ const UploadSection: React.FC<{
                     )}
                 </div>
             )}
-            <div className="mb-6 p-4 bg-blue-900/50 border border-blue-500/50 rounded-lg">
+            <div className="mb-6 p-4 bg-sky-100 rounded-lg">
                 <button 
                     onClick={() => setIsInstructionsVisible(!isInstructionsVisible)}
                     className="w-full flex justify-between items-center text-left"
                     aria-expanded={isInstructionsVisible}
                 >
-                    <h3 className="font-bold text-blue-300">Struktur File Excel (.xlsx)</h3>
-                    <ChevronDownIcon className={`w-5 h-5 text-blue-300 transition-transform duration-300 ${isInstructionsVisible ? 'rotate-180' : ''}`} />
+                    <h3 className="font-bold text-sky-800">Struktur File Excel (.xlsx)</h3>
+                    <ChevronDownIcon className={`w-5 h-5 text-sky-800 transition-transform duration-300 ${isInstructionsVisible ? 'rotate-180' : ''}`} />
                 </button>
                 <div className={`overflow-hidden transition-all duration-500 ease-in-out ${isInstructionsVisible ? 'max-h-96 mt-2' : 'max-h-0'}`}>
-                    <p className="text-sm text-blue-300 mt-2">Pastikan file Anda memiliki kolom header berikut (urutan dan nama harus sesuai):</p>
-                    <code className="block bg-blue-900 p-2 rounded-md text-xs mt-2 whitespace-pre-wrap text-blue-200">{instructions}</code>
+                    <p className="text-sm text-sky-700 mt-2">Pastikan file Anda memiliki kolom header berikut (urutan dan nama harus sesuai):</p>
+                    <code className="block bg-sky-200/50 p-2 rounded-md text-xs mt-2 whitespace-pre-wrap text-slate-600">{instructions}</code>
                 </div>
             </div>
             
             <div
                 {...getRootProps()}
                 className={`border-2 border-dashed rounded-lg p-10 text-center cursor-pointer transition-colors
-                    ${isDragActive ? 'border-primary bg-primary/20' : 'border-gray-600 hover:border-primary'}`}
+                    ${isDragActive ? 'border-primary bg-primary/10' : 'border-slate-300 hover:border-primary'}`}
             >
                 <input {...getInputProps()} />
                 <div className="flex flex-col items-center">
-                    <UploadIcon className="w-12 h-12 text-gray-500 mb-3" />
-                    <p className="text-gray-400">
+                    <UploadIcon className="w-12 h-12 text-slate-400 mb-3" />
+                    <p className="text-gray-text">
                         Seret & jatuhkan file di sini, atau <span className="text-primary font-semibold">klik untuk memilih</span>
                     </p>
                 </div>
@@ -129,14 +129,14 @@ const UploadSection: React.FC<{
 
             {file && (
                 <div className="mt-6">
-                    <div className="p-3 bg-gray-700 rounded-lg flex justify-between items-center">
-                        <span className="text-sm text-gray-300">{file.name}</span>
-                        <button onClick={removeFile} disabled={disabled} className="text-red-400 hover:text-red-300 text-sm font-semibold disabled:text-gray-500">Hapus</button>
+                    <div className="p-3 bg-slate-100 rounded-lg flex justify-between items-center">
+                        <span className="text-sm text-dark">{file.name}</span>
+                        <button onClick={removeFile} disabled={disabled} className="text-red-600 hover:text-red-700 text-sm font-semibold disabled:text-slate-400">Hapus</button>
                     </div>
                     <button
                         onClick={handleUpload}
                         disabled={disabled || status === 'processing'}
-                        className="w-full mt-4 bg-primary text-white py-3 px-4 rounded-lg font-semibold hover:bg-primary-dark transition-colors disabled:bg-gray-500"
+                        className="w-full mt-4 bg-primary text-white py-3 px-4 rounded-lg font-semibold hover:bg-primary-dark transition-colors disabled:bg-slate-400"
                     >
                         {status === 'processing' ? 'Memproses...' : 'Mulai Unggah'}
                     </button>
@@ -146,12 +146,12 @@ const UploadSection: React.FC<{
             {status !== 'idle' && (
                  <div className="mt-6">
                     <ProgressBar progress={progress} />
-                    {status === 'success' && <p className="text-green-400 mt-2 text-center font-semibold">Proses unggah selesai! {result ? `${result.successCount} data berhasil diproses.` : ''}</p>}
+                    {status === 'success' && <p className="text-green-600 mt-2 text-center font-semibold">Proses unggah selesai! {result ? `${result.successCount} data berhasil diproses.` : ''}</p>}
                     {status === 'error' && result && (
-                        <div className="text-red-400 mt-2 text-center font-semibold">
+                        <div className="text-red-600 mt-2 text-center font-semibold">
                             <p>Proses selesai dengan {result.errorCount} kesalahan.</p>
-                             {result.successCount > 0 && <p className="text-green-400">{result.successCount} data berhasil diproses.</p>}
-                             <details className="text-xs text-left mt-2 bg-red-900/50 p-2 rounded">
+                             {result.successCount > 0 && <p className="text-green-600">{result.successCount} data berhasil diproses.</p>}
+                             <details className="text-xs text-left mt-2 bg-red-100 p-2 rounded">
                                 <summary>Lihat Detail Kesalahan</summary>
                                 <ul className="list-disc pl-5 mt-1">
                                     {result.errors.slice(0, 5).map((e, i) => <li key={i}>Anggota {e.no_anggota}: {e.error}</li>)}
@@ -488,12 +488,12 @@ const AdminUpload: React.FC = () => {
             />
             
             <div>
-                 <div className="bg-surface p-6 rounded-t-xl border border-gray-700 flex flex-wrap justify-between items-center gap-2">
+                 <div className="bg-surface p-6 rounded-t-xl shadow-md flex flex-wrap justify-between items-center gap-2">
                     <h2 className="text-lg md:text-xl font-bold text-dark">2. Upload Data Awal Keuangan</h2>
                     <button
                         onClick={() => setIsResetModalOpen(true)}
                         disabled={isUploading || isResetting}
-                        className="flex items-center gap-2 bg-red-600 text-white px-3 py-1.5 rounded-lg text-sm font-semibold hover:bg-red-700 transition-colors disabled:bg-gray-400"
+                        className="flex items-center gap-2 bg-red-600 text-white px-3 py-1.5 rounded-lg text-sm font-semibold hover:bg-red-700 transition-colors disabled:bg-slate-400"
                     >
                         <TrashIcon className="w-4 h-4" />
                         <span>{isResetting ? 'Mereset...' : 'Reset Semua Data Keuangan'}</span>
@@ -509,17 +509,17 @@ const AdminUpload: React.FC = () => {
             </div>
 
              <div>
-                <div className="bg-surface p-6 rounded-t-xl border border-gray-700 flex flex-wrap justify-between items-center gap-2">
+                <div className="bg-surface p-6 rounded-t-xl shadow-md flex flex-wrap justify-between items-center gap-2">
                     <div>
                         <h2 className="text-lg md:text-xl font-bold text-dark">3. Upload Data Transaksi Bulanan</h2>
-                         <p className="text-sm text-gray-400 mt-1">
-                            Pastikan nama sheet pertama berformat <code className="bg-gray-700 px-1 rounded">YYYY MM</code> (contoh: <code className="bg-gray-700 px-1 rounded">2024 07</code>).
+                         <p className="text-sm text-gray-text mt-1">
+                            Pastikan nama sheet pertama berformat <code className="bg-slate-200 px-1 rounded">YYYY MM</code> (contoh: <code className="bg-slate-200 px-1 rounded">2024 07</code>).
                         </p>
                     </div>
                      <button
                         onClick={handleDownloadReport}
                         disabled={isDownloading}
-                        className="flex-shrink-0 flex items-center gap-2 bg-green-600 text-white px-3 py-1.5 rounded-lg text-sm font-semibold hover:bg-green-700 transition-colors disabled:bg-gray-400"
+                        className="flex-shrink-0 flex items-center gap-2 bg-green-600 text-white px-3 py-1.5 rounded-lg text-sm font-semibold hover:bg-green-700 transition-colors disabled:bg-slate-400"
                     >
                         <DownloadIcon className="w-4 h-4" />
                         <span>{isDownloading ? 'Menyiapkan...' : 'Download Laporan Lengkap'}</span>
@@ -533,31 +533,31 @@ const AdminUpload: React.FC = () => {
                     disabled={isUploading || !!isDeleting}
                 />
             </div>
-             <div className="mt-8 bg-surface p-6 rounded-xl border border-gray-700">
+             <div className="mt-8 bg-surface p-6 rounded-xl shadow-md">
                 <div className="flex justify-between items-center mb-4">
                     <h2 className="text-lg md:text-xl font-bold text-dark">Riwayat Upload Transaksi Bulanan</h2>
                     <button
                         onClick={handleRebuildHistory}
                         disabled={isRebuilding}
-                        className="bg-blue-900/50 text-blue-300 px-3 py-1 rounded-lg text-sm font-semibold hover:bg-blue-800/50 transition-colors disabled:opacity-50"
+                        className="bg-slate-200 text-slate-700 px-3 py-1 rounded-lg text-sm font-semibold hover:bg-slate-300 transition-colors disabled:opacity-50"
                         title="Pindai data lama dan perbaiki riwayat jika ada yang tidak muncul."
                     >
                         {isRebuilding ? 'Memindai...' : 'Pindai & Perbaiki Riwayat'}
                     </button>
                 </div>
                 {isHistoryLoading ? (
-                    <p className="text-center text-gray-400 py-4">Memuat riwayat...</p>
+                    <p className="text-center text-gray-text py-4">Memuat riwayat...</p>
                 ) : uploadHistory.length > 0 ? (
                     <ul className="space-y-3">
                         {uploadHistory.map(month => (
-                            <li key={month} className="flex justify-between items-center p-3 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
+                            <li key={month} className="flex justify-between items-center p-3 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors">
                                 <span className="font-medium text-dark">
                                     {new Date(`${month}-02`).toLocaleDateString('id-ID', { month: 'long', year: 'numeric'})}
                                 </span>
                                 <button
                                     onClick={() => handleDeleteClick(month)}
                                     disabled={isDeleting === month}
-                                    className="flex items-center gap-2 text-sm text-red-400 hover:text-red-300 font-semibold disabled:text-gray-500 disabled:cursor-wait"
+                                    className="flex items-center gap-2 text-sm text-red-600 hover:text-red-700 font-semibold disabled:text-slate-400 disabled:cursor-wait"
                                 >
                                     {isDeleting === month ? 'Menghapus...' : <><TrashIcon className="w-4 h-4" /> Hapus</>}
                                 </button>
@@ -565,7 +565,7 @@ const AdminUpload: React.FC = () => {
                         ))}
                     </ul>
                 ) : (
-                    <p className="text-center text-gray-400 py-4">Belum ada riwayat upload.</p>
+                    <p className="text-center text-gray-text py-4">Belum ada riwayat upload.</p>
                 )}
             </div>
 
@@ -578,13 +578,13 @@ const AdminUpload: React.FC = () => {
                     <p className="text-dark mb-4">
                         Apakah Anda yakin ingin menghapus semua data transaksi untuk bulan <span className="font-bold">{monthToDelete && new Date(`${monthToDelete}-02`).toLocaleDateString('id-ID', { month: 'long', year: 'numeric'})}</span>?
                     </p>
-                    <p className="text-sm bg-red-900/50 text-red-300 p-3 rounded-lg">
+                    <p className="text-sm bg-red-100 text-red-700 p-3 rounded-lg">
                         <strong>Peringatan:</strong> Tindakan ini akan menghapus semua data transaksi untuk bulan yang dipilih dan mengembalikan saldo anggota ke kondisi bulan sebelumnya. Aksi ini tidak dapat diurungkan.
                     </p>
                     <div className="flex justify-end gap-4 mt-6">
                         <button
                             onClick={() => setIsDeleteModalOpen(false)}
-                            className="bg-gray-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-gray-500 transition-colors"
+                            className="bg-slate-200 text-slate-700 px-4 py-2 rounded-lg font-semibold hover:bg-slate-300 transition-colors"
                         >
                             Batal
                         </button>
@@ -607,7 +607,7 @@ const AdminUpload: React.FC = () => {
                     <p className="text-dark mb-4">
                         Apakah Anda yakin ingin melanjutkan?
                     </p>
-                    <div className="text-sm bg-red-900/50 text-red-300 p-3 rounded-lg">
+                    <div className="text-sm bg-red-100 text-red-700 p-3 rounded-lg">
                         <p><strong>Peringatan Sangat Penting:</strong></p>
                         <ul className="list-disc list-inside mt-2">
                             <li>Semua data saldo (simpanan & pinjaman) akan menjadi <strong>NOL</strong>.</li>
@@ -620,7 +620,7 @@ const AdminUpload: React.FC = () => {
                     <div className="flex justify-end gap-4 mt-6">
                         <button
                             onClick={() => setIsResetModalOpen(false)}
-                            className="bg-gray-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-gray-500 transition-colors"
+                            className="bg-slate-200 text-slate-700 px-4 py-2 rounded-lg font-semibold hover:bg-slate-300 transition-colors"
                         >
                             Batal
                         </button>

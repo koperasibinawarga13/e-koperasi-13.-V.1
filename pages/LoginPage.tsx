@@ -173,12 +173,12 @@ export const LoginPage: React.FC = () => {
             </div>
             
             <div className="flex justify-center mb-6">
-                <span className="bg-sky-100 text-sky-700 text-sm font-semibold px-5 py-2 rounded-full shadow-sm">
+                <span className="bg-primary-light text-primary text-sm font-semibold px-5 py-2 rounded-full">
                     {welcomeMessage}
                 </span>
             </div>
             
-            <div className="w-full bg-surface shadow-md rounded-xl p-8 border border-slate-200">
+            <div className="w-full bg-surface rounded-xl p-8">
                 <h2 className="text-2xl font-bold text-dark text-center mb-1">{getTitle()}</h2>
                 <p className="text-center text-gray-text text-sm mb-6">{getSubtitle()}</p>
                 
@@ -188,16 +188,16 @@ export const LoginPage: React.FC = () => {
                 {view === 'login' && (
                   <form className="space-y-5" onSubmit={handleLogin}>
                     <div>
-                      <input type="text" autoComplete="username" required className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 bg-slate-50 placeholder-slate-400 text-dark" placeholder="No. Anggota / Email Admin" value={username} onChange={(e) => setUsername(e.target.value)} />
+                      <input type="text" autoComplete="username" required className="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 bg-zinc-800 placeholder-zinc-500 text-dark" placeholder="No. Anggota / Email Admin" value={username} onChange={(e) => setUsername(e.target.value)} />
                     </div>
                     <div className="relative">
-                      <input type={showPassword ? "text" : "password"} autoComplete="current-password" required className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 bg-slate-50 placeholder-slate-400 text-dark" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
-                      <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-0 px-4 flex items-center text-slate-400 hover:text-slate-600">
+                      <input type={showPassword ? "text" : "password"} autoComplete="current-password" required className="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 bg-zinc-800 placeholder-zinc-500 text-dark" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
+                      <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-0 px-4 flex items-center text-zinc-400 hover:text-zinc-200">
                         {showPassword ? <EyeSlashIcon className="w-5 h-5"/> : <EyeIcon className="w-5 h-5"/>}
                       </button>
                     </div>
                     <div className="pt-2">
-                        <button type="submit" disabled={isLoading} className="w-full text-center py-3 px-4 text-sm font-bold tracking-widest rounded-lg text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface focus:ring-primary transition-colors disabled:bg-slate-400 disabled:text-slate-200">
+                        <button type="submit" disabled={isLoading} className="w-full text-center py-3 px-4 text-sm font-bold tracking-widest rounded-lg text-black bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface focus:ring-primary transition-colors disabled:bg-zinc-700 disabled:text-zinc-400">
                             {isLoading ? 'MEMPROSES...' : 'LOGIN'}
                         </button>
                     </div>
@@ -216,35 +216,35 @@ export const LoginPage: React.FC = () => {
                 
                 {view === 'activate' && (
                 <form className="space-y-4" onSubmit={handleActivate}>
-                    <div><input type="text" required className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 bg-slate-50 placeholder-slate-400 text-dark" placeholder="No. Anggota" value={activateNoAnggota} onChange={(e) => setActivateNoAnggota(e.target.value)} /></div>
-                    <div><input type="tel" required className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 bg-slate-50 placeholder-slate-400 text-dark" placeholder="No. HP (Contoh: 081234...)" value={activateNoHp} onChange={(e) => setActivateNoHp(e.target.value)} /></div>
+                    <div><input type="text" required className="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 bg-zinc-800 placeholder-zinc-500 text-dark" placeholder="No. Anggota" value={activateNoAnggota} onChange={(e) => setActivateNoAnggota(e.target.value)} /></div>
+                    <div><input type="tel" required className="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 bg-zinc-800 placeholder-zinc-500 text-dark" placeholder="No. HP (Contoh: 081234...)" value={activateNoHp} onChange={(e) => setActivateNoHp(e.target.value)} /></div>
                     <div className="relative">
-                      <input type={showPassword ? "text" : "password"} required className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 bg-slate-50 placeholder-slate-400 text-dark" placeholder="Buat Password Baru" value={activatePassword} onChange={(e) => setActivatePassword(e.target.value)} />
-                       <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-0 px-4 flex items-center text-slate-400 hover:text-slate-600">{showPassword ? <EyeSlashIcon className="w-5 h-5"/> : <EyeIcon className="w-5 h-5"/>}</button>
+                      <input type={showPassword ? "text" : "password"} required className="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 bg-zinc-800 placeholder-zinc-500 text-dark" placeholder="Buat Password Baru" value={activatePassword} onChange={(e) => setActivatePassword(e.target.value)} />
+                       <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-0 px-4 flex items-center text-zinc-400 hover:text-zinc-200">{showPassword ? <EyeSlashIcon className="w-5 h-5"/> : <EyeIcon className="w-5 h-5"/>}</button>
                     </div>
-                    <button type="submit" disabled={isLoading} className="w-full py-3 px-4 text-sm font-bold rounded-lg text-white bg-secondary hover:bg-secondary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary transition-colors disabled:bg-slate-400">{isLoading ? 'MEMPROSES...' : 'AKTIVASI AKUN'}</button>
+                    <button type="submit" disabled={isLoading} className="w-full py-3 px-4 text-sm font-bold rounded-lg text-white bg-secondary hover:bg-secondary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary transition-colors disabled:bg-zinc-700">{isLoading ? 'MEMPROSES...' : 'AKTIVASI AKUN'}</button>
                     <p className="text-center text-sm text-gray-text pt-2">Sudah punya akun?{' '} <button type="button" onClick={() => switchView('login')} className="font-medium text-primary hover:text-primary-dark hover:underline">Login</button></p>
                 </form>
                 )}
 
                 {view === 'register-new' && (
                     <form className="space-y-4" onSubmit={handleNewMemberRegister}>
-                        <div><input type="text" required value={regNama} onChange={(e) => setRegNama(e.target.value)} className="w-full px-4 py-3 border border-slate-300 rounded-lg bg-slate-50 placeholder-slate-400 text-dark" placeholder="Nama Lengkap" /></div>
-                        <div><textarea value={regAlamat} onChange={(e) => setRegAlamat(e.target.value)} className="w-full px-4 py-3 border border-slate-300 rounded-lg bg-slate-50 placeholder-slate-400 text-dark" placeholder="Alamat" required rows={2}></textarea></div>
+                        <div><input type="text" required value={regNama} onChange={(e) => setRegNama(e.target.value)} className="w-full px-4 py-3 rounded-lg bg-zinc-800 placeholder-zinc-500 text-dark" placeholder="Nama Lengkap" /></div>
+                        <div><textarea value={regAlamat} onChange={(e) => setRegAlamat(e.target.value)} className="w-full px-4 py-3 rounded-lg bg-zinc-800 placeholder-zinc-500 text-dark" placeholder="Alamat" required rows={2}></textarea></div>
                         <div>
-                            <select value={regStatus} onChange={(e) => setRegStatus(e.target.value as any)} className="w-full px-4 py-3 border border-slate-300 rounded-lg bg-slate-50 text-dark">
+                            <select value={regStatus} onChange={(e) => setRegStatus(e.target.value as any)} className="w-full px-4 py-3 rounded-lg bg-zinc-800 text-dark">
                                 <option value="AK">Pegawai Aktif SMPN 13 Tasikmalaya</option>
                                 <option value="PB">Purna Bakti SMPN 13 Tasikmalaya</option>
                                 <option value="WL">Warga Luar SMPN 13 Tasikmalaya</option>
                             </select>
                         </div>
-                        <div><input type="text" value={isLoading ? 'Membuat kode...' : regNoAnggota} className="w-full px-4 py-3 border border-slate-200 rounded-lg bg-slate-100 text-slate-500" placeholder="Kode Anggota" readOnly /></div>
+                        <div><input type="text" value={isLoading ? 'Membuat kode...' : regNoAnggota} className="w-full px-4 py-3 rounded-lg bg-zinc-700 text-zinc-400" placeholder="Kode Anggota" readOnly /></div>
                         <div className="relative">
-                            <input type={showPassword ? "text" : "password"} value={regPassword} onChange={(e) => setRegPassword(e.target.value)} className="w-full px-4 py-3 border border-slate-300 rounded-lg bg-slate-50 placeholder-slate-400 text-dark" placeholder="Buat Password" required />
-                             <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-0 px-4 flex items-center text-slate-400 hover:text-slate-600">{showPassword ? <EyeSlashIcon className="w-5 h-5"/> : <EyeIcon className="w-5 h-5"/>}</button>
+                            <input type={showPassword ? "text" : "password"} value={regPassword} onChange={(e) => setRegPassword(e.target.value)} className="w-full px-4 py-3 rounded-lg bg-zinc-800 placeholder-zinc-500 text-dark" placeholder="Buat Password" required />
+                             <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-0 px-4 flex items-center text-zinc-400 hover:text-zinc-200">{showPassword ? <EyeSlashIcon className="w-5 h-5"/> : <EyeIcon className="w-5 h-5"/>}</button>
                         </div>
                         
-                        <div className="bg-primary-light border border-primary/20 p-4 rounded-lg text-sm text-sky-800">
+                        <div className="bg-primary-light p-4 rounded-lg text-sm text-lime-100">
                             <button 
                                 type="button"
                                 onClick={() => setIsKewajibanVisible(!isKewajibanVisible)}
@@ -265,12 +265,12 @@ export const LoginPage: React.FC = () => {
                             </div>
                         </div>
 
-                        <button type="submit" disabled={isLoading} className="w-full py-3 px-4 text-sm font-bold rounded-lg text-white bg-secondary hover:bg-secondary-dark disabled:bg-slate-400">{isLoading ? 'MEMPROSES...' : 'DAFTAR SEBAGAI ANGGOTA BARU'}</button>
+                        <button type="submit" disabled={isLoading} className="w-full py-3 px-4 text-sm font-bold rounded-lg text-white bg-secondary hover:bg-secondary-dark disabled:bg-zinc-700">{isLoading ? 'MEMPROSES...' : 'DAFTAR SEBAGAI ANGGOTA BARU'}</button>
                         <p className="text-center text-sm text-gray-text pt-2">Sudah punya akun?{' '} <button type="button" onClick={() => switchView('login')} className="font-medium text-primary hover:text-primary-dark hover:underline">Login</button></p>
                     </form>
                 )}
                 
-                <div className="mt-6 text-center border-t border-slate-200 pt-4">
+                <div className="mt-6 text-center border-t border-zinc-800 pt-4">
                   <Link to="/berita" className="text-sm font-medium text-primary hover:underline">Lihat Pengumuman Koperasi &rarr;</Link>
                 </div>
             </div>

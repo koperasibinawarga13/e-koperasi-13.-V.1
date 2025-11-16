@@ -84,33 +84,33 @@ const AdminPengaturan: React.FC = () => {
     return (
         <div>
             <Header title="Pengaturan Akun Admin" />
-            <div className="bg-surface p-6 rounded-xl border border-gray-700">
+            <div className="bg-surface p-6 rounded-xl shadow-md">
                 <div className="flex justify-end mb-6">
-                    <button onClick={() => openModal()} className="bg-primary text-white px-4 py-2 rounded-lg font-semibold hover:bg-primary-dark flex items-center gap-2">
+                    <button onClick={() => openModal()} className="bg-primary text-white px-4 py-2 rounded-lg font-semibold hover:bg-primary-dark transition-colors flex items-center gap-2">
                         <PlusIcon className="w-5 h-5" />
                         Tambah Admin
                     </button>
                 </div>
                 <div className="overflow-x-auto">
-                    {isLoading ? <p className="text-gray-400">Memuat data admin...</p> : (
-                        <table className="w-full text-sm text-left text-gray-400">
-                            <thead className="text-xs text-gray-400 uppercase">
+                    {isLoading ? <p className="text-gray-text">Memuat data admin...</p> : (
+                        <table className="w-full text-sm text-left text-gray-text">
+                            <thead className="text-xs text-gray-text uppercase">
                                 <tr>
-                                    <th className="px-6 py-3 border-b-2 border-gray-700">Nama</th>
-                                    <th className="px-6 py-3 border-b-2 border-gray-700">Email</th>
-                                    <th className="px-6 py-3 border-b-2 border-gray-700">Aksi</th>
+                                    <th className="px-6 py-3">Nama</th>
+                                    <th className="px-6 py-3">Email</th>
+                                    <th className="px-6 py-3">Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-gray-700">
+                            <tbody>
                                 {admins.map((admin) => (
-                                    <tr key={admin.id} className="hover:bg-gray-600">
+                                    <tr key={admin.id} className="border-t border-slate-100 hover:bg-slate-50">
                                         <td className="px-6 py-4 font-medium text-dark">{admin.nama}</td>
                                         <td className="px-6 py-4">{admin.email}</td>
                                         <td className="px-6 py-4 flex gap-4">
-                                            <button onClick={() => openModal(admin)} className="text-blue-400 hover:text-blue-300"><PencilIcon className="w-5 h-5"/></button>
+                                            <button onClick={() => openModal(admin)} className="text-primary hover:text-primary-dark"><PencilIcon className="w-5 h-5"/></button>
                                             <button 
                                                 onClick={() => handleDelete(admin.id)} 
-                                                className="text-red-400 hover:text-red-300 disabled:text-gray-600 disabled:cursor-not-allowed"
+                                                className="text-red-500 hover:text-red-600 disabled:text-slate-400 disabled:cursor-not-allowed"
                                                 disabled={user?.id === admin.id}
                                                 title={user?.id === admin.id ? 'Tidak dapat menghapus diri sendiri' : 'Hapus Admin'}
                                             >
@@ -128,29 +128,29 @@ const AdminPengaturan: React.FC = () => {
             <Modal isOpen={isModalOpen} onClose={closeModal} title={selectedAdmin ? 'Edit Admin' : 'Tambah Admin Baru'}>
                 <form onSubmit={handleSave} className="space-y-4">
                     <div>
-                        <label htmlFor="nama" className="block text-sm font-medium text-gray-300">Nama Lengkap</label>
+                        <label htmlFor="nama" className="block text-sm font-medium text-gray-text">Nama Lengkap</label>
                         <input
                             id="nama"
                             type="text"
                             value={formData.nama}
                             onChange={(e) => setFormData({ ...formData, nama: e.target.value })}
                             required
-                            className="mt-1 block w-full bg-gray-800 border border-gray-600 rounded-md py-2 px-3 text-dark"
+                            className="mt-1 block w-full bg-slate-100 rounded-md py-2 px-3 text-dark"
                         />
                     </div>
                      <div>
-                        <label htmlFor="email" className="block text-sm font-medium text-gray-300">Email</label>
+                        <label htmlFor="email" className="block text-sm font-medium text-gray-text">Email</label>
                         <input
                             id="email"
                             type="email"
                             value={formData.email}
                             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                             required
-                            className="mt-1 block w-full bg-gray-800 border border-gray-600 rounded-md py-2 px-3 text-dark"
+                            className="mt-1 block w-full bg-slate-100 rounded-md py-2 px-3 text-dark"
                         />
                     </div>
                      <div>
-                        <label htmlFor="password" className="block text-sm font-medium text-gray-300">Password</label>
+                        <label htmlFor="password" className="block text-sm font-medium text-gray-text">Password</label>
                         <input
                             id="password"
                             type="password"
@@ -158,11 +158,11 @@ const AdminPengaturan: React.FC = () => {
                             onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                             required={!selectedAdmin} // Required only for new admin
                             placeholder={selectedAdmin ? 'Isi untuk mengubah password' : 'Wajib diisi'}
-                            className="mt-1 block w-full bg-gray-800 border border-gray-600 rounded-md py-2 px-3 text-dark"
+                            className="mt-1 block w-full bg-slate-100 rounded-md py-2 px-3 text-dark"
                         />
                     </div>
                     <div className="flex justify-end gap-4 pt-4">
-                         <button type="button" onClick={closeModal} className="bg-gray-600 text-gray-200 px-4 py-2 rounded-lg font-semibold hover:bg-gray-500">
+                         <button type="button" onClick={closeModal} className="bg-slate-200 text-slate-700 px-4 py-2 rounded-lg font-semibold hover:bg-slate-300">
                             Batal
                         </button>
                         <button type="submit" className="bg-primary text-white px-4 py-2 rounded-lg font-semibold hover:bg-primary-dark">

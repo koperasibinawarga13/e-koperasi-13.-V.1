@@ -106,7 +106,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar, isMobileO
       ></div>
       
       <div 
-        className={`bg-sidebar text-dark flex flex-col h-screen fixed z-40 transform transition-transform duration-300 ease-in-out md:translate-x-0 border-r border-slate-200 ${
+        className={`bg-sidebar text-dark flex flex-col h-screen fixed z-40 transform transition-transform duration-300 ease-in-out md:translate-x-0 ${
           isCollapsed ? 'w-20 p-2' : 'w-64 p-4'
         } ${
           isMobileOpen ? 'translate-x-0' : '-translate-x-full'
@@ -114,7 +114,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar, isMobileO
       >
         <button
           onClick={toggleSidebar}
-          className={`absolute top-16 -right-3 transform bg-primary hover:bg-primary-dark text-white w-7 h-7 rounded-full items-center justify-center focus:outline-none ring-2 ring-white shadow-lg z-10 hidden md:flex`}
+          className={`absolute top-16 -right-3 transform bg-primary hover:bg-primary-dark text-black w-7 h-7 rounded-full items-center justify-center focus:outline-none ring-2 ring-black z-10 hidden md:flex`}
           aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
           <ChevronLeftIcon className={`w-4 h-4 transition-transform duration-300 ${isCollapsed ? 'rotate-180' : ''}`} />
@@ -160,7 +160,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar, isMobileO
                     `flex items-center w-full text-gray-text hover:bg-primary-light hover:text-primary rounded-lg transition-colors duration-200 relative ${
                       isCollapsed ? 'p-3 justify-center' : 'px-4 py-3'
                     } ${
-                      isActive ? 'bg-primary font-semibold text-white' : ''
+                      isActive ? 'bg-primary font-semibold text-black' : ''
                     }`
                   } onClick={onMobileClose}>
                       <div className="flex-shrink-0">{item.icon}</div>
@@ -168,7 +168,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar, isMobileO
                   </NavLink>
                 )}
                 {isCollapsed && (
-                  <div className="absolute left-full top-1/2 -translate-y-1/2 ml-4 px-2 py-1 bg-slate-800 text-white text-xs rounded-md shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap z-20">
+                  <div className="absolute left-full top-1/2 -translate-y-1/2 ml-4 px-2 py-1 bg-zinc-800 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap z-20">
                     {item.label}
                   </div>
                 )}
@@ -177,7 +177,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar, isMobileO
           </ul>
         </nav>
 
-        <div className="group relative border-t border-slate-200 pt-2">
+        <div className="group relative border-t border-zinc-800 pt-2">
           <button
             onClick={handleLogout}
             className={`flex items-center w-full text-gray-text hover:bg-primary-light hover:text-primary rounded-lg transition-colors duration-200 ${isCollapsed ? 'p-3 justify-center' : 'px-4 py-3'}`}
@@ -186,7 +186,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar, isMobileO
             <span className={`ml-4 whitespace-nowrap overflow-hidden transition-all duration-300 ${isCollapsed ? 'w-0 opacity-0' : 'w-auto opacity-100'}`}>Logout</span>
           </button>
           {isCollapsed && (
-            <div className="absolute left-full top-1/2 -translate-y-1/2 ml-4 px-2 py-1 bg-slate-800 text-white text-xs rounded-md shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap z-20">
+            <div className="absolute left-full top-1/2 -translate-y-1/2 ml-4 px-2 py-1 bg-zinc-800 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap z-20">
               Logout
             </div>
           )}

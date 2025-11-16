@@ -18,7 +18,7 @@ const formatDate = (dateString: string) => {
 
 const InfoItem: React.FC<{ label: string; value: React.ReactNode }> = ({ label, value }) => (
     <div>
-        <p className="text-sm text-gray-400">{label}</p>
+        <p className="text-sm text-gray-text">{label}</p>
         <p className="font-semibold text-dark">{value}</p>
     </div>
 );
@@ -27,9 +27,9 @@ const StatusBadge: React.FC<{ status: PengajuanPinjaman['status'] }> = ({ status
     const baseClasses = 'px-3 py-1 text-sm font-bold rounded-full inline-block';
     let colorClasses = '';
     switch (status) {
-        case 'Menunggu Persetujuan': colorClasses = 'bg-yellow-900/50 text-yellow-300'; break;
-        case 'Disetujui': colorClasses = 'bg-green-900/50 text-green-300'; break;
-        case 'Ditolak': colorClasses = 'bg-red-900/50 text-red-300'; break;
+        case 'Menunggu Persetujuan': colorClasses = 'bg-amber-100 text-amber-700'; break;
+        case 'Disetujui': colorClasses = 'bg-green-100 text-green-700'; break;
+        case 'Ditolak': colorClasses = 'bg-red-100 text-red-700'; break;
     }
     return <span className={`${baseClasses} ${colorClasses}`}>{status}</span>;
 };
@@ -84,12 +84,12 @@ const AdminPinjamanDetail: React.FC = () => {
     };
 
     if (isLoading) {
-        return <div className="p-8 text-center text-gray-400">Memuat detail pengajuan...</div>;
+        return <div className="p-8 text-center text-gray-text">Memuat detail pengajuan...</div>;
     }
 
     if (!pinjaman) {
         return (
-            <div className="p-8 text-center text-gray-400">
+            <div className="p-8 text-center text-gray-text">
                 <Header title="Pengajuan Tidak Ditemukan" />
                 <p>Data pengajuan pinjaman tidak ditemukan.</p>
                 <Link to="/admin/pinjaman" className="mt-4 inline-flex items-center gap-2 text-primary hover:underline">
@@ -107,14 +107,14 @@ const AdminPinjamanDetail: React.FC = () => {
             <Header title={`Detail Pengajuan: ${pengajuanId}`} />
             
             <div className="mb-6">
-                <Link to="/admin/pinjaman" className="inline-flex items-center gap-2 bg-surface px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors border border-gray-600 text-dark">
+                <Link to="/admin/pinjaman" className="inline-flex items-center gap-2 bg-surface px-4 py-2 rounded-lg hover:bg-slate-100 transition-colors shadow-sm text-dark">
                     <ChevronLeftIcon className="w-5 h-5" />
                     Kembali ke Daftar Pinjaman
                 </Link>
             </div>
 
             {/* Main Details Card */}
-            <div className="bg-surface p-6 rounded-xl border border-gray-700 mb-8">
+            <div className="bg-surface p-6 rounded-xl shadow-md mb-8">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                     <InfoItem label="Nama Anggota" value={pinjaman.nama_anggota} />
                     <InfoItem label="No. Anggota" value={pinjaman.no_anggota} />
@@ -124,42 +124,42 @@ const AdminPinjamanDetail: React.FC = () => {
             </div>
 
             {/* Financial Summary Card */}
-            <div className="bg-surface p-6 rounded-xl border border-gray-700 mb-8">
-                <h3 className="text-lg md:text-xl font-bold text-dark border-b border-gray-600 pb-3 mb-4">Ringkasan Finansial</h3>
+            <div className="bg-surface p-6 rounded-xl shadow-md mb-8">
+                <h3 className="text-lg md:text-xl font-bold text-dark pb-3 mb-4">Ringkasan Finansial</h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                     <InfoItem label="Jenis Pinjaman" value={<span className="font-bold">{pinjaman.jenis_pinjaman}</span>} />
-                    <InfoItem label="Pokok Pinjaman" value={<span className="text-green-400 font-bold">{formatCurrency(pinjaman.pokok_pinjaman)}</span>} />
+                    <InfoItem label="Pokok Pinjaman" value={<span className="text-green-600 font-bold">{formatCurrency(pinjaman.pokok_pinjaman)}</span>} />
                     {pinjaman.jenis_pinjaman === 'Berjangka' && (
                         <>
                             <InfoItem label="Jangka Waktu" value={`${pinjaman.jangka_waktu} Bulan`} />
                             <InfoItem label="Bunga per Bulan" value={`${pinjaman.bunga_per_bulan}%`} />
                             <InfoItem label="Total Bunga" value={formatCurrency(pinjaman.total_bunga)} />
-                            <InfoItem label="Total Pembayaran" value={<span className="text-blue-400 font-bold">{formatCurrency(pinjaman.total_bayar)}</span>} />
+                            <InfoItem label="Total Pembayaran" value={<span className="text-sky-600 font-bold">{formatCurrency(pinjaman.total_bayar)}</span>} />
                             <InfoItem label="Angsuran Pokok/Bulan" value={formatCurrency(pinjaman.angsuran_pokok_bulan)} />
                             <InfoItem label="Total Angsuran/Bulan" value={formatCurrency(pinjaman.jadwal_angsuran?.[0]?.totalAngsuran)} />
                         </>
                     )}
                 </div>
                  {pinjaman.jenis_pinjaman === 'Khusus' && (
-                    <div className="mt-4 pt-4 border-t border-gray-600">
+                    <div className="mt-4 pt-4">
                         <InfoItem label="Keterangan" value={<p className="whitespace-pre-wrap">{pinjaman.keterangan || '-'}</p>} />
                     </div>
                  )}
                  {pinjaman.catatan_admin && (
-                    <div className="mt-4 pt-4 border-t border-gray-600 col-span-2 md:col-span-4">
-                        <InfoItem label="Catatan Admin" value={<p className="whitespace-pre-wrap font-normal bg-yellow-900/50 text-yellow-300 p-3 rounded-md">{pinjaman.catatan_admin}</p>} />
+                    <div className="mt-4 pt-4 col-span-2 md:col-span-4">
+                        <InfoItem label="Catatan Admin" value={<p className="whitespace-pre-wrap font-normal bg-amber-100 text-amber-800 p-3 rounded-md">{pinjaman.catatan_admin}</p>} />
                     </div>
                 )}
             </div>
 
             {/* Action Buttons */}
             {pinjaman.status === 'Menunggu Persetujuan' && (
-                <div className="bg-surface p-6 rounded-xl border border-gray-700 mb-8 flex justify-center items-center gap-6">
+                <div className="bg-surface p-6 rounded-xl shadow-md mb-8 flex justify-center items-center gap-6">
                     <h3 className="text-base md:text-lg font-semibold text-dark">Tindakan Persetujuan:</h3>
-                    <button onClick={() => handleActionClick('Disetujui')} disabled={isUpdating} className="flex items-center gap-2 bg-green-500 text-white px-6 py-2 rounded-lg font-bold hover:bg-green-600 disabled:bg-gray-400">
+                    <button onClick={() => handleActionClick('Disetujui')} disabled={isUpdating} className="flex items-center gap-2 bg-green-500 text-white px-6 py-2 rounded-lg font-bold hover:bg-green-600 disabled:bg-slate-400">
                         <CheckIcon className="w-5 h-5" /> {isUpdating ? 'Memproses...' : 'Setujui'}
                     </button>
-                    <button onClick={() => handleActionClick('Ditolak')} disabled={isUpdating} className="flex items-center gap-2 bg-red-500 text-white px-6 py-2 rounded-lg font-bold hover:bg-red-600 disabled:bg-gray-400">
+                    <button onClick={() => handleActionClick('Ditolak')} disabled={isUpdating} className="flex items-center gap-2 bg-red-500 text-white px-6 py-2 rounded-lg font-bold hover:bg-red-600 disabled:bg-slate-400">
                         <XMarkIcon className="w-5 h-5" /> {isUpdating ? 'Memproses...' : 'Tolak'}
                     </button>
                 </div>
@@ -167,29 +167,29 @@ const AdminPinjamanDetail: React.FC = () => {
             
             {/* Installment Table */}
             {pinjaman.jenis_pinjaman === 'Berjangka' && pinjaman.jadwal_angsuran && (
-                <div className="bg-surface p-6 rounded-xl border border-gray-700">
+                <div className="bg-surface p-6 rounded-xl shadow-md">
                     <h3 className="text-lg md:text-xl font-bold text-dark mb-4">Jadwal Angsuran</h3>
                     <div className="overflow-x-auto">
-                        <table className="w-full text-sm text-left text-gray-400">
-                             <thead className="text-xs text-gray-400 uppercase">
+                        <table className="w-full text-sm text-left text-gray-text">
+                             <thead className="text-xs text-gray-text uppercase">
                                 <tr>
-                                    <th className="px-4 py-3 font-semibold border-b-2 border-gray-700">Bulan Ke</th>
-                                    <th className="px-4 py-3 font-semibold border-b-2 border-gray-700">Tanggal</th>
-                                    <th className="px-4 py-3 font-semibold border-b-2 border-gray-700 text-right">Angsuran Pokok</th>
-                                    <th className="px-4 py-3 font-semibold border-b-2 border-gray-700 text-right">Angsuran Bunga</th>
-                                    <th className="px-4 py-3 font-semibold border-b-2 border-gray-700 text-right">Total Angsuran</th>
-                                    <th className="px-4 py-3 font-semibold border-b-2 border-gray-700 text-right">Sisa Pinjaman</th>
+                                    <th className="px-4 py-3 font-semibold">Bulan Ke</th>
+                                    <th className="px-4 py-3 font-semibold">Tanggal</th>
+                                    <th className="px-4 py-3 font-semibold text-right">Angsuran Pokok</th>
+                                    <th className="px-4 py-3 font-semibold text-right">Angsuran Bunga</th>
+                                    <th className="px-4 py-3 font-semibold text-right">Total Angsuran</th>
+                                    <th className="px-4 py-3 font-semibold text-right">Sisa Pinjaman</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-gray-700">
+                            <tbody>
                                 {pinjaman.jadwal_angsuran.map(row => (
-                                    <tr key={row.bulan} className="hover:bg-gray-600">
+                                    <tr key={row.bulan} className="border-t border-slate-100 hover:bg-slate-50">
                                         <td className="px-4 py-3 font-medium text-dark">{row.bulan}</td>
                                         <td className="px-4 py-3">{formatDate(row.tanggal)}</td>
                                         <td className="px-4 py-3 text-right">{formatCurrency(row.angsuranPokok)}</td>
                                         <td className="px-4 py-3 text-right">{formatCurrency(row.angsuranBunga)}</td>
                                         <td className="px-4 py-3 text-right font-semibold text-dark">{formatCurrency(row.totalAngsuran)}</td>
-                                        <td className="px-4 py-3 text-right font-bold text-blue-400">{formatCurrency(row.sisaPinjaman)}</td>
+                                        <td className="px-4 py-3 text-right font-bold text-primary">{formatCurrency(row.sisaPinjaman)}</td>
                                     </tr>
                                 ))}
                             </tbody>
@@ -204,7 +204,7 @@ const AdminPinjamanDetail: React.FC = () => {
                         Anda akan <span className="font-bold">{actionType?.toLowerCase()}</span> pengajuan untuk <span className="font-bold">{pinjaman?.nama_anggota}</span>.
                     </p>
                     <div>
-                        <label htmlFor="adminNotesDetail" className="block text-sm font-medium text-gray-300">
+                        <label htmlFor="adminNotesDetail" className="block text-sm font-medium text-gray-text">
                            Catatan / Alasan (Opsional)
                         </label>
                         <textarea
@@ -212,16 +212,16 @@ const AdminPinjamanDetail: React.FC = () => {
                             value={adminNotes}
                             onChange={(e) => setAdminNotes(e.target.value)}
                             rows={4}
-                            className="mt-1 block w-full bg-gray-800 border border-gray-600 rounded-md p-2 text-dark"
+                            className="mt-1 block w-full bg-slate-100 rounded-md p-2 text-dark"
                             placeholder={actionType === 'Ditolak' ? 'Contoh: Total pinjaman aktif melebihi batas.' : 'Contoh: Disetujui dengan syarat...'}
                         />
                     </div>
                      <div className="flex justify-end gap-4 mt-6">
-                        <button onClick={() => setIsModalOpen(false)} className="bg-gray-600 text-gray-200 px-4 py-2 rounded-lg font-semibold hover:bg-gray-500">Batal</button>
+                        <button onClick={() => setIsModalOpen(false)} className="bg-slate-200 text-slate-700 px-4 py-2 rounded-lg font-semibold hover:bg-slate-300">Batal</button>
                         <button
                             onClick={handleConfirmAction}
                             disabled={isUpdating}
-                            className={`px-4 py-2 rounded-lg font-semibold text-white disabled:bg-gray-500 ${actionType === 'Disetujui' ? 'bg-secondary hover:bg-secondary-dark' : 'bg-red-600 hover:bg-red-700'}`}
+                            className={`px-4 py-2 rounded-lg font-semibold text-white disabled:bg-slate-400 ${actionType === 'Disetujui' ? 'bg-secondary hover:bg-secondary-dark' : 'bg-red-600 hover:bg-red-700'}`}
                         >
                             {isUpdating ? 'Memproses...' : `Konfirmasi & ${actionType}`}
                         </button>

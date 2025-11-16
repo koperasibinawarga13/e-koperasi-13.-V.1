@@ -1,8 +1,3 @@
-
-
-
-
-
 import React from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -15,7 +10,8 @@ import AdminUpload from './pages/admin/AdminUpload';
 import AdminLaporan from './pages/admin/AdminLaporan';
 import AnggotaLayout from './pages/anggota/AnggotaLayout';
 import AnggotaDashboard from './pages/anggota/AnggotaDashboard';
-import AnggotaKeuangan from './pages/anggota/AnggotaKeuangan';
+// FIX: Changed import to be a named import to fix module resolution error.
+import { AnggotaKeuangan } from './pages/anggota/AnggotaKeuangan';
 import AnggotaProfil from './pages/anggota/AnggotaProfil';
 import { UserRole } from './types';
 import AdminKeuanganDetail from './pages/admin/AdminKeuanganDetail';

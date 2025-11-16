@@ -54,25 +54,25 @@ const AnggotaDashboard: React.FC = () => {
         const pinjamanBaru = (log.transaksi_penambahan_pinjaman_berjangka || 0) + (log.transaksi_penambahan_pinjaman_khusus || 0) + (log.transaksi_penambahan_pinjaman_niaga || 0);
 
         if (setoran > penarikan && setoran > pinjamanBaru) {
-            return { type: 'Setoran Bulanan', amount: setoran, icon: <ArrowUpRightIcon className="w-5 h-5" />, color: 'text-green-600', bgColor: 'bg-green-100' };
+            return { type: 'Setoran Bulanan', amount: setoran, icon: <ArrowUpRightIcon className="w-5 h-5" />, color: 'text-primary', bgColor: 'bg-primary-light' };
         }
         if (penarikan > setoran && penarikan > pinjamanBaru) {
-            return { type: 'Penarikan Simpanan', amount: penarikan, icon: <ArrowDownLeftIcon className="w-5 h-5" />, color: 'text-amber-600', bgColor: 'bg-amber-100' };
+            return { type: 'Penarikan Simpanan', amount: penarikan, icon: <ArrowDownLeftIcon className="w-5 h-5" />, color: 'text-amber-400', bgColor: 'bg-amber-500/10' };
         }
         if (pinjamanBaru > setoran && pinjamanBaru > penarikan) {
-            return { type: 'Pencairan Pinjaman', amount: pinjamanBaru, icon: <ArrowDownLeftIcon className="w-5 h-5" />, color: 'text-red-600', bgColor: 'bg-red-100' };
+            return { type: 'Pencairan Pinjaman', amount: pinjamanBaru, icon: <ArrowDownLeftIcon className="w-5 h-5" />, color: 'text-red-400', bgColor: 'bg-red-500/10' };
         }
         if (setoran > 0) {
-             return { type: 'Transaksi Bulanan', amount: setoran, icon: <ArrowUpRightIcon className="w-5 h-5" />, color: 'text-green-600', bgColor: 'bg-green-100' };
+             return { type: 'Transaksi Bulanan', amount: setoran, icon: <ArrowUpRightIcon className="w-5 h-5" />, color: 'text-primary', bgColor: 'bg-primary-light' };
         }
         const totalOut = penarikan + pinjamanBaru;
         if (totalOut > 0) {
-             return { type: 'Penarikan/Pinjaman', amount: totalOut, icon: <ArrowDownLeftIcon className="w-5 h-5" />, color: 'text-amber-600', bgColor: 'bg-amber-100' };
+             return { type: 'Penarikan/Pinjaman', amount: totalOut, icon: <ArrowDownLeftIcon className="w-5 h-5" />, color: 'text-amber-400', bgColor: 'bg-amber-500/10' };
         }
         return null; // Don't show zero-value logs
     };
 
-    const COLORS = ['#0ea5e9', '#14B8A6', '#F59E0B', '#F43F5E']; // sky, teal, amber, rose
+    const COLORS = ['#a3e635', '#3b82f6', '#f59e0b', '#f43f5e']; // lime, blue, amber, rose
     
     const pieChartData = keuangan ? [
         { name: 'Simpanan Pokok', value: keuangan.akhir_simpanan_pokok || 0 },
@@ -107,12 +107,12 @@ const AnggotaDashboard: React.FC = () => {
     <div>
       <Header title="Dashboard" />
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <StatCard title="Saldo Akhir" value={formatCurrency(saldoAkhir)} icon={<CreditCardIcon className="w-6 h-6" />} iconBgColor="bg-sky-500" />
-        <StatCard title="Total Simpanan" value={formatCurrency(totalSimpanan)} icon={<CreditCardIcon className="w-6 h-6" />} iconBgColor="bg-teal-500" />
+        <StatCard title="Saldo Akhir" value={formatCurrency(saldoAkhir)} icon={<CreditCardIcon className="w-6 h-6" />} iconBgColor="bg-primary" />
+        <StatCard title="Total Simpanan" value={formatCurrency(totalSimpanan)} icon={<CreditCardIcon className="w-6 h-6" />} iconBgColor="bg-secondary" />
         <StatCard title="Total Pinjaman" value={formatCurrency(totalPinjaman)} icon={<ChartBarIcon className="w-6 h-6" />} iconBgColor="bg-amber-500" />
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
-        <div className="bg-surface p-6 rounded-xl border border-slate-200">
+        <div className="bg-surface p-6 rounded-xl">
             <h2 className="text-lg md:text-xl font-bold text-dark mb-4">Rincian Simpanan</h2>
             <div style={{ width: '100%', height: 300 }}>
             <ResponsiveContainer>
@@ -132,8 +132,8 @@ const AnggotaDashboard: React.FC = () => {
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                         ))}
                     </Pie>
-                    <Tooltip contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', color: '#1e2937' }} formatter={(value) => formatCurrency(value as number)} />
-                    <Legend wrapperStyle={{ color: '#64748b' }}/>
+                    <Tooltip contentStyle={{ backgroundColor: '#18181b', border: '1px solid #3f3f46', color: '#ffffff' }} formatter={(value) => formatCurrency(value as number)} />
+                    <Legend wrapperStyle={{ color: '#a1a1aa' }}/>
                     </PieChart>
                 ) : (
                     <div className="flex items-center justify-center h-full text-gray-text">
@@ -144,7 +144,7 @@ const AnggotaDashboard: React.FC = () => {
             </div>
         </div>
 
-        <div className="bg-surface p-6 rounded-xl border border-slate-200">
+        <div className="bg-surface p-6 rounded-xl">
             <div className="flex justify-between items-center mb-4">
                 <h2 className="text-lg md:text-xl font-bold text-dark">Aktivitas Terbaru</h2>
                 <Link to="/anggota/keuangan" className="text-sm font-semibold text-primary hover:underline">
@@ -166,7 +166,7 @@ const AnggotaDashboard: React.FC = () => {
                       <p className="text-sm text-gray-text">{new Date(log.log_time).toLocaleDateString('id-ID', {day: 'numeric', month: 'long'})}</p>
                     </div>
                     <div className={`font-semibold text-right ${summary.color}`}>
-                      {summary.color.includes('green') ? '+' : '-'} {formatCurrency(summary.amount)}
+                      {summary.color.includes('primary') ? '+' : '-'} {formatCurrency(summary.amount)}
                     </div>
                   </div>
                 );

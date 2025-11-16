@@ -12,7 +12,7 @@ const AdminLayout: React.FC = () => {
   };
 
   return (
-    <div className="bg-background min-h-screen">
+    <div className="bg-background min-h-screen text-dark">
       <Sidebar 
         isCollapsed={isSidebarCollapsed} 
         toggleSidebar={toggleSidebar} 
@@ -23,7 +23,7 @@ const AdminLayout: React.FC = () => {
         {/* Hamburger Button for Mobile */}
         <button 
           onClick={() => setMobileMenuOpen(true)} 
-          className="md:hidden fixed top-4 left-4 z-20 p-2 bg-surface/80 backdrop-blur-sm rounded-full text-dark shadow-lg border border-slate-200"
+          className="md:hidden fixed top-4 left-4 z-20 p-2 bg-surface/80 backdrop-blur-sm rounded-full text-dark"
           aria-label="Open sidebar"
         >
           <MenuIcon className="w-6 h-6" />

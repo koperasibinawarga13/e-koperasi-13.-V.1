@@ -112,23 +112,23 @@ const AdminDashboard: React.FC = () => {
         <div>
             <Header title="Dashboard Admin" />
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <StatCard title="Total Anggota" value={stats.totalAnggota.toLocaleString('id-ID')} icon={<UsersIcon className="w-6 h-6" />} iconBgColor="bg-sky-500" />
-                <StatCard title="Total Simpanan" value={formatCurrency(stats.totalSimpanan)} icon={<CreditCardIcon className="w-6 h-6" />} iconBgColor="bg-teal-500" />
+                <StatCard title="Total Anggota" value={stats.totalAnggota.toLocaleString('id-ID')} icon={<UsersIcon className="w-6 h-6" />} iconBgColor="bg-primary" />
+                <StatCard title="Total Simpanan" value={formatCurrency(stats.totalSimpanan)} icon={<CreditCardIcon className="w-6 h-6" />} iconBgColor="bg-secondary" />
                 <StatCard title="Total Pinjaman" value={formatCurrency(stats.totalPinjaman)} icon={<ChartBarIcon className="w-6 h-6" />} iconBgColor="bg-amber-500" />
                 <StatCard title="Saldo Kas" value={formatCurrency(stats.saldoKas)} icon={<BuildingOfficeIcon className="w-6 h-6" />} iconBgColor="bg-rose-500" />
             </div>
-            <div className="bg-surface p-6 rounded-xl border border-slate-200">
+            <div className="bg-surface p-6 rounded-xl">
                 <h2 className="text-lg md:text-xl font-bold text-dark mb-4">Ringkasan Saldo Akhir</h2>
                  {chartData.length > 0 ? (
                     <div style={{ width: '100%', height: 400 }}>
                         <ResponsiveContainer>
                             <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                                <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.4}/>
-                                <XAxis dataKey="name" angle={-15} textAnchor="end" height={50} tick={{ fill: '#64748b' }} />
-                                <YAxis tickFormatter={(tick) => `${(tick / 1000000).toLocaleString('id-ID')} Jt`} tick={{ fill: '#64748b' }}/>
-                                <Tooltip contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0' }}/>
-                                <Legend wrapperStyle={{ color: '#64748b' }}/>
-                                <Bar dataKey="total" name="Total Saldo Akhir" fill="#0ea5e9" />
+                                <CartesianGrid strokeDasharray="3 3" stroke="#3f3f46"/>
+                                <XAxis dataKey="name" angle={-15} textAnchor="end" height={50} tick={{ fill: '#a1a1aa' }} />
+                                <YAxis tickFormatter={(tick) => `${(tick / 1000000).toLocaleString('id-ID')} Jt`} tick={{ fill: '#a1a1aa' }}/>
+                                <Tooltip contentStyle={{ backgroundColor: '#18181b', border: '1px solid #3f3f46', color: '#ffffff' }} cursor={{fill: 'rgba(163, 230, 53, 0.1)'}}/>
+                                <Legend wrapperStyle={{ color: '#a1a1aa' }}/>
+                                <Bar dataKey="total" name="Total Saldo Akhir" fill="#a3e635" />
                             </BarChart>
                         </ResponsiveContainer>
                     </div>
@@ -137,24 +137,24 @@ const AdminDashboard: React.FC = () => {
                  )}
             </div>
 
-             <div className="mt-8 bg-surface p-6 rounded-xl border border-slate-200">
+             <div className="mt-8 bg-surface p-6 rounded-xl">
                 <h2 className="text-lg md:text-xl font-bold text-dark mb-4">Pengajuan Pinjaman Baru</h2>
                 {pendingLoans.length > 0 ? (
                     <div className="overflow-x-auto">
                         <table className="w-full text-sm text-left text-gray-text">
                             <thead className="text-xs text-gray-text uppercase">
                                 <tr>
-                                    <th className="px-4 py-4 font-semibold border-b-2 border-slate-200">Nama Anggota</th>
-                                    <th className="px-4 py-4 font-semibold border-b-2 border-slate-200">Jenis</th>
-                                    <th className="px-4 py-4 font-semibold border-b-2 border-slate-200">Tanggal</th>
-                                    <th className="px-4 py-4 font-semibold border-b-2 border-slate-200 text-right">Jumlah Pinjaman</th>
-                                    <th className="px-4 py-4 font-semibold border-b-2 border-slate-200 text-center">Jangka Waktu</th>
-                                    <th className="px-4 py-4 font-semibold border-b-2 border-slate-200 text-center">Aksi</th>
+                                    <th className="px-4 py-4 font-semibold">Nama Anggota</th>
+                                    <th className="px-4 py-4 font-semibold">Jenis</th>
+                                    <th className="px-4 py-4 font-semibold">Tanggal</th>
+                                    <th className="px-4 py-4 font-semibold text-right">Jumlah Pinjaman</th>
+                                    <th className="px-4 py-4 font-semibold text-center">Jangka Waktu</th>
+                                    <th className="px-4 py-4 font-semibold text-center">Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-200">
+                            <tbody>
                                 {pendingLoans.map(loan => (
-                                    <tr key={loan.id} className="hover:bg-slate-50 transition-colors">
+                                    <tr key={loan.id} className="border-t border-zinc-800 hover:bg-zinc-900 transition-colors">
                                         <td className="px-4 py-4 font-medium text-dark">{loan.nama_anggota}</td>
                                         <td className="px-4 py-4 font-semibold">{loan.jenis_pinjaman}</td>
                                         <td className="px-4 py-4">{new Date(loan.tanggal_pengajuan).toLocaleDateString('id-ID')}</td>
@@ -165,7 +165,7 @@ const AdminDashboard: React.FC = () => {
                                                 <button
                                                     onClick={() => handleLoanAction(loan.id, 'Disetujui')}
                                                     disabled={isUpdatingLoan === loan.id}
-                                                    className="p-2 rounded-full bg-green-100 text-green-600 hover:bg-green-200 disabled:opacity-50"
+                                                    className="p-2 rounded-full bg-green-500/10 text-green-400 hover:bg-green-500/20 disabled:opacity-50"
                                                     title="Setujui"
                                                 >
                                                     <CheckIcon className="w-4 h-4" />
@@ -173,7 +173,7 @@ const AdminDashboard: React.FC = () => {
                                                 <button
                                                     onClick={() => handleLoanAction(loan.id, 'Ditolak')}
                                                     disabled={isUpdatingLoan === loan.id}
-                                                    className="p-2 rounded-full bg-red-100 text-red-600 hover:bg-red-200 disabled:opacity-50"
+                                                    className="p-2 rounded-full bg-red-500/10 text-red-400 hover:bg-red-500/20 disabled:opacity-50"
                                                     title="Tolak"
                                                 >
                                                     <XMarkIcon className="w-4 h-4" />

@@ -78,16 +78,16 @@ const AdminPinjaman: React.FC = () => {
         let colorClasses = '';
         switch (status) {
             case 'Menunggu Persetujuan':
-                colorClasses = 'bg-amber-900/50 text-amber-300';
+                colorClasses = 'bg-amber-100 text-amber-700';
                 break;
             case 'Disetujui':
-                colorClasses = 'bg-green-900/50 text-green-300';
+                colorClasses = 'bg-green-100 text-green-700';
                 break;
             case 'Ditolak':
-                colorClasses = 'bg-red-900/50 text-red-300';
+                colorClasses = 'bg-red-100 text-red-700';
                 break;
             default:
-                colorClasses = 'bg-gray-700 text-gray-300';
+                colorClasses = 'bg-slate-100 text-slate-600';
         }
         return <span className={`${baseClasses} ${colorClasses}`}>{status}</span>;
     };
@@ -95,8 +95,8 @@ const AdminPinjaman: React.FC = () => {
     return (
         <div>
             <Header title="Pengajuan Pinjaman" />
-            <div className="bg-surface p-6 rounded-xl border border-gray-700">
-                <div className="border-b border-gray-700 mb-6">
+            <div className="bg-surface p-6 rounded-xl shadow-md">
+                <div className="border-b border-slate-200 mb-6">
                     <nav className="-mb-px flex space-x-6">
                         {(['Menunggu Persetujuan', 'Disetujui', 'Ditolak', 'Semua'] as StatusFilter[]).map(tab => (
                             <button
@@ -105,7 +105,7 @@ const AdminPinjaman: React.FC = () => {
                                 className={`whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm ${
                                     activeTab === tab
                                         ? 'border-primary text-primary'
-                                        : 'border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-500'
+                                        : 'border-transparent text-gray-text hover:text-dark hover:border-slate-300'
                                 }`}
                             >
                                 {tab}
@@ -116,25 +116,25 @@ const AdminPinjaman: React.FC = () => {
 
                 <div className="overflow-x-auto">
                     {isLoading ? (
-                        <p className="text-center py-10 text-gray-400">Memuat data pengajuan...</p>
+                        <p className="text-center py-10 text-gray-text">Memuat data pengajuan...</p>
                     ) : filteredPinjaman.length > 0 ? (
-                        <table className="w-full text-sm text-left text-gray-400">
-                            <thead className="text-xs text-gray-400 uppercase">
+                        <table className="w-full text-sm text-left text-gray-text">
+                            <thead className="text-xs text-gray-text uppercase">
                                 <tr>
-                                    <th className="px-4 py-3 font-semibold border-b-2 border-gray-700">No. Pengajuan</th>
-                                    <th className="px-4 py-3 font-semibold border-b-2 border-gray-700">Nama Anggota</th>
-                                    <th className="px-4 py-3 font-semibold border-b-2 border-gray-700">Jenis Pinjaman</th>
-                                    <th className="px-4 py-3 font-semibold border-b-2 border-gray-700">Tanggal</th>
-                                    <th className="px-4 py-3 font-semibold border-b-2 border-gray-700 text-right">Jumlah</th>
-                                    <th className="px-4 py-3 font-semibold border-b-2 border-gray-700 text-center">Jangka Waktu</th>
-                                    <th className="px-4 py-3 font-semibold border-b-2 border-gray-700 text-center">Status</th>
-                                    <th className="px-4 py-3 font-semibold border-b-2 border-gray-700">Catatan Admin</th>
-                                    <th className="px-4 py-3 font-semibold border-b-2 border-gray-700 text-center">Aksi</th>
+                                    <th className="px-4 py-3 font-semibold">No. Pengajuan</th>
+                                    <th className="px-4 py-3 font-semibold">Nama Anggota</th>
+                                    <th className="px-4 py-3 font-semibold">Jenis Pinjaman</th>
+                                    <th className="px-4 py-3 font-semibold">Tanggal</th>
+                                    <th className="px-4 py-3 font-semibold text-right">Jumlah</th>
+                                    <th className="px-4 py-3 font-semibold text-center">Jangka Waktu</th>
+                                    <th className="px-4 py-3 font-semibold text-center">Status</th>
+                                    <th className="px-4 py-3 font-semibold">Catatan Admin</th>
+                                    <th className="px-4 py-3 font-semibold text-center">Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-gray-700">
+                            <tbody>
                                 {filteredPinjaman.map(p => (
-                                    <tr key={p.id} className="hover:bg-gray-600 transition-colors">
+                                    <tr key={p.id} className="border-t border-slate-100 hover:bg-slate-50 transition-colors">
                                         <td className="px-4 py-3">
                                             <Link to={`/admin/pinjaman/${p.id}`} className="text-primary font-semibold hover:underline">
                                                 {`${p.no_anggota.replace(/-/g, '')}${new Date(p.tanggal_pengajuan).toLocaleDateString('sv-SE').replace(/-/g, '')}`}
@@ -152,21 +152,21 @@ const AdminPinjaman: React.FC = () => {
                                                 <div className="flex justify-center gap-2">
                                                     <button
                                                         onClick={() => handleActionClick(p, 'Disetujui')}
-                                                        className="p-2 rounded-full bg-green-900/50 text-green-300 hover:bg-green-800/50"
+                                                        className="p-2 rounded-full bg-green-100 text-green-600 hover:bg-green-200"
                                                         title="Setujui"
                                                     >
                                                         <CheckIcon className="w-4 h-4" />
                                                     </button>
                                                     <button
                                                         onClick={() => handleActionClick(p, 'Ditolak')}
-                                                        className="p-2 rounded-full bg-red-900/50 text-red-300 hover:bg-red-800/50"
+                                                        className="p-2 rounded-full bg-red-100 text-red-600 hover:bg-red-200"
                                                         title="Tolak"
                                                     >
                                                         <XMarkIcon className="w-4 h-4" />
                                                     </button>
                                                 </div>
                                             ) : (
-                                                <div className="text-center text-gray-500">-</div>
+                                                <div className="text-center text-slate-400">-</div>
                                             )}
                                         </td>
                                     </tr>
@@ -174,7 +174,7 @@ const AdminPinjaman: React.FC = () => {
                             </tbody>
                         </table>
                     ) : (
-                        <p className="text-center py-10 text-gray-400">Tidak ada pengajuan dengan status '{activeTab}'.</p>
+                        <p className="text-center py-10 text-gray-text">Tidak ada pengajuan dengan status '{activeTab}'.</p>
                     )}
                 </div>
             </div>
@@ -185,7 +185,7 @@ const AdminPinjaman: React.FC = () => {
                         Anda akan <span className="font-bold">{actionType?.toLowerCase()}</span> pengajuan untuk <span className="font-bold">{currentPinjaman?.nama_anggota}</span>.
                     </p>
                     <div>
-                        <label htmlFor="adminNotes" className="block text-sm font-medium text-gray-300">
+                        <label htmlFor="adminNotes" className="block text-sm font-medium text-gray-text">
                            Catatan / Alasan (Opsional)
                         </label>
                         <textarea
@@ -193,16 +193,16 @@ const AdminPinjaman: React.FC = () => {
                             value={adminNotes}
                             onChange={(e) => setAdminNotes(e.target.value)}
                             rows={4}
-                            className="mt-1 block w-full bg-gray-800 border border-gray-600 rounded-md p-2 text-dark"
+                            className="mt-1 block w-full bg-slate-100 rounded-md p-2 text-dark"
                             placeholder={actionType === 'Ditolak' ? 'Contoh: Total pinjaman aktif melebihi batas.' : 'Contoh: Disetujui dengan syarat...'}
                         />
                     </div>
                      <div className="flex justify-end gap-4 mt-6">
-                        <button onClick={closeModal} className="bg-gray-600 text-gray-200 px-4 py-2 rounded-lg font-semibold hover:bg-gray-500">Batal</button>
+                        <button onClick={closeModal} className="bg-slate-200 text-slate-700 px-4 py-2 rounded-lg font-semibold hover:bg-slate-300">Batal</button>
                         <button
                             onClick={handleConfirmAction}
                             disabled={isUpdating}
-                            className={`px-4 py-2 rounded-lg font-semibold text-white disabled:bg-gray-500 ${actionType === 'Disetujui' ? 'bg-secondary hover:bg-secondary-dark' : 'bg-red-600 hover:bg-red-700'}`}
+                            className={`px-4 py-2 rounded-lg font-semibold text-white disabled:bg-slate-400 ${actionType === 'Disetujui' ? 'bg-secondary hover:bg-secondary-dark' : 'bg-red-600 hover:bg-red-700'}`}
                         >
                             {isUpdating ? 'Memproses...' : `Konfirmasi & ${actionType}`}
                         </button>
