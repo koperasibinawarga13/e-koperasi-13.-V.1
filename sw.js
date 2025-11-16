@@ -1,4 +1,4 @@
-const CACHE_NAME = 'e-koperasi-cache-v32'; // Incremented version
+const CACHE_NAME = 'e-koperasi-cache-v33'; // Incremented version
 const urlsToCache = [
   // App Shell
   '/',
@@ -12,14 +12,16 @@ const urlsToCache = [
   'https://cdn.tailwindcss.com',
   'https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap',
   // JS Dependencies from importmap
-  'https://aistudiocdn.com/react@19.2.0',
-  'https://aistudiocdn.com/react-dom@19.2.0/client',
+  'https://aistudiocdn.com/react@18.3.1',
+  'https://aistudiocdn.com/react-dom@18.3.1',
+  'https://aistudiocdn.com/react-dom@18.3.1/client',
+  'https://aistudiocdn.com/react@18.3.1/jsx-runtime',
   'https://esm.sh/react-router-dom@6.23.1',
   'https://esm.sh/recharts@2.12.7',
-  'https://esm.sh/firebase@10.12.2/app',
-  'https://esm.sh/firebase@10.12.2/firestore',
+  'https://esm.sh/xlsx@0.18.5',
   'https://esm.sh/react-dropzone@14.2.3',
-  'https://esm.sh/xlsx@0.18.5'
+  'https://esm.sh/firebase@10.12.2/app',
+  'https://esm.sh/firebase@10.12.2/firestore'
 ];
 
 
