@@ -1,3 +1,4 @@
+
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 
@@ -11,8 +12,9 @@ const firebaseConfig = {
   measurementId: "G-B96R2RRHPW"
 };
 
-// More robust initialization: get the app if it exists, otherwise initialize.
-const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
+// Pola inisialisasi yang lebih eksplisit untuk mencegah race condition.
+// Ambil aplikasi yang ada jika sudah diinisialisasi, jika tidak, inisialisasi yang baru.
+const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 
-// Explicitly pass the app instance to getFirestore to ensure connection.
+// Teruskan instance aplikasi secara eksplisit ke getFirestore() untuk memastikan koneksi yang benar.
 export const db = getFirestore(app);

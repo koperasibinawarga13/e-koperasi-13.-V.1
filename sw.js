@@ -1,108 +1,80 @@
-const CACHE_NAME = 'e-koperasi-cache-v35'; // Incremented version
-const urlsToCache = [
-  // App Shell
-  '/',
+
+const CACHE_NAME = 'e-koperasi-cache-v41';
+
+const STATIC_ASSETS = [
+  '/',                // app shell
   '/index.html',
   '/manifest.json',
-  '/icon-192x192.png',
-  '/icon-512x512.png',
-  // Main script
-  '/index.tsx',
-  // Styles & Fonts
-  'https://cdn.tailwindcss.com',
-  'https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap',
-  // JS Dependencies from importmap
-  'https://aistudiocdn.com/react@18.3.1',
-  'https://aistudiocdn.com/react-dom@18.3.1',
-  'https://aistudiocdn.com/react-dom@18.3.1/client',
-  'https://aistudiocdn.com/react@18.3.1/jsx-runtime',
-  'https://esm.sh/react-router-dom@6.23.1',
-  'https://esm.sh/recharts@2.12.7',
-  'https://esm.sh/xlsx@0.18.5',
-  'https://esm.sh/react-dropzone@14.2.3',
-  'https://esm.sh/firebase@10.12.2/app',
-  'https://esm.sh/firebase@10.12.2/firestore'
+  '/assets/icon-192x192.png',
+  '/assets/icon-512x512.png'
 ];
 
-
-// Install the service worker and cache all critical assets
+// Install & Cache Shell
 self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => {
-        console.log('Service Worker: Caching app shell');
-        return cache.addAll(urlsToCache);
-      })
-  );
-});
-
-// Listen for message from client to skip waiting
-self.addEventListener('message', event => {
-  if (event.data && event.data.type === 'SKIP_WAITING') {
-    self.skipWaiting();
-  }
-});
-
-
-// Clean up old caches on activation
-self.addEventListener('activate', event => {
-  const cacheWhitelist = [CACHE_NAME];
-  event.waitUntil(
-    caches.keys().then(cacheNames => {
-      return Promise.all(
-        cacheNames.map(cacheName => {
-          if (!cacheWhitelist.includes(cacheName)) {
-            console.log('Service Worker: Deleting old cache', cacheName);
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    }).then(() => self.clients.claim())
-  );
-});
-
-
-self.addEventListener('fetch', event => {
-  // Always go to the network for Firestore requests. Do not cache them.
-  if (event.request.url.includes('firestore.googleapis.com')) {
-    event.respondWith(fetch(event.request));
-    return;
-  }
-
-  // Handle navigation requests for our SPA using a network-first, falling back to cache strategy.
-  if (event.request.mode === 'navigate') {
-    event.respondWith(
-      fetch(event.request).catch(() => {
-        // If the network fails (offline), serve the main app shell from the cache.
-        return caches.match('/index.html');
-      })
-    );
-    return;
-  }
-
-  // For all other requests (assets like JS, CSS, images, fonts),
-  // use a "cache-first, then network" strategy.
-  event.respondWith(
-    caches.match(event.request).then(cachedResponse => {
-      // If we have a match in the cache, return it.
-      if (cachedResponse) {
-        return cachedResponse;
-      }
-      
-      // If not in cache, fetch from the network.
-      return fetch(event.request).then(networkResponse => {
-        // We only want to cache successful responses.
-        // For 'basic' responses (same-origin), we can check the status.
-        // For 'opaque' responses (cross-origin no-cors), we can't see the status,
-        // but we cache it anyway to enable offline functionality.
-        if (networkResponse && (networkResponse.status === 200 || networkResponse.type === 'opaque')) {
-            const responseToCache = networkResponse.clone();
-            caches.open(CACHE_NAME).then(cache => {
-                cache.put(event.request, responseToCache);
-            });
-        }
-        return networkResponse;
-      });
+    caches.open(CACHE_NAME).then(cache => {
+      return cache.addAll(STATIC_ASSETS);
     })
   );
+  self.skipWaiting();
+});
+
+// Activate & Remove old caches
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(
+        keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
+      )
+    )
+  );
+  self.clients.claim();
+});
+
+// Fetch handler
+self.addEventListener('fetch', event => {
+  const req = event.request;
+  const url = new URL(req.url);
+
+  // Always bypass Firestore & API calls
+  if (url.hostname.includes('firestore.googleapis.com')) {
+    return event.respondWith(fetch(req));
+  }
+
+  // SPA route handler (React Router)
+  if (req.mode === 'navigate') {
+    return event.respondWith(
+      fetch(req).catch(() => caches.match('/index.html'))
+    );
+  }
+
+  // Cache-first strategy for static & CDN
+  event.respondWith(
+    caches.match(req).then(cacheRes => {
+      return (
+        cacheRes ||
+        fetch(req)
+          .then(networkRes => {
+            // cache only successful or opaque responses
+            if (networkRes.ok || networkRes.type === 'opaque') {
+              caches.open(CACHE_NAME).then(cache => cache.put(req, networkRes.clone()));
+            }
+            return networkRes;
+          })
+          .catch(() => {
+            // Optional: Offline fallback image
+            if (req.destination === 'image') {
+              return caches.match('/assets/icon-192x192.png');
+            }
+          })
+      );
+    })
+  );
+});
+
+// Allow client app to update SW immediately
+self.addEventListener('message', event => {
+  if (event.data?.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });
