@@ -1,4 +1,4 @@
-import { initializeApp } from "firebase/app";
+import { initializeApp, getApps, getApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
@@ -11,10 +11,9 @@ const firebaseConfig = {
   measurementId: "G-B96R2RRHPW"
 };
 
-// Inisialisasi Firebase. This creates the default app instance.
-initializeApp(firebaseConfig);
+// This robust pattern prevents re-initialization errors.
+// It checks if an app is already initialized before creating a new one.
+const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 
-// Dapatkan referensi ke layanan database.
-// By not passing an app instance, getFirestore() uses the default instance.
-// This can prevent initialization issues in some environments.
-export const db = getFirestore();
+// Explicitly pass the app instance to getFirestore for clarity and robustness.
+export const db = getFirestore(app);
