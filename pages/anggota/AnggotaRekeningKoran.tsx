@@ -1,11 +1,13 @@
 
 import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 import { Keuangan, Anggota } from '../../types';
 import { useAuth } from '../../context/AuthContext';
 import { getAnggotaById } from '../../services/anggotaService';
 import { getHistoryByAnggota } from '../../services/keuanganService';
-import { ChevronLeftIcon } from '../../components/icons/Icons';
+import { ChevronLeftIcon, PrintIcon } from '../../components/icons/Icons';
 
 type AccountType = 
   | 'simpanan_pokok' 
@@ -44,6 +46,7 @@ const AnggotaRekeningKoran: React.FC = () => {
     const [anggota, setAnggota] = useState<Anggota | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [selectedAccount, setSelectedAccount] = useState<AccountType>('simpanan_wajib');
+    const [isPrinting, setIsPrinting] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -107,6 +110,61 @@ const AnggotaRekeningKoran: React.FC = () => {
     
     const selectedAccountLabel = accountOptions.find(opt => opt.value === selectedAccount)?.label;
 
+    const handlePrintPdf = () => {
+        if (!anggota || transactionData.length === 0) return;
+        setIsPrinting(true);
+
+        const doc = new jsPDF();
+        const selectedAccountLabel = accountOptions.find(opt => opt.value === selectedAccount)?.label || 'Rekening';
+
+        // Title
+        doc.setFontSize(18);
+        doc.text(`Rekening Koran - ${selectedAccountLabel}`, 14, 22);
+
+        // Member Info
+        doc.setFontSize(11);
+        doc.text(`Nama Anggota: ${anggota.nama}`, 14, 32);
+        doc.text(`No. Anggota: ${anggota.no_anggota}`, 14, 38);
+
+        // Current Balance
+        doc.setFontSize(12);
+        doc.text(`Saldo Terkini: ${formatCurrency(latestBalance)}`, 14, 48);
+        
+        const tableColumn = ["Periode", "Keterangan", "Debit", "Kredit", "Saldo Akhir"];
+        const tableRows: (string | number)[][] = [];
+
+        transactionData.forEach(item => {
+            if (!item) return;
+            const rowData = [
+                formatPeriod(item.periode!),
+                "Transaksi Bulan Ini",
+                item.debit > 0 ? formatCurrency(item.debit).replace(/Rp\s*/, '') : '-',
+                item.kredit > 0 ? formatCurrency(item.kredit).replace(/Rp\s*/, '') : '-',
+                formatCurrency(item.saldo).replace(/Rp\s*/, '')
+            ];
+            tableRows.push(rowData);
+        });
+
+        (doc as any).autoTable({
+            head: [tableColumn],
+            body: tableRows,
+            startY: 55,
+            headStyles: { fillColor: [30, 41, 59] }, // slate-800
+            theme: 'grid',
+            styles: {
+                halign: 'left'
+            },
+            columnStyles: {
+                2: { halign: 'right' },
+                3: { halign: 'right' },
+                4: { halign: 'right' }
+            }
+        });
+        
+        doc.save(`Rekening_Koran_${selectedAccountLabel.replace(/ /g, '_')}_${anggota.no_anggota}.pdf`);
+        setIsPrinting(false);
+    };
+
     return (
         <div>
              <div className="bg-surface p-6 rounded-lg mb-8 shadow-sm">
@@ -120,7 +178,7 @@ const AnggotaRekeningKoran: React.FC = () => {
                              <p className="text-sm text-gray-text">{anggota?.nama}</p>
                         </div>
                     </div>
-                     <div className="w-full sm:w-auto">
+                     <div className="w-full sm:w-auto flex flex-wrap items-center gap-4">
                         <select
                             id="account-select"
                             value={selectedAccount}
@@ -129,6 +187,14 @@ const AnggotaRekeningKoran: React.FC = () => {
                         >
                            {accountOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
                         </select>
+                        <button
+                            onClick={handlePrintPdf}
+                            disabled={isPrinting || transactionData.length === 0}
+                            className="flex-grow sm:flex-grow-0 inline-flex items-center gap-2 bg-secondary text-white px-4 py-2 rounded-lg hover:bg-secondary-dark transition-colors disabled:bg-zinc-700 disabled:cursor-not-allowed"
+                        >
+                            <PrintIcon className="w-5 h-5" />
+                            <span>{isPrinting ? 'Mencetak...' : 'Cetak PDF'}</span>
+                        </button>
                     </div>
                 </div>
             </div>
