@@ -91,7 +91,9 @@ const AdminRiwayatTransaksi: React.FC = () => {
             setSyncMessage(`Sinkronisasi berhasil! ${count} riwayat transaksi yang hilang berhasil dibuat.`);
             // Refresh search if a member was already searched
             if (searchedMember) {
-                handleSearch(new Event('submit') as any);
+                // To avoid form submission side-effects, create a dummy event
+                const dummyEvent = { preventDefault: () => {} } as React.FormEvent;
+                handleSearch(dummyEvent);
             }
         } catch (error) {
             console.error("Sync failed:", error);
@@ -115,29 +117,29 @@ const AdminRiwayatTransaksi: React.FC = () => {
                         <input
                             type="text"
                             placeholder="Masukkan Nomor Anggota (e.g., AK-101)"
-                            className="bg-slate-100 rounded-lg px-4 py-2 w-full sm:w-64 text-dark"
+                            className="bg-zinc-800 rounded-lg px-4 py-2 w-full sm:w-64 focus:ring-1 focus:ring-primary focus:border-primary text-dark"
                             value={searchNoAnggota}
                             onChange={(e) => setSearchNoAnggota(e.target.value)}
                         />
-                        <button type="submit" disabled={isLoading} className="bg-primary text-white px-6 py-2 rounded-lg font-semibold hover:bg-primary-dark disabled:bg-slate-400">
+                        <button type="submit" disabled={isLoading} className="bg-primary text-black px-6 py-2 rounded-lg font-semibold hover:bg-primary-dark disabled:bg-zinc-700">
                            {isLoading ? 'Mencari...' : 'Cari'}
                         </button>
                     </form>
                     <div className="text-right">
-                         <button onClick={handleSync} disabled={isSyncing} className="bg-green-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-600 disabled:bg-slate-400">
+                         <button onClick={handleSync} disabled={isSyncing} className="bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-700 disabled:bg-zinc-700">
                             {isSyncing ? 'Menyinkronkan...' : 'Sinkronisasi Riwayat'}
                         </button>
                         <p className="text-xs text-gray-text mt-1">Gunakan jika riwayat transaksi tidak muncul.</p>
                     </div>
                 </div>
                  {syncMessage && (
-                    <div className="mb-4 p-3 rounded-md text-sm bg-sky-100 text-sky-800 text-center">
+                    <div className="mb-4 p-3 rounded-md text-sm bg-secondary-light text-secondary text-center">
                         {syncMessage}
                     </div>
                 )}
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm text-left text-gray-text">
-                        <thead className="text-xs text-gray-text uppercase">
+                        <thead className="text-xs text-gray-text uppercase border-b border-zinc-800">
                             <tr>
                                 <th className="px-4 py-3">WAKTU LOG</th>
                                 <th className="px-4 py-3">PERIODE</th>
@@ -163,12 +165,12 @@ const AdminRiwayatTransaksi: React.FC = () => {
                                     if (item.type === 'log') {
                                         const log = data as TransaksiLog;
                                         return (
-                                            <tr key={log.id} className="border-t border-slate-100 hover:bg-slate-50">
+                                            <tr key={log.id} className="border-t border-zinc-800 hover:bg-zinc-900/50">
                                                 <td className="px-4 py-3">{new Date(log.log_time).toLocaleString('id-ID')}</td>
                                                 <td className="px-4 py-3">{log.periode}</td>
                                                 <td className="px-4 py-3 text-dark">{log.admin_nama}</td>
                                                 <td className="px-4 py-3">
-                                                    <span className={`px-2 py-1 text-xs font-semibold rounded-full ${log.type === 'EDIT' ? 'bg-amber-100 text-amber-700' : 'bg-green-100 text-green-700'}`}>
+                                                    <span className={`px-2 py-1 text-xs font-semibold rounded-full ${log.type === 'EDIT' ? 'bg-amber-500/10 text-amber-400' : 'bg-green-500/10 text-green-400'}`}>
                                                         {log.type}
                                                     </span>
                                                 </td>
@@ -176,7 +178,7 @@ const AdminRiwayatTransaksi: React.FC = () => {
                                                 <td className="px-4 py-3 text-center">
                                                     <button 
                                                         onClick={() => navigate(`/admin/transaksi?editLogId=${log.id}`)}
-                                                        className="text-primary hover:text-primary-dark disabled:text-slate-400"
+                                                        className="text-primary hover:text-primary-dark disabled:text-zinc-600"
                                                         title="Edit Transaksi"
                                                         disabled={log.admin_nama !== user?.name && user?.email !== 'admin@koperasi13.com'}
                                                     >
@@ -188,12 +190,12 @@ const AdminRiwayatTransaksi: React.FC = () => {
                                     } else { // type === 'history'
                                         const history = data as Keuangan;
                                         return (
-                                            <tr key={history.id} className="bg-amber-50 hover:bg-amber-100 border-t border-amber-200">
-                                                <td className="px-4 py-3 italic text-slate-400">Belum ada Log</td>
+                                            <tr key={history.periode} className="bg-amber-500/10 hover:bg-amber-500/20 border-t border-amber-900/50">
+                                                <td className="px-4 py-3 italic text-gray-text">Belum ada Log</td>
                                                 <td className="px-4 py-3">{history.periode}</td>
                                                 <td className="px-4 py-3 italic text-dark">{history.admin_nama || 'Sistem'}</td>
                                                 <td className="px-4 py-3">
-                                                    <span className="px-2 py-1 text-xs font-semibold rounded-full bg-slate-200 text-slate-600">
+                                                    <span className="px-2 py-1 text-xs font-semibold rounded-full bg-zinc-700 text-zinc-300">
                                                        TRANSAKSI
                                                     </span>
                                                 </td>
@@ -201,7 +203,7 @@ const AdminRiwayatTransaksi: React.FC = () => {
                                                 <td className="px-4 py-3 text-center">
                                                      <button 
                                                         onClick={() => handleCreateAndEdit(history)}
-                                                        className="text-green-600 hover:text-green-700 flex items-center gap-1 text-xs font-bold"
+                                                        className="text-green-400 hover:text-green-500 flex items-center gap-1 text-xs font-bold"
                                                         title="Buat Riwayat & Edit"
                                                     >
                                                         <PlusIcon className="w-4 h-4" /> BUAT & EDIT

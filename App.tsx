@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -31,6 +32,7 @@ import AdminRiwayatTransaksi from './pages/admin/AdminRiwayatTransaksi';
 import AdminRekapTransaksiManual from './pages/admin/AdminRekapSetoran';
 import AdminPengaturanKewajiban from './pages/admin/AdminPengaturanKewajiban';
 import AdminPengaturanPinjaman from './pages/admin/AdminPengaturanPinjaman';
+import AdminPengaturanJasa from './pages/admin/AdminPengaturanJasa';
 
 const App: React.FC = () => {
   return (
@@ -80,6 +82,10 @@ const AppRoutes: React.FC = () => {
         <Route 
           path="pengaturan-pinjaman" 
           element={user?.email === 'admin@koperasi13.com' ? <AdminPengaturanPinjaman /> : <Navigate to="/admin/dashboard" />} 
+        />
+         <Route 
+          path="pengaturan-jasa" 
+          element={user?.email === 'admin@koperasi13.com' ? <AdminPengaturanJasa /> : <Navigate to="/admin/dashboard" />} 
         />
         <Route index element={<Navigate to="dashboard" />} />
       </Route>

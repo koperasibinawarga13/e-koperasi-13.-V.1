@@ -1,6 +1,6 @@
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
-import { PengaturanPinjaman } from '../types';
+import { PengaturanPinjaman, PengaturanJasa } from '../types';
 
 export interface PengaturanKewajiban {
   simpananPokok: number;
@@ -13,6 +13,7 @@ export interface PengaturanKewajiban {
 const PENGATURAN_DOC_ID = 'kewajiban_anggota_baru';
 const pengaturanDocRef = doc(db, 'pengaturan', PENGATURAN_DOC_ID);
 const pinjamanDocRef = doc(db, 'pengaturan', 'pinjaman');
+const jasaDocRef = doc(db, 'pengaturan', 'jasa_persentase');
 
 
 export const getPengaturanKewajiban = async (): Promise<PengaturanKewajiban | null> => {
@@ -56,6 +57,28 @@ export const updatePengaturanPinjaman = async (data: PengaturanPinjaman): Promis
         await setDoc(pinjamanDocRef, data, { merge: true });
     } catch (error) {
         console.error("Error updating pinjaman settings: ", error);
+        throw error;
+    }
+};
+
+export const getPengaturanJasa = async (): Promise<PengaturanJasa | null> => {
+    try {
+        const docSnap = await getDoc(jasaDocRef);
+        if (docSnap.exists()) {
+            return docSnap.data() as PengaturanJasa;
+        }
+        return null;
+    } catch (error) {
+        console.error("Error fetching jasa settings: ", error);
+        return null;
+    }
+};
+
+export const updatePengaturanJasa = async (data: PengaturanJasa): Promise<void> => {
+    try {
+        await setDoc(jasaDocRef, data, { merge: true });
+    } catch (error) {
+        console.error("Error updating jasa settings: ", error);
         throw error;
     }
 };

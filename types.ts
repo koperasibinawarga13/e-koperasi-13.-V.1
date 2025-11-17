@@ -156,3 +156,16 @@ export interface Pengumuman {
 export interface PengaturanPinjaman {
   sukuBunga: number; // Disimpan sebagai persen, misal 2 untuk 2%
 }
+
+export interface PengaturanJasa {
+  simpanan_jasa_rat: number;
+  simpanan_jasa_shu: number;
+  simpanan_jasa_simpanan: number;
+  simpanan_jasa_fons_lebaran: number;
+  pinjaman_jasa_rat: number;
+  pinjaman_jasa_shu: number;
+  pinjaman_jasa_simpanan: number;
+  pinjaman_jasa_fons_lebaran: number;
+  bunga_berjangka: number;
+  bunga_khusus: number;
+}

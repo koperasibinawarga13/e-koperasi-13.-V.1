@@ -5,7 +5,7 @@ import { getKeuanganByNoAnggota } from '../../services/keuanganService';
 import { Keuangan, Anggota, PengajuanPinjaman } from '../../types';
 import { getAnggotaById } from '../../services/anggotaService';
 import { addPengajuanPinjaman, getPengajuanPinjamanByNoAnggota, deletePengajuanPinjaman } from '../../services/pinjamanService';
-import { getPengaturanPinjaman } from '../../services/pengaturanService';
+import { getPengaturanJasa } from '../../services/pengaturanService';
 
 interface SimulasiResult {
     pokokPinjaman: number;
@@ -59,9 +59,9 @@ const AnggotaPinjaman: React.FC = () => {
         const fetchData = async () => {
             setIsLoading(true);
             try {
-                 const settings = await getPengaturanPinjaman();
-                if (settings) {
-                    setSukuBunga(settings.sukuBunga);
+                 const jasaSettings = await getPengaturanJasa();
+                if (jasaSettings?.bunga_berjangka) {
+                    setSukuBunga(jasaSettings.bunga_berjangka);
                 }
 
                 if (user?.anggotaId) {
@@ -290,8 +290,25 @@ const AnggotaPinjaman: React.FC = () => {
     };
 
     const sisaPokokPinjaman = keuangan?.akhir_pinjaman_berjangka || 0;
-    const bungaBulanIni = sisaPokokPinjaman * (sukuBunga / 100);
-    const totalPelunasan = sisaPokokPinjaman + bungaBulanIni;
+    const lastPeriod = keuangan?.periode;
+    let numberOfInterestPeriods = 1;
+    if (lastPeriod && sisaPokokPinjaman > 0) {
+        const [lastYear, lastMonth] = lastPeriod.split('-').map(Number);
+        const now = new Date();
+        const currentYear = now.getFullYear();
+        const currentMonth = now.getMonth() + 1; // 1-indexed
+        
+        const monthsSinceLastTx = (currentYear - lastYear) * 12 + (currentMonth - lastMonth);
+        
+        numberOfInterestPeriods = Math.max(1, monthsSinceLastTx);
+    }
+    
+    const jasaBulanIni = sisaPokokPinjaman * (sukuBunga / 100);
+    const bulanJasaBelumDibayar = Math.max(0, numberOfInterestPeriods - 1);
+    const jasaBelumDibayar = jasaBulanIni * bulanJasaBelumDibayar;
+    const totalJasaPinjaman = sisaPokokPinjaman * (sukuBunga / 100) * numberOfInterestPeriods;
+    const totalPelunasan = sisaPokokPinjaman + totalJasaPinjaman;
+
 
     return (
         <div>
@@ -423,15 +440,23 @@ const AnggotaPinjaman: React.FC = () => {
                             <div className="space-y-4">
                                 <div className="bg-zinc-800 p-4 rounded-lg">
                                     <InfoItem label="Sisa Pokok Pinjaman" value={formatCurrency(sisaPokokPinjaman)} />
-                                    <InfoItem label={`Bunga Bulan Ini (${sukuBunga}%)`} value={formatCurrency(bungaBulanIni)} />
+                                    {bulanJasaBelumDibayar > 0 && (
+                                        <InfoItem label={`Jasa Belum Dibayar (${bulanJasaBelumDibayar} bulan)`} value={formatCurrency(jasaBelumDibayar)} />
+                                    )}
+                                    <InfoItem label={`Jasa Bulan Ini (${sukuBunga}%)`} value={formatCurrency(jasaBulanIni)} />
+                                     <InfoItem 
+                                        label="Total Akumulasi Jasa" 
+                                        value={formatCurrency(totalJasaPinjaman)}
+                                        className="border-t border-zinc-700 pt-2 mt-2 font-semibold"
+                                    />
                                     <InfoItem 
                                         label="Total yang Harus Dibayar" 
                                         value={formatCurrency(totalPelunasan)}
-                                        className="font-bold text-base md:text-lg bg-amber-500/10 text-amber-400 -mx-4 px-4"
+                                        className="font-bold text-base md:text-lg bg-amber-500/10 text-amber-400 -mx-4 px-4 mt-2"
                                     />
                                 </div>
                                 <p className="text-sm text-gray-text text-center italic">
-                                    Ini adalah simulasi pelunasan untuk bulan ini. Hubungi admin untuk konfirmasi jumlah akhir dan proses pelunasan.
+                                    Total pelunasan dihitung berdasarkan sisa pokok ditambah akumulasi jasa (bunga) yang belum terbayar hingga bulan ini. Hubungi admin untuk konfirmasi jumlah akhir.
                                 </p>
                             </div>
                         ) : (
