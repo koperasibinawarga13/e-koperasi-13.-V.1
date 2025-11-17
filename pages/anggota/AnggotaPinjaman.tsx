@@ -46,6 +46,7 @@ const AnggotaPinjaman: React.FC = () => {
     // State for Pinjaman Khusus
     const [pokokPinjamanKhusus, setPokokPinjamanKhusus] = useState(0);
     const [keteranganKhusus, setKeteranganKhusus] = useState('');
+    const [rencanaPelunasanKhusus, setRencanaPelunasanKhusus] = useState('');
     
     // General State
     const [activeTab, setActiveTab] = useState<'berjangka' | 'khusus' | 'pelunasan'>('berjangka');
@@ -233,10 +234,12 @@ const AnggotaPinjaman: React.FC = () => {
                 jenis_pinjaman: 'Khusus',
                 pokok_pinjaman: pokokPinjamanKhusus,
                 keterangan: keteranganKhusus,
+                rencana_pelunasan: rencanaPelunasanKhusus,
             });
             setSubmitMessage({type: 'success', text: 'Pengajuan pinjaman khusus berhasil dikirim.'});
             setPokokPinjamanKhusus(0);
             setKeteranganKhusus('');
+            setRencanaPelunasanKhusus('');
         } catch (error) {
             setSubmitMessage({type: 'error', text: 'Gagal mengirim pengajuan.'});
         } finally {
@@ -401,6 +404,10 @@ const AnggotaPinjaman: React.FC = () => {
                              <div>
                                 <label htmlFor="keterangan" className="block text-sm font-medium text-gray-text">Keterangan / Tujuan Pinjaman</label>
                                 <textarea id="keterangan" value={keteranganKhusus} onChange={e => setKeteranganKhusus(e.target.value)} rows={3} className="mt-1 block w-full bg-zinc-800 rounded-md py-2 px-3 text-dark" required></textarea>
+                            </div>
+                            <div>
+                                <label htmlFor="rencanaPelunasan" className="block text-sm font-medium text-gray-text">Rencana Tanggal Pelunasan</label>
+                                <input type="date" id="rencanaPelunasan" value={rencanaPelunasanKhusus} onChange={e => setRencanaPelunasanKhusus(e.target.value)} className="mt-1 block w-full bg-zinc-800 rounded-md py-2 px-3 text-dark" />
                             </div>
                              <div className="text-center pt-2">
                                  <button type="submit" disabled={isSubmitting} className="bg-secondary text-white py-2 px-6 rounded-lg font-semibold hover:bg-secondary-dark disabled:bg-zinc-700">

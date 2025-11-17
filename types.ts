@@ -142,6 +142,7 @@ export interface PengajuanPinjaman {
   metode_perhitungan?: 'Plat Pokok' | 'Plat Total';
   keterangan?: string;
   catatan_admin?: string;
+  rencana_pelunasan?: string;
 }
 
 export interface Pengumuman {

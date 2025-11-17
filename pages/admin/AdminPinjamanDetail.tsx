@@ -142,8 +142,11 @@ const AdminPinjamanDetail: React.FC = () => {
                     )}
                 </div>
                  {pinjaman.jenis_pinjaman === 'Khusus' && (
-                    <div className="mt-4 pt-4">
+                    <div className="mt-4 pt-4 space-y-4">
                         <InfoItem label="Keterangan" value={<p className="whitespace-pre-wrap">{pinjaman.keterangan || '-'}</p>} />
+                        {pinjaman.rencana_pelunasan && (
+                            <InfoItem label="Rencana Tanggal Pelunasan" value={formatDate(pinjaman.rencana_pelunasan)} />
+                        )}
                     </div>
                  )}
                  {pinjaman.catatan_admin && (

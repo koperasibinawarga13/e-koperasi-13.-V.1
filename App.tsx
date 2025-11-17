@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -16,6 +17,7 @@ import { AnggotaKeuangan } from './pages/anggota/AnggotaKeuangan';
 import AnggotaProfil from './pages/anggota/AnggotaProfil';
 import { UserRole } from './types';
 import AdminKeuanganDetail from './pages/admin/AdminKeuanganDetail';
+import AnggotaRekeningKoran from './pages/anggota/AnggotaRekeningKoran';
 import SlipRincian from './pages/anggota/SlipRincian';
 import AnggotaPinjaman from './pages/anggota/AnggotaPinjaman';
 import AdminPinjaman from './pages/admin/AdminPinjaman';
@@ -91,6 +93,7 @@ const AppRoutes: React.FC = () => {
         <Route path="keuangan" element={<AnggotaKeuangan />} />
         <Route path="profil" element={<AnggotaProfil />} />
         <Route path="pinjaman" element={<AnggotaPinjaman />} />
+        <Route path="rekening-koran" element={<AnggotaRekeningKoran />} />
         <Route path="slip" element={<SlipRincian />} />
         <Route index element={<Navigate to="dashboard" />} />
       </Route>

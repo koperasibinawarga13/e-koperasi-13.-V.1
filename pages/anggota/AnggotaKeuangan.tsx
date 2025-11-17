@@ -1,10 +1,11 @@
+
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Keuangan, Anggota } from '../../types';
 import { useAuth } from '../../context/AuthContext';
 import { getAnggotaById } from '../../services/anggotaService';
 import { getLaporanBulanan, getAvailableLaporanMonths, getKeuanganByNoAnggota } from '../../services/keuanganService';
-import { PrintIcon, UserCircleIcon } from '../../components/icons/Icons';
+import { PrintIcon, UserCircleIcon, ClipboardDocumentListIcon } from '../../components/icons/Icons';
 
 export const AnggotaKeuangan: React.FC = () => {
     const { user } = useAuth();
@@ -114,7 +115,7 @@ export const AnggotaKeuangan: React.FC = () => {
                         </div>
                     )}
                 </div>
-                 <div className="flex items-center gap-4">
+                 <div className="flex flex-wrap items-center gap-4">
                     <div>
                         <select
                             id="month-select"
@@ -137,6 +138,14 @@ export const AnggotaKeuangan: React.FC = () => {
                     >
                         <PrintIcon className="w-5 h-5 text-dark" />
                         <span className="text-dark font-semibold">Cetak Slip</span>
+                    </Link>
+                    <Link 
+                        to="/anggota/rekening-koran" 
+                        className={`inline-flex items-center gap-2 bg-zinc-700 px-4 py-2 rounded-lg hover:bg-zinc-600 transition-colors ${!data ? 'pointer-events-none opacity-50' : ''}`}
+                        aria-disabled={!data}
+                    >
+                        <ClipboardDocumentListIcon className="w-5 h-5 text-dark" />
+                        <span className="text-dark font-semibold">Rekening Koran</span>
                     </Link>
                  </div>
             </div>
