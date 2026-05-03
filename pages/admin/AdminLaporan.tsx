@@ -144,7 +144,7 @@ const AdminLaporan: React.FC = () => {
             ];
     
             const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, `Laporan ${reportPeriod}`);
+            XLSX.utils.book_append_sheet(workbook, worksheet, `Laporan ${reportPeriod}`);
             const today = new Date().toISOString().split('T')[0];
             XLSX.writeFile(workbook, `Laporan_Koperasi_${reportPeriod.replace(/ /g, '_')}_${today}.xlsx`);
     
