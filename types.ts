@@ -119,7 +119,8 @@ export interface TransaksiLog extends TransaksiBulanan {
   id: string;
   log_time: string; // ISO String
   periode: string; // YYYY-MM
-  type: 'INPUT BARU' | 'EDIT';
+  type: 'INPUT BARU' | 'EDIT' | 'UPLOAD BULANAN';
+  upload_session_id?: string;
   editedAt?: string; // ISO String
   editedBy?: string;
 }

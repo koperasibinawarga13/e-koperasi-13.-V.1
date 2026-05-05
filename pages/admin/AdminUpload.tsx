@@ -8,7 +8,7 @@ import ProgressBar from '../../components/ProgressBar';
 import Modal from '../../components/Modal';
 import { UploadIcon, TrashIcon, DownloadIcon, ChevronDownIcon } from '../../components/icons/Icons';
 import { batchUpsertAnggota } from '../../services/anggotaService';
-import { batchUpsertKeuangan, batchProcessTransaksiBulanan, getUploadedMonths, deleteMonthlyReport, rebuildUploadHistory, getKeuangan, resetAllFinancialData } from '../../services/keuanganService';
+import { batchUpsertKeuangan, batchProcessTransaksiBulanan, getUploadHistory, deleteUploadSession, deleteMonthlyReport, rebuildUploadHistory, getKeuangan, resetAllFinancialData, MonthUploadHistory } from '../../services/keuanganService';
 import { Anggota, Keuangan, TransaksiBulanan } from '../../types';
 import { useAuth } from '../../context/AuthContext';
 
@@ -170,7 +170,8 @@ const UploadSection: React.FC<{
 const AdminUpload: React.FC = () => {
     const { user } = useAuth();
     const [isUploading, setIsUploading] = useState(false);
-    const [uploadHistory, setUploadHistory] = useState<string[]>([]);
+    const [uploadHistory, setUploadHistory] = useState<MonthUploadHistory[]>([]);
+    const [expandedMonths, setExpandedMonths] = useState<string[]>([]);
     const [isHistoryLoading, setIsHistoryLoading] = useState(true);
     const [isDeleting, setIsDeleting] = useState<string | null>(null);
     const [isRebuilding, setIsRebuilding] = useState(false);
@@ -181,14 +182,19 @@ const AdminUpload: React.FC = () => {
 
     // State for delete confirmation modal
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-    const [monthToDelete, setMonthToDelete] = useState<string | null>(null);
+    const [deleteTarget, setDeleteTarget] = useState<{ month: string; sessionId?: string } | null>(null);
 
     useEffect(() => {
         const fetchHistory = async () => {
             setIsHistoryLoading(true);
-            const months = await getUploadedMonths();
-            setUploadHistory(months);
-            setIsHistoryLoading(false);
+            try {
+                const history = await getUploadHistory();
+                setUploadHistory(history);
+            } catch (error) {
+                console.error('Gagal memuat riwayat upload:', error);
+            } finally {
+                setIsHistoryLoading(false);
+            }
         };
         fetchHistory();
     }, []);
@@ -346,9 +352,23 @@ const AdminUpload: React.FC = () => {
             
             if (transaksiList.length === 0) throw new Error("File tidak berisi data transaksi yang valid.");
 
+            const duplicateRows = transaksiList.reduce((acc, tx) => {
+                const id = tx.no_anggota.toUpperCase();
+                acc[id] = (acc[id] || 0) + 1;
+                return acc;
+            }, {} as Record<string, number>);
+
+            const duplicateEntries = Object.entries(duplicateRows)
+                .filter(([, count]) => count > 1)
+                .map(([no_anggota, count]) => `${no_anggota} (${count} baris)`);
+
+            if (duplicateEntries.length > 0) {
+                throw new Error(`File unggahan mengandung data duplikat untuk anggota: ${duplicateEntries.join(', ')}. Hapus baris duplikat dan coba lagi.`);
+            }
+
             const result = await batchProcessTransaksiBulanan(transaksiList, uploadMonth, user?.name);
             if (result.successCount > 0) {
-                setUploadHistory(await getUploadedMonths());
+                setUploadHistory(await getUploadHistory());
             }
             return result;
 
@@ -360,41 +380,61 @@ const AdminUpload: React.FC = () => {
         }
     };
     
-    const handleDeleteClick = (month: string) => {
-        setMonthToDelete(month);
+    const toggleMonthExpand = (month: string) => {
+        setExpandedMonths(prev => prev.includes(month) ? prev.filter(m => m !== month) : [...prev, month]);
+    };
+
+    const handleDeleteSessionClick = (month: string, sessionId: string) => {
+        setDeleteTarget({ month, sessionId });
+        setIsDeleteModalOpen(true);
+    };
+
+    const handleDeleteMonthClick = (month: string) => {
+        setDeleteTarget({ month });
         setIsDeleteModalOpen(true);
     };
 
     const handleConfirmDelete = async () => {
-        if (!monthToDelete) return;
+        if (!deleteTarget) return;
 
-        const formattedMonth = new Date(`${monthToDelete}-02`).toLocaleDateString('id-ID', { month: 'long', year: 'numeric'});
-        
-        setIsDeleting(monthToDelete);
+        const { month, sessionId } = deleteTarget;
+        const formattedMonth = new Date(`${month}-02`).toLocaleDateString('id-ID', { month: 'long', year: 'numeric'});
+        const targetLabel = sessionId ? `Upload ${sessionId}` : `bulan ${formattedMonth}`;
+
+        setIsDeleting(sessionId || month);
         setIsDeleteModalOpen(false);
 
         try {
-            await deleteMonthlyReport(monthToDelete);
-            setUploadHistory(prev => prev.filter(m => m !== monthToDelete));
-            alert(`Data untuk bulan ${formattedMonth} berhasil dihapus.`);
+            if (sessionId) {
+                await deleteUploadSession(month, sessionId);
+            } else {
+                await deleteMonthlyReport(month);
+            }
+            setUploadHistory(await getUploadHistory());
+            alert(`Data ${targetLabel} berhasil dihapus.`);
         } catch (error) {
-            console.error("Failed to delete monthly report:", error);
+            console.error("Failed to delete upload data:", error);
             alert("Terjadi kesalahan saat menghapus data. Silakan coba lagi.");
         } finally {
             setIsDeleting(null);
-            setMonthToDelete(null);
+            setDeleteTarget(null);
         }
     };
 
     const handleRebuildHistory = async () => {
         setIsRebuilding(true);
         try {
-            const updatedMonths = await rebuildUploadHistory();
-            setUploadHistory(updatedMonths);
-            alert('Riwayat berhasil dipindai dan diperbarui!');
+            await rebuildUploadHistory();
         } catch (error) {
             console.error("Failed to rebuild history:", error);
-            alert('Gagal memindai riwayat. Silakan coba lagi.');
+        }
+
+        try {
+            setUploadHistory(await getUploadHistory());
+            alert('Riwayat berhasil dipindai dan diperbarui!');
+        } catch (error) {
+            console.error("Failed to load upload history after rebuild:", error);
+            alert('Gagal memuat riwayat setelah pemindaian. Silakan coba lagi.');
         } finally {
             setIsRebuilding(false);
         }
@@ -515,6 +555,9 @@ const AdminUpload: React.FC = () => {
                          <p className="text-sm text-gray-text mt-1">
                             Pastikan nama sheet pertama berformat <code className="bg-zinc-700 px-1 rounded">YYYY MM</code> (contoh: <code className="bg-zinc-700 px-1 rounded">2024 07</code>).
                         </p>
+                        <p className="text-sm text-green-400 mt-2">
+                            Upload ulang untuk bulan yang sama diperbolehkan dan akan tercatat sebagai session tersendiri. Gunakan riwayat di bawah untuk menghapus upload yang salah.
+                        </p>
                     </div>
                      <button
                         onClick={handleDownloadReport}
@@ -549,20 +592,61 @@ const AdminUpload: React.FC = () => {
                     <p className="text-center text-gray-text py-4">Memuat riwayat...</p>
                 ) : uploadHistory.length > 0 ? (
                     <ul className="space-y-3">
-                        {uploadHistory.map(month => (
-                            <li key={month} className="flex justify-between items-center p-3 bg-zinc-800 rounded-lg hover:bg-zinc-700 transition-colors">
-                                <span className="font-medium text-dark">
-                                    {new Date(`${month}-02`).toLocaleDateString('id-ID', { month: 'long', year: 'numeric'})}
-                                </span>
-                                <button
-                                    onClick={() => handleDeleteClick(month)}
-                                    disabled={isDeleting === month}
-                                    className="flex items-center gap-2 text-sm text-red-500 hover:text-red-400 font-semibold disabled:text-zinc-600 disabled:cursor-wait"
-                                >
-                                    {isDeleting === month ? 'Menghapus...' : <><TrashIcon className="w-4 h-4" /> Hapus</>}
-                                </button>
-                            </li>
-                        ))}
+                        {uploadHistory.map(monthHistory => {
+                            const isExpanded = expandedMonths.includes(monthHistory.month);
+                            return (
+                                <li key={monthHistory.month} className="bg-zinc-800 rounded-lg overflow-hidden">
+                                    <button
+                                        onClick={() => toggleMonthExpand(monthHistory.month)}
+                                        className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-zinc-700 transition-colors"
+                                    >
+                                        <div>
+                                            <p className="font-medium text-dark">
+                                                {new Date(`${monthHistory.month}-02`).toLocaleDateString('id-ID', { month: 'long', year: 'numeric'})}
+                                            </p>
+                                            <p className="text-sm text-gray-text">{monthHistory.sessions.length} upload</p>
+                                        </div>
+                                        <span className="text-primary font-semibold">{isExpanded ? 'Sembunyikan' : 'Lihat'}</span>
+                                    </button>
+
+                                    {isExpanded && (
+                                        <div className="border-t border-zinc-700 px-4 py-3 space-y-3 bg-zinc-900">
+                                            {monthHistory.sessions.map((session, index) => (
+                                                <div key={session.id} className="rounded-lg bg-zinc-800 p-3 flex flex-col gap-2">
+                                                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
+                                                        <div>
+                                                            <p className="text-sm font-semibold text-dark">Upload {index + 1}</p>
+                                                            <p className="text-xs text-gray-text">{new Date(session.createdAt).toLocaleString('id-ID')}</p>
+                                                        </div>
+                                                        <div className="text-sm text-gray-text">
+                                                            {session.admin_nama} · {session.rowCount} baris
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex justify-end">
+                                                        <button
+                                                            onClick={() => handleDeleteSessionClick(monthHistory.month, session.id)}
+                                                            disabled={isDeleting === session.id}
+                                                            className="flex items-center gap-2 text-sm text-red-500 hover:text-red-400 font-semibold disabled:text-zinc-600 disabled:cursor-wait"
+                                                        >
+                                                            {isDeleting === session.id ? 'Menghapus...' : <><TrashIcon className="w-4 h-4" /> Hapus Upload</>}
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                            <div className="flex justify-end pt-2">
+                                                <button
+                                                    onClick={() => handleDeleteMonthClick(monthHistory.month)}
+                                                    disabled={isDeleting === monthHistory.month}
+                                                    className="flex items-center gap-2 text-sm text-red-500 hover:text-red-400 font-semibold disabled:text-zinc-600 disabled:cursor-wait"
+                                                >
+                                                    {isDeleting === monthHistory.month ? 'Menghapus...' : <><TrashIcon className="w-4 h-4" /> Hapus Semua Upload Bulan Ini</>}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
+                                </li>
+                            );
+                        })}
                     </ul>
                 ) : (
                     <p className="text-center text-gray-text py-4">Belum ada riwayat upload.</p>
@@ -576,10 +660,10 @@ const AdminUpload: React.FC = () => {
             >
                 <div>
                     <p className="text-dark mb-4">
-                        Apakah Anda yakin ingin menghapus semua data transaksi untuk bulan <span className="font-bold">{monthToDelete && new Date(`${monthToDelete}-02`).toLocaleDateString('id-ID', { month: 'long', year: 'numeric'})}</span>?
+                        Apakah Anda yakin ingin menghapus <span className="font-bold">{deleteTarget?.sessionId ? 'upload ini' : 'seluruh upload bulan ini'}</span> untuk bulan <span className="font-bold">{deleteTarget?.month && new Date(`${deleteTarget.month}-02`).toLocaleDateString('id-ID', { month: 'long', year: 'numeric'})}</span>?
                     </p>
                     <p className="text-sm bg-red-500/10 text-red-400 p-3 rounded-lg">
-                        <strong>Peringatan:</strong> Tindakan ini akan menghapus semua data transaksi untuk bulan yang dipilih dan mengembalikan saldo anggota ke kondisi bulan sebelumnya. Aksi ini tidak dapat diurungkan.
+                        <strong>Peringatan:</strong> Tindakan ini akan menghapus data upload yang dipilih. Jika Anda menghapus seluruh bulan, semua data transaksi untuk bulan tersebut akan dikembalikan seperti sebelum bulan tersebut.
                     </p>
                     <div className="flex justify-end gap-4 mt-6">
                         <button

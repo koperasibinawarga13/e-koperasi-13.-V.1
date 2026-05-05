@@ -13,7 +13,7 @@ import {
   collectionGroup
 } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
-import { TransaksiLog, Keuangan } from '../types';
+import { TransaksiLog, Keuangan, TransaksiBulanan } from '../types';
 
 const logCollectionRef = collection(db, 'transaksi_logs');
 
@@ -29,6 +29,30 @@ export const createLog = async (logData: Omit<TransaksiLog, 'id' | 'log_time'>):
         console.error("Error creating transaction log: ", error);
         throw error;
     }
+};
+
+export const batchCreateUploadLogs = async (
+    transaksiList: TransaksiBulanan[],
+    periode: string,
+    adminName?: string,
+    uploadSessionId?: string
+): Promise<void> => {
+    const batch = writeBatch(db);
+    const timestamp = new Date().toISOString();
+
+    transaksiList.forEach((tx) => {
+        const logRef = doc(logCollectionRef);
+        batch.set(logRef, {
+            ...tx,
+            periode,
+            type: 'UPLOAD BULANAN',
+            admin_nama: adminName || tx.admin_nama || 'Sistem',
+            upload_session_id: uploadSessionId,
+            log_time: timestamp,
+        });
+    });
+
+    await batch.commit();
 };
 
 export const getLogById = async (id: string): Promise<TransaksiLog | null> => {
@@ -115,9 +139,27 @@ export const getLogsByPeriod = async (periode: string): Promise<TransaksiLog[]> 
     }
 };
 
+export const getUploadLogsByPeriod = async (periode: string): Promise<TransaksiLog[]> => {
+    const allLogs = await getLogsByPeriod(periode);
+    return allLogs.filter(log => log.type === 'UPLOAD BULANAN');
+};
+
+export const getLogsByUploadSession = async (periode: string, uploadSessionId: string): Promise<TransaksiLog[]> => {
+    try {
+        const q = query(logCollectionRef, where('upload_session_id', '==', uploadSessionId));
+        const data = await getDocs(q);
+        return data.docs
+            .map(doc => ({ ...(doc.data() as TransaksiLog), id: doc.id }))
+            .filter(log => log.periode === periode);
+    } catch (error) {
+        console.error(`Error fetching logs for session ${uploadSessionId}: `, error);
+        return [];
+    }
+};
+
 export const deleteLogsByPeriod = async (periode: string): Promise<void> => {
     try {
-        const logsToDelete = await getLogsByPeriod(periode);
+        const logsToDelete = await getUploadLogsByPeriod(periode);
         if (logsToDelete.length === 0) return;
 
         const batch = writeBatch(db);
@@ -127,7 +169,7 @@ export const deleteLogsByPeriod = async (periode: string): Promise<void> => {
         });
         await batch.commit();
     } catch (error) {
-        console.error(`Error deleting logs for period ${periode}: `, error);
+        console.error(`Error deleting upload logs for period ${periode}: `, error);
         throw error;
     }
 };
