@@ -10,7 +10,6 @@ import {
   runTransaction,
   query,
   where,
-  documentId,
   arrayUnion,
   arrayRemove,
   collectionGroup,
@@ -311,16 +310,6 @@ export const rebuildFinancialData = async (): Promise<void> => {
             logsByMember.get(log.no_anggota)!.push(log);
         });
 
-        const historyQuery = query(collectionGroup(db, 'history'), where(documentId(), '==', month));
-        const existingHistorySnapshot = await getDocs(historyQuery);
-        const existingHistoryMap = new Map<string, any>();
-        existingHistorySnapshot.forEach((docSnap) => {
-            const parentDoc = docSnap.ref.parent.parent;
-            if (parentDoc) {
-                existingHistoryMap.set(parentDoc.id, docSnap.ref);
-            }
-        });
-
         const batch = writeBatch(db);
 
         for (const [no_anggota, memberLogs] of logsByMember) {
@@ -344,12 +333,6 @@ export const rebuildFinancialData = async (): Promise<void> => {
             batch.set(historyDocRef, updatedHistory);
             latestState.set(no_anggota, updatedHistory);
         }
-
-        existingHistoryMap.forEach((docRef, no_anggota) => {
-            if (!logsByMember.has(no_anggota)) {
-                batch.delete(docRef);
-            }
-        });
 
         await batch.commit();
     }
