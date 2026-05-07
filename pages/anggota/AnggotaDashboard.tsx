@@ -109,15 +109,15 @@ const AnggotaDashboard: React.FC = () => {
   return (
     <div>
       <Header title="Dashboard" />
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <StatCard title="Saldo Akhir" value={formatCurrency(saldoAkhir)} icon={<CreditCardIcon className="w-6 h-6" />} iconBgColor="bg-primary" />
-        <StatCard title="Total Simpanan" value={formatCurrency(totalSimpanan)} icon={<CreditCardIcon className="w-6 h-6" />} iconBgColor="bg-secondary" />
-        <StatCard title="Total Pinjaman" value={formatCurrency(totalPinjaman)} icon={<ChartBarIcon className="w-6 h-6" />} iconBgColor="bg-accent" />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <StatCard title="Saldo Akhir" value={formatCurrency(saldoAkhir)} icon={<CreditCardIcon className="w-5 h-5" />} iconBgColor="bg-primary" />
+        <StatCard title="Total Simpanan" value={formatCurrency(totalSimpanan)} icon={<CreditCardIcon className="w-5 h-5" />} iconBgColor="bg-secondary" />
+        <StatCard title="Total Pinjaman" value={formatCurrency(totalPinjaman)} icon={<ChartBarIcon className="w-5 h-5" />} iconBgColor="bg-accent" />
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
-        <div className="bg-surface p-6 rounded-xl">
-            <h2 className="text-lg md:text-xl font-bold text-dark mb-4">Riwayat Simpanan & Pinjaman</h2>
-            <div style={{ width: '100%', height: 300 }}>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+        <div className="bg-surface p-4 rounded-2xl">
+            <h2 className="text-base md:text-lg font-bold text-dark mb-3">Riwayat Simpanan & Pinjaman</h2>
+            <div style={{ width: '100%', height: 240 }}>
             <ResponsiveContainer>
               <LineChart
                 data={chartData}
@@ -138,28 +138,28 @@ const AnggotaDashboard: React.FC = () => {
             </div>
         </div>
 
-        <div className="bg-surface p-6 rounded-xl">
-            <div className="flex justify-between items-center mb-4">
-                <h2 className="text-lg md:text-xl font-bold text-dark">Aktivitas Terbaru</h2>
-                <Link to="/anggota/keuangan" className="text-sm font-semibold text-primary hover:underline">
+        <div className="bg-surface p-4 rounded-2xl">
+            <div className="flex justify-between items-center mb-3">
+                <h2 className="text-base md:text-lg font-bold text-dark">Aktivitas Terbaru</h2>
+                <Link to="/anggota/keuangan" className="text-xs font-semibold text-primary hover:underline">
                     Lihat Semua
                 </Link>
             </div>
-            <div className="space-y-4">
+            <div className="space-y-3">
               {recentLogs.length > 0 ? recentLogs.map(log => {
                 const summary = summarizeLog(log);
                 if (!summary) return null;
                 
                 return (
-                  <div key={log.id} className="flex items-center space-x-4">
+                  <div key={log.id} className="flex items-center gap-3">
                     <div className={`p-2 rounded-full ${summary.bgColor} ${summary.color}`}>
                       {summary.icon}
                     </div>
-                    <div className="flex-grow">
-                      <p className="font-semibold text-dark">{summary.type}</p>
-                      <p className="text-sm text-gray-text">{new Date(log.log_time).toLocaleDateString('id-ID', {day: 'numeric', month: 'long'})}</p>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-dark text-sm truncate">{summary.type}</p>
+                      <p className="text-xs text-gray-text">{new Date(log.log_time).toLocaleDateString('id-ID', {day: 'numeric', month: 'long'})}</p>
                     </div>
-                    <div className={`font-semibold text-right ${summary.color}`}>
+                    <div className={`font-semibold text-right text-sm ${summary.color}`}>
                       {summary.color.includes('primary') ? '+' : '-'} {formatCurrency(summary.amount)}
                     </div>
                   </div>
