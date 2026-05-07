@@ -168,33 +168,39 @@ export const LoginPage: React.FC = () => {
 
 
   return (
-    <div className="min-h-screen flex flex-col justify-center items-center p-4 font-sans bg-background">
-        <div className="w-full max-w-sm">
+    <div className="min-h-screen flex flex-col justify-center items-center p-4 font-sans bg-[radial-gradient(circle_at_top,_rgba(163,230,53,0.14),_transparent_20%),linear-gradient(180deg,#020203_0%,#09090b_100%)]">
+        <div className="w-full max-w-md">
             <div className="flex justify-center mb-6">
-                <Logo className="h-16 w-auto text-dark" />
+                <Logo className="h-16 w-auto text-white" />
             </div>
-            
-            {installPromptEvent && view === 'login' && (
+
+            {view === 'login' && (
                 <div className="mb-6 animate-fade-in-up">
                     <button 
                         onClick={triggerInstallPrompt}
-                        className="w-full flex items-center justify-center gap-3 bg-secondary text-white px-4 py-3 rounded-lg text-sm font-semibold hover:bg-secondary-dark transition-colors"
+                        disabled={!installPromptEvent}
+                        className={`w-full flex items-center justify-center gap-3 px-4 py-3 rounded-lg text-sm font-semibold transition-colors ${installPromptEvent ? 'bg-secondary text-white hover:bg-secondary-dark' : 'bg-zinc-800 text-gray-400 cursor-not-allowed'}`}
                     >
                         <DownloadIcon className="w-5 h-5" />
-                        <span>Download Aplikasi</span>
+                        <span>Pasang Aplikasi</span>
                     </button>
+                    {!installPromptEvent && (
+                        <p className="mt-3 text-center text-xs text-gray-text">Jika tombol ini tidak aktif, gunakan Chrome/Edge dan buka dari HTTPS atau localhost untuk mengaktifkan instalasi PWA.</p>
+                    )}
                 </div>
             )}
 
             <div className="flex justify-center mb-6">
-                <span className="bg-primary-light text-primary text-sm font-semibold px-5 py-2 rounded-full">
+                <span className="bg-slate-950/80 border border-zinc-800 text-primary text-sm font-semibold px-5 py-2 rounded-full shadow-sm">
                     {welcomeMessage}
                 </span>
             </div>
-            
-            <div className="w-full bg-surface rounded-xl p-8">
-                <h2 className="text-2xl font-bold text-dark text-center mb-1">{getTitle()}</h2>
-                <p className="text-center text-gray-text text-sm mb-6">{getSubtitle()}</p>
+
+            <div className="w-full bg-slate-950/90 border border-zinc-800 shadow-2xl shadow-black/20 rounded-[2rem] p-8 backdrop-blur-xl">
+                <div className="text-center mb-6">
+                    <h2 className="text-3xl sm:text-4xl font-bold text-white mb-2">{getTitle()}</h2>
+                    <p className="mx-auto text-gray-text text-sm sm:text-base max-w-xs">{getSubtitle()}</p>
+                </div>
                 
                 {error && <p className="text-sm text-red-400 text-center font-semibold bg-red-500/10 p-3 rounded-md mb-4">{error}</p>}
                 {success && <p className="text-sm text-green-400 text-center font-semibold bg-green-500/10 p-3 rounded-md mb-4">{success}</p>}

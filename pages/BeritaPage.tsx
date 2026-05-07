@@ -4,17 +4,7 @@ import { Pengumuman } from '../types';
 import { getPengumuman } from '../services/pengumumanService';
 import { ChevronLeftIcon, DownloadIcon } from '../components/icons/Icons';
 import { Logo } from '../components/icons/Logo';
-
-// Definisi tipe untuk event beforeinstallprompt
-interface BeforeInstallPromptEvent extends Event {
-  readonly platforms: Array<string>;
-  readonly userChoice: Promise<{
-    outcome: 'accepted' | 'dismissed',
-    platform: string,
-  }>;
-  prompt(): Promise<void>;
-}
-
+import { usePWA } from '../context/PWAContext';
 
 const TRUNCATE_LENGTH = 500; // Character count threshold
 
@@ -22,8 +12,7 @@ const BeritaPage: React.FC = () => {
     const [pengumumanList, setPengumumanList] = useState<Pengumuman[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [expanded, setExpanded] = useState<Record<string, boolean>>({});
-    // State untuk event instalasi PWA
-    const [installPromptEvent, setInstallPromptEvent] = useState<BeforeInstallPromptEvent | null>(null);
+    const { installPromptEvent, triggerInstallPrompt } = usePWA();
 
     useEffect(() => {
         const fetchPengumuman = async () => {
@@ -35,32 +24,8 @@ const BeritaPage: React.FC = () => {
         fetchPengumuman();
     }, []);
 
-    // Effect untuk menangani prompt instalasi PWA
-    useEffect(() => {
-        const handleBeforeInstallPrompt = (e: Event) => {
-            e.preventDefault();
-            setInstallPromptEvent(e as BeforeInstallPromptEvent);
-        };
-
-        window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-
-        const handleAppInstalled = () => {
-            setInstallPromptEvent(null);
-        };
-
-        window.addEventListener('appinstalled', handleAppInstalled);
-
-        return () => {
-            window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-            window.removeEventListener('appinstalled', handleAppInstalled);
-        };
-    }, []);
-    
     const handleInstallClick = () => {
-        if (!installPromptEvent) {
-            return;
-        }
-        installPromptEvent.prompt();
+        triggerInstallPrompt();
     };
     
     const toggleExpand = (id: string) => {

@@ -33,6 +33,7 @@ import AdminRekapTransaksiManual from './pages/admin/AdminRekapSetoran';
 import AdminPengaturanKewajiban from './pages/admin/AdminPengaturanKewajiban';
 import AdminPengaturanPinjaman from './pages/admin/AdminPengaturanPinjaman';
 import AdminPengaturanJasa from './pages/admin/AdminPengaturanJasa';
+import PWAInstallPrompt from './components/PWAInstallPrompt';
 
 const App: React.FC = () => {
   return (
@@ -40,6 +41,7 @@ const App: React.FC = () => {
       <AuthProvider>
         <HashRouter>
           <AppRoutes />
+          <PWAInstallPrompt />
         </HashRouter>
       </AuthProvider>
     </PWAProvider>

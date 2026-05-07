@@ -2,9 +2,10 @@
   "name": "Koperasi Bina 13 Warga",
   "short_name": "Koperasi 13",
   "description": "Aplikasi e-Koperasi 13 Bina Warga untuk anggota dan admin.",
-  "start_url": "/",
-  "scope": "/",
+  "start_url": "./?source=pwa",
+  "scope": "./",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#000000",
   "theme_color": "#000000",
   "icons": [
