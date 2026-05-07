@@ -185,7 +185,9 @@ export const LoginPage: React.FC = () => {
                         <span>Pasang Aplikasi</span>
                     </button>
                     {!installPromptEvent && (
-                        <p className="mt-3 text-center text-xs text-gray-text">Jika tombol ini tidak aktif, gunakan Chrome/Edge dan buka dari HTTPS atau localhost untuk mengaktifkan instalasi PWA.</p>
+                        <p className="mt-3 text-center text-xs text-gray-text">
+                          Instalasi PWA tidak tersedia saat ini. Coba buka halaman ini di Chrome/Edge melalui HTTPS, lalu pilih menu browser &rarr; Install atau Add to Home screen.
+                        </p>
                     )}
                 </div>
             )}
