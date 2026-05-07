@@ -39,7 +39,7 @@ export const LoginPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isKewajibanVisible, setIsKewajibanVisible] = useState(false);
   const { login } = useAuth();
-  const { installPromptEvent, triggerInstallPrompt } = usePWA(); // Get PWA install functions
+  const { installPromptEvent, isAppInstalled, triggerInstallPrompt } = usePWA(); // Get PWA install functions
 
   // Fetch kewajiban settings
   useEffect(() => {
@@ -174,18 +174,18 @@ export const LoginPage: React.FC = () => {
                 <Logo className="h-16 w-auto text-white" />
             </div>
 
-            {view === 'login' && (
-                <div className="mb-6 animate-fade-in-up">
+            {view === 'login' && !isAppInstalled && (
+                <div className="mb-5 animate-fade-in-up">
                     <button 
                         onClick={triggerInstallPrompt}
                         disabled={!installPromptEvent}
-                        className={`w-full flex items-center justify-center gap-3 px-4 py-3 rounded-lg text-sm font-semibold transition-colors ${installPromptEvent ? 'bg-secondary text-white hover:bg-secondary-dark' : 'bg-zinc-800 text-gray-400 cursor-not-allowed'}`}
+                        className={`w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors ${installPromptEvent ? 'bg-secondary text-white hover:bg-secondary-dark' : 'bg-zinc-800 text-gray-400 cursor-not-allowed'}`}
                     >
                         <DownloadIcon className="w-5 h-5" />
                         <span>Pasang Aplikasi</span>
                     </button>
                     {!installPromptEvent && (
-                        <p className="mt-3 text-center text-xs text-gray-text">
+                        <p className="mt-2 text-center text-[11px] leading-5 text-gray-text">
                           Instalasi PWA tidak tersedia saat ini. Coba buka halaman ini di Chrome/Edge melalui HTTPS, lalu pilih menu browser &rarr; Install atau Add to Home screen.
                         </p>
                     )}
@@ -200,15 +200,15 @@ export const LoginPage: React.FC = () => {
 
             <div className="w-full bg-slate-950/90 border border-zinc-800 shadow-2xl shadow-black/20 rounded-[2rem] p-8 backdrop-blur-xl">
                 <div className="text-center mb-6">
-                    <h2 className="text-3xl sm:text-4xl font-bold text-white mb-2">{getTitle()}</h2>
-                    <p className="mx-auto text-gray-text text-sm sm:text-base max-w-xs">{getSubtitle()}</p>
+                    <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2">{getTitle()}</h2>
+                    <p className="mx-auto text-gray-text text-sm max-w-xs">{getSubtitle()}</p>
                 </div>
                 
                 {error && <p className="text-sm text-red-400 text-center font-semibold bg-red-500/10 p-3 rounded-md mb-4">{error}</p>}
                 {success && <p className="text-sm text-green-400 text-center font-semibold bg-green-500/10 p-3 rounded-md mb-4">{success}</p>}
 
                 {view === 'login' && (
-                  <form className="space-y-5" onSubmit={handleLogin}>
+                  <form className="space-y-4" onSubmit={handleLogin}>
                     <div>
                       <input type="text" autoComplete="username" required className="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 bg-zinc-800 placeholder-zinc-500 text-dark" placeholder="No. Anggota / Email Admin" value={username} onChange={(e) => setUsername(e.target.value)} />
                     </div>
@@ -292,7 +292,7 @@ export const LoginPage: React.FC = () => {
                     </form>
                 )}
                 
-                <div className="mt-6 text-center border-t border-zinc-800 pt-4">
+                <div className="mt-4 text-center border-t border-zinc-800 pt-3">
                   <Link to="/berita" className="text-sm font-medium text-primary hover:underline">Lihat Pengumuman Koperasi &rarr;</Link>
                 </div>
             </div>

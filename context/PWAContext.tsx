@@ -12,6 +12,7 @@ interface BeforeInstallPromptEvent extends Event {
 
 interface PWAContextType {
   installPromptEvent: BeforeInstallPromptEvent | null;
+  isAppInstalled: boolean;
   triggerInstallPrompt: () => void;
 }
 
@@ -19,8 +20,15 @@ const PWAContext = createContext<PWAContextType | undefined>(undefined);
 
 export const PWAProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [installPromptEvent, setInstallPromptEvent] = useState<BeforeInstallPromptEvent | null>(null);
+  const [isAppInstalled, setIsAppInstalled] = useState(false);
 
   useEffect(() => {
+    const checkInstallState = () => {
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+      const isSafariStandalone = (window.navigator as any).standalone === true;
+      setIsAppInstalled(isStandalone || isSafariStandalone);
+    };
+
     const handleBeforeInstallPrompt = (e: Event) => {
       // Prevent the mini-infobar from appearing on mobile
       e.preventDefault();
@@ -32,15 +40,20 @@ export const PWAProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
     // Listen for the appinstalled event
     const handleAppInstalled = () => {
-      // Hide the install button
+      setIsAppInstalled(true);
       setInstallPromptEvent(null);
     };
 
     window.addEventListener('appinstalled', handleAppInstalled);
 
+    const mediaQuery = window.matchMedia('(display-mode: standalone)');
+    mediaQuery.addEventListener?.('change', checkInstallState);
+    checkInstallState();
+
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
       window.removeEventListener('appinstalled', handleAppInstalled);
+      mediaQuery.removeEventListener?.('change', checkInstallState);
     };
   }, []);
 
@@ -57,7 +70,7 @@ export const PWAProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   };
 
   return (
-    <PWAContext.Provider value={{ installPromptEvent, triggerInstallPrompt }}>
+    <PWAContext.Provider value={{ installPromptEvent, isAppInstalled, triggerInstallPrompt }}>
       {children}
     </PWAContext.Provider>
   );
