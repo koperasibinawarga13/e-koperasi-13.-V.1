@@ -1,10 +1,11 @@
 
-const CACHE_NAME = 'e-koperasi-cache-v44';
+const CACHE_NAME = 'e-koperasi-cache-v46';
 
 const STATIC_ASSETS = [
   '/',                // app shell
   '/index.html',
   '/manifest.json',
+  '/icons/logo-bina-warga.svg',
   '/icon-192x192.png',
   '/icon-512x512.png'
 ];
@@ -62,9 +63,9 @@ self.addEventListener('fetch', event => {
             return networkRes;
           })
           .catch(() => {
-            // Optional: Offline fallback image
+            // Optional: Offline fallback image (prefer new svg icon)
             if (req.destination === 'image') {
-              return caches.match('/icon-192x192.png');
+              return caches.match('/icons/logo-bina-warga.svg') || caches.match('/icon-192x192.png');
             }
           })
       );

@@ -3,9 +3,11 @@ import { DownloadIcon } from './icons/Icons';
 import { usePWA } from '../context/PWAContext';
 
 const PWAInstallPrompt: React.FC = () => {
-  const { installPromptEvent, triggerInstallPrompt } = usePWA();
+  const { installPromptEvent, isAppInstalled, triggerInstallPrompt } = usePWA();
 
-  if (!installPromptEvent) {
+  // If there's no deferred prompt event or the app is already installed,
+  // don't show the install notification.
+  if (!installPromptEvent || isAppInstalled) {
     return null;
   }
 

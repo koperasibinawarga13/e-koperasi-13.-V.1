@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Koperasi 13 Bina Warga">
+  <rect width="512" height="512" rx="80" fill="#071f3f" />
+  <text x="50%" y="38%" text-anchor="middle" font-family="Poppins, sans-serif" font-weight="800" font-size="180" letter-spacing="-10" fill="#fbbf24">
+    1<tspan fill="#10b981">3</tspan>
+  </text>
+  <text x="50%" y="66%" text-anchor="middle" font-family="Poppins, sans-serif" font-weight="600" font-size="40" fill="#ffffff" letter-spacing="1.5">
+    KOPERASI
+  </text>
+  <text x="50%" y="78%" text-anchor="middle" font-family="Poppins, sans-serif" font-weight="700" font-size="40" fill="#ffffff" letter-spacing="1.5">
+    BINA WARGA
+  </text>
+</svg>
