@@ -389,13 +389,24 @@ export const getUploadedMonths = async (): Promise<string[]> => {
     try {
         const docRef = doc(metadataCollectionRef, UPLOAD_HISTORY_DOC_ID);
         const docSnap = await getDoc(docRef);
-        // FIX: Cast Firestore document data to access the 'months' property safely.
         const data = docSnap.data();
-        if (docSnap.exists() && data?.months) {
-            // FIX: Cast Firestore document data to access the 'months' property safely.
-            return (data.months as string[]).sort((a, b) => b.localeCompare(a));
+
+        if (docSnap.exists() && Array.isArray(data?.months)) {
+            return [...(data.months as string[])].sort((a, b) => b.localeCompare(a));
         }
-        return [];
+
+        // Fallback: scan history docs directly if metadata is missing or incomplete.
+        const historyQuery = query(collectionGroup(db, 'history'));
+        const snapshot = await getDocs(historyQuery);
+        const months = new Set<string>();
+        snapshot.forEach(doc => {
+            const historyData = doc.data() as Keuangan;
+            if (historyData.periode && /^\d{4}-\d{2}$/.test(historyData.periode)) {
+                months.add(historyData.periode);
+            }
+        });
+
+        return Array.from(months).sort((a, b) => b.localeCompare(a));
     } catch (error) {
         return [];
     }
@@ -515,12 +526,16 @@ export const getLaporanBulanan = async (no_anggota: string, month: string): Prom
 
 export const getLaporanBulananForAll = async (month: string): Promise<Keuangan[]> => {
     try {
-        const historyQuery = query(collectionGroup(db, 'history'), where('periode', '==', month));
+        const historyQuery = query(collectionGroup(db, 'history'));
         const snapshot = await getDocs(historyQuery);
+
         if (snapshot.empty) {
             return [];
         }
-        return snapshot.docs.map(doc => doc.data() as Keuangan);
+
+        return snapshot.docs
+            .map(doc => doc.data() as Keuangan)
+            .filter(data => data.periode === month && data.no_anggota);
     } catch (error) {
         console.error(`Error fetching monthly report for all members for ${month}: `, error);
         return [];

@@ -51,7 +51,7 @@ const AdminLaporan: React.FC = () => {
             }
     
             if (dataForExport.length === 0) {
-                alert('Tidak ada data untuk diunduh pada periode yang dipilih.');
+                alert('Tidak ada data laporan untuk bulan yang dipilih. Pastikan bulan tersebut sudah pernah diunggah dan memiliki data yang valid.');
                 setIsDownloading(false);
                 return;
             }
@@ -230,21 +230,21 @@ const AdminLaporan: React.FC = () => {
                 <StatCard title="Total Pinjaman Keseluruhan" value={formatCurrency(summaryData.totalPinjaman)} icon={<ChartBarIcon className="w-6 h-6" />} iconBgColor="bg-accent" />
             </div>
 
-            <div className="bg-surface p-6 rounded-xl">
-                <div className="flex flex-wrap justify-between items-center mb-6 gap-4">
-                    <h2 className="text-lg md:text-xl font-bold text-dark">Rincian Keuangan Anggota</h2>
-                    <div className="flex flex-wrap items-center gap-4">
+            <div className="bg-surface p-4 sm:p-6 rounded-xl">
+                <div className="flex flex-col gap-3 mb-4">
+                    <h2 className="text-base sm:text-lg md:text-xl font-bold text-dark">Rincian Keuangan Anggota</h2>
+                    <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch gap-2 sm:gap-3">
                         <input
                             type="text"
-                            placeholder="Cari (nama, no. anggota)..."
-                            className="bg-zinc-800 rounded-lg px-4 py-2 w-full sm:w-auto focus:ring-1 focus:ring-primary text-dark"
+                            placeholder="Cari nama / no. anggota"
+                            className="bg-zinc-800 rounded-lg px-3 py-2 w-full sm:w-52 focus:ring-1 focus:ring-primary text-dark text-sm"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                          <select
                             value={sortOption}
                             onChange={(e) => setSortOption(e.target.value)}
-                            className="bg-zinc-800 rounded-lg px-4 py-2 w-full sm:w-auto focus:ring-1 focus:ring-primary text-dark"
+                            className="bg-zinc-800 rounded-lg px-3 py-2 w-full sm:w-auto focus:ring-1 focus:ring-primary text-dark text-sm"
                         >
                             <option value="no_anggota_asc">Urutkan No. Anggota (A-Z)</option>
                             <option value="no_anggota_desc">Urutkan No. Anggota (Z-A)</option>
@@ -258,7 +258,7 @@ const AdminLaporan: React.FC = () => {
                         <select
                             value={selectedMonth}
                             onChange={(e) => setSelectedMonth(e.target.value)}
-                            className="bg-zinc-800 rounded-lg px-4 py-2 w-full sm:w-auto focus:ring-1 focus:ring-primary text-dark"
+                            className="bg-zinc-800 rounded-lg px-3 py-2 w-full sm:w-auto focus:ring-1 focus:ring-primary text-dark text-sm"
                             disabled={isLoading}
                         >
                              {availableMonths.length > 0 ? availableMonths.map(renderMonthOption) : <option>Memuat...</option>}
@@ -266,35 +266,35 @@ const AdminLaporan: React.FC = () => {
                          <button
                             onClick={handleDownload}
                             disabled={isDownloading || isLoading}
-                            className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-700 transition-colors disabled:bg-zinc-700 disabled:cursor-not-allowed"
+                            className="flex items-center justify-center gap-2 bg-green-600 text-white px-3 py-2 rounded-lg font-semibold hover:bg-green-700 transition-colors disabled:bg-zinc-700 disabled:cursor-not-allowed text-sm whitespace-nowrap"
                         >
-                            <DownloadIcon className="w-5 h-5" />
+                            <DownloadIcon className="w-4 h-4" />
                             {isDownloading ? 'Menyiapkan...' : 'Download Laporan'}
                         </button>
                     </div>
                 </div>
-                <div className="overflow-x-auto">
-                    {isLoading ? <p>Memuat data laporan...</p> : (
-                        <table className="w-full text-sm text-left text-gray-text">
-                            <thead className="text-xs text-gray-text uppercase border-b border-zinc-800">
+                <div className="overflow-x-auto -mx-4 sm:mx-0">
+                    {isLoading ? <p className="px-4 py-6 text-sm">Memuat data laporan...</p> : (
+                        <table className="min-w-full text-xs sm:text-sm text-left text-gray-text">
+                            <thead className="text-[11px] sm:text-xs text-gray-text uppercase border-b border-zinc-800">
                                 <tr>
-                                    <th scope="col" className="px-4 py-4 sm:px-6 font-semibold">No. Anggota</th>
-                                    <th scope="col" className="px-4 py-4 sm:px-6 font-semibold">Nama</th>
-                                    <th scope="col" className="px-4 py-4 sm:px-6 font-semibold text-right">Simpanan Pokok</th>
-                                    <th scope="col" className="px-4 py-4 sm:px-6 font-semibold text-right">Simpanan Wajib</th>
-                                    <th scope="col" className="px-4 py-4 sm:px-6 font-semibold text-right">Total Simpanan</th>
-                                    <th scope="col" className="px-4 py-4 sm:px-6 font-semibold text-right">Total Pinjaman</th>
+                                    <th scope="col" className="px-3 py-3 sm:px-4 font-semibold">No. Anggota</th>
+                                    <th scope="col" className="px-3 py-3 sm:px-4 font-semibold">Nama</th>
+                                    <th scope="col" className="px-3 py-3 sm:px-4 font-semibold text-right">Simpanan Pokok</th>
+                                    <th scope="col" className="px-3 py-3 sm:px-4 font-semibold text-right">Simpanan Wajib</th>
+                                    <th scope="col" className="px-3 py-3 sm:px-4 font-semibold text-right">Total Simpanan</th>
+                                    <th scope="col" className="px-3 py-3 sm:px-4 font-semibold text-right">Total Pinjaman</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {filteredKeuangan.length > 0 ? filteredKeuangan.map((item) => (
                                     <tr key={item.no_anggota} className="hover:bg-zinc-800/50 transition-colors">
-                                        <td className="px-4 py-4 sm:px-6 font-medium text-dark">
+                                        <td className="px-3 py-3 sm:px-4 font-medium text-dark">
                                             <Link to={`/admin/keuangan/${item.no_anggota}`} className="text-primary hover:underline">
                                                 {item.no_anggota}
                                             </Link>
                                         </td>
-                                        <td className="px-4 py-4 sm:px-6">{item.nama_angota}</td>
+                                        <td className="px-3 py-3 sm:px-4 whitespace-nowrap">{item.nama_angota}</td>
                                         <CurrencyCell amount={item.akhir_simpanan_pokok} />
                                         <CurrencyCell amount={item.akhir_simpanan_wajib} />
                                         <CurrencyCell amount={item.jumlah_total_simpanan} defaultColor="text-primary" className="font-semibold" />
@@ -302,7 +302,7 @@ const AdminLaporan: React.FC = () => {
                                     </tr>
                                 )) : (
                                     <tr>
-                                        <td colSpan={6} className="text-center py-10 text-gray-text">
+                                        <td colSpan={6} className="text-center py-10 text-gray-text px-4">
                                             Tidak ada data keuangan yang cocok dengan pencarian Anda.
                                         </td>
                                     </tr>

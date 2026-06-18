@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import Header from '../../components/Header';
 import { TransaksiLog, Keuangan } from '../../types';
 import { getLogsByAnggota, createLogFromHistory, synchronizeMissingLogs } from '../../services/transaksiLogService';
-import { getHistoryByAnggota } from '../../services/keuanganService';
+import { getHistoryByAnggota, rebuildFinancialData, rebuildUploadHistory } from '../../services/keuanganService';
+import { getAnggota } from '../../services/anggotaService';
 import { PencilIcon, PlusIcon } from '../../components/icons/Icons';
 import { useAuth } from '../../context/AuthContext';
 
@@ -19,20 +20,43 @@ const AdminRiwayatTransaksi: React.FC = () => {
     const [combinedHistory, setCombinedHistory] = useState<CombinedHistoryItem[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [searchNoAnggota, setSearchNoAnggota] = useState('');
+    const [searchMode, setSearchMode] = useState<'no_anggota' | 'nama'>('no_anggota');
     const [searchedMember, setSearchedMember] = useState<string | null>(null);
     const [isSyncing, setIsSyncing] = useState(false);
+    const [isRecalculatingAll, setIsRecalculatingAll] = useState(false);
     const [syncMessage, setSyncMessage] = useState('');
     
     const handleSearch = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!searchNoAnggota) return;
+        const trimmedQuery = searchNoAnggota.trim();
+        if (!trimmedQuery) return;
         
         setIsLoading(true);
-        setSearchedMember(searchNoAnggota.toUpperCase());
+        setSyncMessage('');
         try {
+            let targetNoAnggota = trimmedQuery;
+
+            if (searchMode === 'nama') {
+                const allAnggota = await getAnggota();
+                const query = trimmedQuery.toLowerCase();
+                const matches = allAnggota.filter(anggota => anggota.nama.toLowerCase().includes(query));
+
+                if (matches.length === 0) {
+                    setCombinedHistory([]);
+                    setSearchedMember(null);
+                    setSyncMessage('Tidak ada anggota yang cocok dengan nama yang dicari.');
+                    return;
+                }
+
+                targetNoAnggota = matches[0].no_anggota;
+            } else {
+                targetNoAnggota = trimmedQuery.toUpperCase();
+            }
+
+            setSearchedMember(targetNoAnggota);
             const [logsData, historyData] = await Promise.all([
-                getLogsByAnggota(searchNoAnggota.toUpperCase()),
-                getHistoryByAnggota(searchNoAnggota.toUpperCase())
+                getLogsByAnggota(targetNoAnggota),
+                getHistoryByAnggota(targetNoAnggota)
             ]);
             
             const logPeriods = new Set(logsData.map(log => log.periode));
@@ -67,6 +91,8 @@ const AdminRiwayatTransaksi: React.FC = () => {
         } catch (error) {
             console.error("Error fetching history:", error);
             setCombinedHistory([]);
+            setSearchedMember(null);
+            setSyncMessage('Gagal memuat riwayat transaksi.');
         } finally {
             setIsLoading(false);
         }
@@ -103,6 +129,21 @@ const AdminRiwayatTransaksi: React.FC = () => {
         }
     };
 
+    const handleRecalculateAll = async () => {
+        setIsRecalculatingAll(true);
+        setSyncMessage('');
+        try {
+            await rebuildUploadHistory();
+            await rebuildFinancialData();
+            setSyncMessage('Update & rekalkulasi keseluruhan berhasil dilakukan.');
+        } catch (error) {
+            console.error('Recalculate all failed:', error);
+            setSyncMessage('Gagal melakukan update & rekalkulasi keseluruhan.');
+        } finally {
+            setIsRecalculatingAll(false);
+        }
+    };
+
     const formatCurrency = (amount: number | undefined) => {
         if (typeof amount !== 'number') return 'Rp 0';
         return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(amount);
@@ -112,24 +153,39 @@ const AdminRiwayatTransaksi: React.FC = () => {
         <div>
             <Header title="Riwayat Transaksi Manual" />
             <div className="bg-surface p-6 rounded-xl shadow-md">
-                <div className="flex justify-between items-start mb-4">
-                    <form onSubmit={handleSearch} className="flex items-center gap-2">
+                <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-3 mb-4">
+                    <form onSubmit={handleSearch} className="flex flex-col sm:flex-row items-stretch gap-2 w-full xl:w-auto">
+                        <select
+                            value={searchMode}
+                            onChange={(e) => setSearchMode(e.target.value as 'no_anggota' | 'nama')}
+                            className="bg-zinc-800 rounded-lg px-3 py-2 text-dark focus:ring-1 focus:ring-primary focus:border-primary"
+                        >
+                            <option value="no_anggota">Nomor Anggota</option>
+                            <option value="nama">Nama</option>
+                        </select>
                         <input
                             type="text"
-                            placeholder="Masukkan Nomor Anggota (e.g., AK-101)"
+                            placeholder={searchMode === 'no_anggota' ? 'Masukkan nomor anggota (contoh: AK-101)' : 'Masukkan nama anggota'}
                             className="bg-zinc-800 rounded-lg px-4 py-2 w-full sm:w-64 focus:ring-1 focus:ring-primary focus:border-primary text-dark"
                             value={searchNoAnggota}
                             onChange={(e) => setSearchNoAnggota(e.target.value)}
                         />
-                        <button type="submit" disabled={isLoading} className="bg-primary text-black px-6 py-2 rounded-lg font-semibold hover:bg-primary-dark disabled:bg-zinc-700">
+                        <button
+                            type="submit"
+                            disabled={isLoading}
+                            className="bg-primary text-black px-6 py-2 rounded-lg font-semibold hover:bg-primary-dark disabled:bg-zinc-700 whitespace-nowrap"
+                        >
                            {isLoading ? 'Mencari...' : 'Cari'}
                         </button>
                     </form>
-                    <div className="text-right">
-                         <button onClick={handleSync} disabled={isSyncing} className="bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-700 disabled:bg-zinc-700">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 xl:justify-end w-full xl:w-auto">
+                         <button onClick={handleSync} disabled={isSyncing} className="bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-700 disabled:bg-zinc-700 whitespace-nowrap">
                             {isSyncing ? 'Menyinkronkan...' : 'Sinkronisasi Riwayat'}
                         </button>
-                        <p className="text-xs text-gray-text mt-1">Gunakan jika riwayat transaksi tidak muncul.</p>
+                         <button onClick={handleRecalculateAll} disabled={isRecalculatingAll} className="bg-amber-500 text-black px-4 py-2 rounded-lg font-semibold hover:bg-amber-400 disabled:bg-zinc-700 disabled:text-white whitespace-nowrap">
+                            {isRecalculatingAll ? 'Memproses...' : 'Update & Rekalkulasi Semua'}
+                        </button>
+                        <p className="text-xs text-gray-text sm:text-right">Gunakan untuk menambah riwayat yang hilang atau mengulang perhitungan keseluruhan.</p>
                     </div>
                 </div>
                  {syncMessage && (
@@ -155,7 +211,7 @@ const AdminRiwayatTransaksi: React.FC = () => {
                             ) : searchedMember && combinedHistory.length === 0 ? (
                                 <tr><td colSpan={6} className="text-center py-10">Tidak ada riwayat transaksi manual untuk anggota {searchedMember}.</td></tr>
                             ) : !searchedMember ? (
-                                 <tr><td colSpan={6} className="text-center py-10">Silakan masukkan nomor anggota untuk melihat riwayat.</td></tr>
+                                 <tr><td colSpan={6} className="text-center py-10">Silakan masukkan nomor anggota atau nama untuk melihat riwayat.</td></tr>
                             ) : (
                                 combinedHistory.map(item => {
                                     const data = item.data;

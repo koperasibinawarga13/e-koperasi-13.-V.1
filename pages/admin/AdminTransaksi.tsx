@@ -168,7 +168,7 @@ const AdminTransaksi: React.FC = () => {
             if (editLogId) {
                 // Update existing log and recalculate
                 await correctPastTransaction(editLogId, dataToSubmit, user?.name || 'Admin');
-                setMessage({ type: 'success', text: `Riwayat transaksi berhasil diperbarui dan semua data terkait telah direkalkulasi.` });
+                setMessage({ type: 'success', text: `Riwayat transaksi berhasil diupdate dan saldo keuangan otomatis direkalkulasi.` });
                 setTimeout(() => navigate('/admin/riwayat-transaksi'), 2000); // Redirect after success
             } else {
                 // Process new transaction and create log
@@ -176,7 +176,7 @@ const AdminTransaksi: React.FC = () => {
                 if (result.errorCount > 0) throw new Error(result.errors[0]?.error || 'Terjadi kesalahan.');
                 
                 await createLog({ ...dataToSubmit, periode, type: 'INPUT BARU' });
-                setMessage({ type: 'success', text: `Transaksi baru untuk ${namaAnggota} berhasil disimpan.` });
+                setMessage({ type: 'success', text: `Transaksi berhasil disimpan dan data keuangan otomatis direkalkulasi.` });
                 setLastSuccessfulTx(dataToSubmit);
             }
         } catch (error: any) {
@@ -194,7 +194,7 @@ const AdminTransaksi: React.FC = () => {
     );
 
     const formTitle = editLogId ? 'Edit Riwayat Transaksi' : 'Input Transaksi Bulanan';
-    const submitButtonText = isSubmitting ? 'Memproses...' : (editLogId ? 'Update & Rekalkulasi Riwayat' : 'Simpan Transaksi');
+    const submitButtonText = isSubmitting ? 'Memproses...' : (editLogId ? 'Update & Rekalkulasi' : 'Simpan & Rekalkulasi');
 
     return (
         <div>
@@ -290,13 +290,16 @@ const AdminTransaksi: React.FC = () => {
                         </Section>
                         
                         <div className="mt-8 border-t border-zinc-800 pt-5">
-                            <div className="flex justify-end gap-4">
-                                <button type="button" onClick={handleReset} className="bg-zinc-700 text-dark py-2 px-4 rounded-md text-sm font-medium hover:bg-zinc-600">
-                                   {editLogId ? 'Batalkan Edit' : 'Reset Form'}
-                                </button>
-                                <button type="submit" disabled={isSubmitting || !namaAnggota || namaAnggota === 'Anggota tidak ditemukan'} className="bg-primary text-black py-2 px-4 rounded-md text-sm font-medium hover:bg-primary-dark disabled:bg-zinc-700">
-                                    {submitButtonText}
-                                </button>
+                            <div className="flex flex-col sm:flex-row sm:justify-end items-end gap-3">
+                                <p className="text-xs text-gray-text">Simpan transaksi sekaligus langsung menghitung ulang saldo keuangan.</p>
+                                <div className="flex gap-4">
+                                    <button type="button" onClick={handleReset} className="bg-zinc-700 text-dark py-2 px-4 rounded-md text-sm font-medium hover:bg-zinc-600">
+                                       {editLogId ? 'Batalkan Edit' : 'Reset Form'}
+                                    </button>
+                                    <button type="submit" disabled={isSubmitting || !namaAnggota || namaAnggota === 'Anggota tidak ditemukan'} className="bg-primary text-black py-2 px-4 rounded-md text-sm font-medium hover:bg-primary-dark disabled:bg-zinc-700">
+                                        {submitButtonText}
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </form>
