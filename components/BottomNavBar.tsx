@@ -27,17 +27,17 @@ const BottomNavBar: React.FC = () => {
   const LogoutButtonClasses = `flex flex-col items-center justify-center text-center w-full pt-1.5 pb-1 transition-colors duration-200 text-gray-text hover:text-primary`;
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-background border-t border-zinc-800 z-50">
-      <div className="flex justify-around max-w-lg mx-auto px-2">
+    <nav className="fixed bottom-0 left-0 right-0 bg-background/95 border-t border-zinc-800 z-50 pb-[max(0.35rem,env(safe-area-inset-bottom))]">
+      <div className="flex justify-around max-w-lg mx-auto px-1 sm:px-2">
         {navItems.map((item) => (
           <NavLink key={item.to} to={item.to} className={NavLinkClasses}>
-            {React.cloneElement(item.icon as React.ReactElement, { className: 'w-5 h-5 mb-1' })}
-            <span className="text-[11px] font-medium">{item.label}</span>
+            {React.cloneElement(item.icon as React.ReactElement, { className: 'w-4 h-4 sm:w-5 sm:h-5 mb-0.5' })}
+            <span className="text-[10px] sm:text-[11px] font-medium">{item.label}</span>
           </NavLink>
         ))}
         <button onClick={handleLogout} className={LogoutButtonClasses}>
-            <LogoutIcon className="w-5 h-5 mb-1" />
-            <span className="text-[11px] font-medium">Logout</span>
+            <LogoutIcon className="w-4 h-4 sm:w-5 sm:h-5 mb-0.5" />
+            <span className="text-[10px] sm:text-[11px] font-medium">Logout</span>
         </button>
       </div>
     </nav>
