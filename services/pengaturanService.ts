@@ -82,3 +82,29 @@ export const updatePengaturanJasa = async (data: PengaturanJasa): Promise<void> 
         throw error;
     }
 };
+
+// Maintenance mode helpers
+const maintenanceDocRef = doc(db, 'pengaturan', 'maintenance');
+
+export const getMaintenanceMode = async (): Promise<{ enabled: boolean; message?: string }> => {
+    try {
+        const snap = await getDoc(maintenanceDocRef);
+        if (snap.exists()) {
+            const data = snap.data() as any;
+            return { enabled: !!data.enabled, message: data.message };
+        }
+        return { enabled: false };
+    } catch (error) {
+        console.error('Error fetching maintenance mode:', error);
+        return { enabled: false };
+    }
+};
+
+export const setMaintenanceMode = async (enabled: boolean, message?: string): Promise<void> => {
+    try {
+        await setDoc(maintenanceDocRef, { enabled, message: message || '' }, { merge: true });
+    } catch (error) {
+        console.error('Error setting maintenance mode:', error);
+        throw error;
+    }
+};
