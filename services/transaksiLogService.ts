@@ -41,15 +41,42 @@ export const batchCreateUploadLogs = async (
     const timestamp = new Date().toISOString();
 
     transaksiList.forEach((tx) => {
-        const logRef = doc(logCollectionRef);
-        batch.set(logRef, {
-            ...tx,
-            periode,
-            type: 'UPLOAD BULANAN',
-            admin_nama: adminName || tx.admin_nama || 'Sistem',
-            upload_session_id: uploadSessionId,
-            log_time: timestamp,
+        // Ensure all expected transaction fields exist and are numbers (default 0)
+        const normalizedTx: any = {};
+        const allFields = [
+            'transaksi_simpanan_pokok', 'transaksi_simpanan_wajib', 'transaksi_simpanan_sukarela', 'transaksi_simpanan_wisata',
+            'transaksi_pinjaman_berjangka', 'transaksi_pinjaman_khusus', 'transaksi_simpanan_jasa', 'transaksi_niaga',
+            'transaksi_dana_perlaya', 'transaksi_dana_katineng', 'Jumlah_setoran', 'transaksi_pengambilan_simpanan_pokok',
+            'transaksi_pengambilan_simpanan_wajib', 'transaksi_pengambilan_simpanan_sukarela', 'transaksi_pengambilan_simpanan_wisata',
+            'transaksi_penambahan_pinjaman_berjangka', 'transaksi_penambahan_pinjaman_khusus', 'transaksi_penambahan_pinjaman_niaga'
+        ];
+
+        // Copy base fields
+        normalizedTx.no_anggota = String(tx.no_anggota || '').trim();
+        normalizedTx.nama_angota = String(tx.nama_angota || (tx as any).nama_anggota || '').trim();
+
+        // Ensure periode and tanggal_transaksi exist
+        normalizedTx.periode = periode;
+        normalizedTx.tanggal_transaksi = tx.tanggal_transaksi || new Date().toISOString().split('T')[0];
+
+        // Normalize numeric fields (try exact key, then lowercased key)
+        allFields.forEach((field) => {
+            const lower = field.toLowerCase();
+            const raw = (tx as any)[field] ?? (tx as any)[lower];
+            const num = Number(raw);
+            normalizedTx[field] = Number.isFinite(num) ? num : 0;
+            // also set lowercase variant to be defensive
+            normalizedTx[lower] = normalizedTx[field];
         });
+
+        // other meta fields
+        normalizedTx.type = 'UPLOAD BULANAN';
+        normalizedTx.admin_nama = adminName || tx.admin_nama || 'Sistem';
+        normalizedTx.upload_session_id = uploadSessionId;
+        normalizedTx.log_time = timestamp;
+
+        const logRef = doc(logCollectionRef);
+        batch.set(logRef, normalizedTx);
     });
 
     await batch.commit();
