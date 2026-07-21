@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../../components/Header';
 import { TransaksiLog, Keuangan } from '../../types';
-import { getLogsByAnggota, createLogFromHistory, synchronizeMissingLogs } from '../../services/transaksiLogService';
+import { getLogsByAnggota, createLogFromHistory, synchronizeMissingLogs, deleteLogById } from '../../services/transaksiLogService';
 import { getHistoryByAnggota, rebuildUploadHistory, rebuildFinancialDataFromMonth, getUploadMonthsFromCollection } from '../../services/keuanganService';
 import { getAnggota } from '../../services/anggotaService';
-import { PencilIcon, PlusIcon } from '../../components/icons/Icons';
+import { PencilIcon, PlusIcon, TrashIcon } from '../../components/icons/Icons';
 import { useAuth } from '../../context/AuthContext';
 
 interface CombinedHistoryItem {
@@ -108,6 +108,25 @@ const AdminRiwayatTransaksi: React.FC = () => {
         } catch (error) {
             console.error("Failed to create log and edit:", error);
             alert("Gagal membuat riwayat untuk diedit.");
+        }
+    };
+
+    const handleDeleteLog = async (logId: string) => {
+        if (!confirm('Hapus log ini? Tindakan ini tidak dapat dibatalkan.')) return;
+        setIsLoading(true);
+        setSyncMessage('');
+        try {
+            await deleteLogById(logId);
+            setSyncMessage('Log berhasil dihapus.');
+            if (searchedMember) {
+                const dummyEvent = { preventDefault: () => {} } as React.FormEvent;
+                handleSearch(dummyEvent);
+            }
+        } catch (error) {
+            console.error('Failed to delete log:', error);
+            setSyncMessage('Gagal menghapus log.');
+        } finally {
+            setIsLoading(false);
         }
     };
     
@@ -280,7 +299,7 @@ const AdminRiwayatTransaksi: React.FC = () => {
                                                     </span>
                                                 </td>
                                                 <td className="px-4 py-3 text-right font-semibold text-dark">{formatCurrency(log.Jumlah_setoran)}</td>
-                                                <td className="px-4 py-3 text-center">
+                                                <td className="px-4 py-3 text-center flex items-center justify-center gap-2">
                                                     <button 
                                                         onClick={() => navigate(`/admin/transaksi?editLogId=${log.id}`)}
                                                         className="text-primary hover:text-primary-dark disabled:text-zinc-600"
@@ -288,6 +307,14 @@ const AdminRiwayatTransaksi: React.FC = () => {
                                                         disabled={log.admin_nama !== user?.name && user?.email !== 'admin@koperasi13.com'}
                                                     >
                                                         <PencilIcon className="w-5 h-5" />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDeleteLog(log.id)}
+                                                        className="text-red-400 hover:text-red-500"
+                                                        title="Hapus Log"
+                                                        disabled={log.admin_nama !== user?.name && user?.email !== 'admin@koperasi13.com'}
+                                                    >
+                                                        <TrashIcon className="w-5 h-5" />
                                                     </button>
                                                 </td>
                                             </tr>

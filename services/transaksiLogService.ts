@@ -166,6 +166,16 @@ export const getLogsByPeriod = async (periode: string): Promise<TransaksiLog[]> 
     }
 };
 
+export const deleteLogById = async (id: string): Promise<void> => {
+    try {
+        const logDocRef = doc(db, 'transaksi_logs', id);
+        await deleteDoc(logDocRef);
+    } catch (error) {
+        console.error(`Error deleting log ${id}: `, error);
+        throw error;
+    }
+};
+
 export const getUploadLogsByPeriod = async (periode: string): Promise<TransaksiLog[]> => {
     const allLogs = await getLogsByPeriod(periode);
     return allLogs.filter(log => log.type === 'UPLOAD BULANAN');
