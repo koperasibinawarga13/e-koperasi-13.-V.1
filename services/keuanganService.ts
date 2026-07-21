@@ -347,6 +347,62 @@ export const rebuildFinancialData = async (): Promise<void> => {
     }
 };
 
+export const rebuildFinancialDataFromMonth = async (startMonth: string): Promise<void> => {
+    const months = await getUploadedMonths();
+    const filtered = months.filter(m => m >= startMonth).sort((a, b) => a.localeCompare(b));
+    if (filtered.length === 0) return;
+
+    const latestState = new Map<string, Keuangan>();
+
+    for (const month of filtered) {
+        const allLogs = await getLogsByPeriod(month);
+        const uploadLogs = allLogs.filter(log => log.type === 'UPLOAD BULANAN');
+        const logsByMember = new Map<string, TransaksiLog[]>();
+
+        uploadLogs.forEach((log) => {
+            const key = String(log.no_anggota || '').toUpperCase();
+            if (!logsByMember.has(key)) logsByMember.set(key, []);
+            // ensure the log uses normalized no_anggota
+            logsByMember.get(key)!.push({ ...log, no_anggota: key } as TransaksiLog);
+        });
+
+        const batch = writeBatch(db);
+
+        for (const [no_anggota, memberLogs] of logsByMember) {
+            const prevMonth = new Date(new Date(`${month}-02`).setMonth(new Date(`${month}-02`).getMonth() - 1)).toISOString().slice(0, 7);
+            let prevState = latestState.get(no_anggota);
+
+            if (!prevState) {
+                const prevHistoryDocRef = doc(db, 'keuangan', no_anggota, 'history', prevMonth);
+                const prevHistorySnap = await getDoc(prevHistoryDocRef);
+                if (prevHistorySnap.exists()) {
+                    prevState = prevHistorySnap.data() as Keuangan;
+                } else {
+                    const currentKeuanganDocRef = doc(db, 'keuangan', no_anggota);
+                    const currentKeuanganSnap = await getDoc(currentKeuanganDocRef);
+                    prevState = currentKeuanganSnap.exists() ? (currentKeuanganSnap.data() as Keuangan) : createEmptyKeuangan(no_anggota);
+                }
+            }
+
+            const updatedHistory = buildHistoryFromLogs(prevState, memberLogs);
+            const historyDocRef = doc(db, 'keuangan', no_anggota, 'history', month);
+            batch.set(historyDocRef, updatedHistory);
+            latestState.set(no_anggota, updatedHistory);
+        }
+
+        await batch.commit();
+    }
+
+    if (latestState.size > 0) {
+        const batch = writeBatch(db);
+        latestState.forEach((state, no_anggota) => {
+            const docRef = doc(db, 'keuangan', no_anggota);
+            batch.set(docRef, state, { merge: true });
+        });
+        await batch.commit();
+    }
+};
+
 export const deleteUploadSession = async (month: string, sessionId: string): Promise<void> => {
     const sessionDocRef = doc(uploadSessionsCollectionRef, sessionId);
     const logs = await getLogsByUploadSession(month, sessionId);

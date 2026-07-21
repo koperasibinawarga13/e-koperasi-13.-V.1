@@ -18,3 +18,4 @@ const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 
 // Teruskan instance aplikasi secara eksplisit ke getFirestore() untuk memastikan koneksi yang benar.
 export const db = getFirestore(app);
+export default firebaseConfig;

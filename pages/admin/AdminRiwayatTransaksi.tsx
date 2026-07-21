@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Header from '../../components/Header';
 import { TransaksiLog, Keuangan } from '../../types';
 import { getLogsByAnggota, createLogFromHistory, synchronizeMissingLogs } from '../../services/transaksiLogService';
-import { getHistoryByAnggota, rebuildFinancialData, rebuildUploadHistory } from '../../services/keuanganService';
+import { getHistoryByAnggota, rebuildUploadHistory, rebuildFinancialDataFromMonth, getUploadMonthsFromCollection } from '../../services/keuanganService';
 import { getAnggota } from '../../services/anggotaService';
 import { PencilIcon, PlusIcon } from '../../components/icons/Icons';
 import { useAuth } from '../../context/AuthContext';
@@ -23,7 +23,9 @@ const AdminRiwayatTransaksi: React.FC = () => {
     const [searchMode, setSearchMode] = useState<'no_anggota' | 'nama'>('no_anggota');
     const [searchedMember, setSearchedMember] = useState<string | null>(null);
     const [isSyncing, setIsSyncing] = useState(false);
-    const [isRecalculatingAll, setIsRecalculatingAll] = useState(false);
+    const [isRecalculatingPeriod, setIsRecalculatingPeriod] = useState(false);
+    const [availableMonths, setAvailableMonths] = useState<string[]>([]);
+    const [selectedMonth, setSelectedMonth] = useState<string>('');
     const [syncMessage, setSyncMessage] = useState('');
     
     const handleSearch = async (e: React.FormEvent) => {
@@ -129,20 +131,40 @@ const AdminRiwayatTransaksi: React.FC = () => {
         }
     };
 
-    const handleRecalculateAll = async () => {
-        setIsRecalculatingAll(true);
+    useEffect(() => {
+        const fetchMonths = async () => {
+            try {
+                const months = await getUploadMonthsFromCollection();
+                setAvailableMonths(months);
+                if (months.length > 0 && !selectedMonth) setSelectedMonth(months[0]);
+            } catch (error) {
+                console.error('Failed to load available months:', error);
+            }
+        };
+        fetchMonths();
+    }, []);
+
+    const handleRecalculatePeriod = async () => {
+        if (!selectedMonth) return;
+        setIsRecalculatingPeriod(true);
         setSyncMessage('');
         try {
             await rebuildUploadHistory();
-            await rebuildFinancialData();
-            setSyncMessage('Update & rekalkulasi keseluruhan berhasil dilakukan.');
+            await rebuildFinancialDataFromMonth(selectedMonth);
+            setSyncMessage(`Rekalkulasi periode ${selectedMonth} selesai.`);
+            if (searchedMember) {
+                const dummyEvent = { preventDefault: () => {} } as React.FormEvent;
+                handleSearch(dummyEvent);
+            }
         } catch (error) {
-            console.error('Recalculate all failed:', error);
-            setSyncMessage('Gagal melakukan update & rekalkulasi keseluruhan.');
+            console.error('Recalculate period failed:', error);
+            setSyncMessage('Gagal melakukan rekalkulasi periode.');
         } finally {
-            setIsRecalculatingAll(false);
+            setIsRecalculatingPeriod(false);
         }
     };
+
+    // Global recalculate removed to prefer per-periode recalculation from Upload page.
 
     const formatCurrency = (amount: number | undefined) => {
         if (typeof amount !== 'number') return 'Rp 0';
@@ -182,9 +204,21 @@ const AdminRiwayatTransaksi: React.FC = () => {
                          <button onClick={handleSync} disabled={isSyncing} className="bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-700 disabled:bg-zinc-700 whitespace-nowrap">
                             {isSyncing ? 'Menyinkronkan...' : 'Sinkronisasi Riwayat'}
                         </button>
-                         <button onClick={handleRecalculateAll} disabled={isRecalculatingAll} className="bg-amber-500 text-black px-4 py-2 rounded-lg font-semibold hover:bg-amber-400 disabled:bg-zinc-700 disabled:text-white whitespace-nowrap">
-                            {isRecalculatingAll ? 'Memproses...' : 'Update & Rekalkulasi Semua'}
-                        </button>
+                        <div className="flex items-center gap-2">
+                            <select
+                                value={selectedMonth}
+                                onChange={(e) => setSelectedMonth(e.target.value)}
+                                className="bg-zinc-800 rounded-lg px-3 py-2 text-dark focus:ring-1 focus:ring-primary"
+                            >
+                                <option value="">Pilih Periode</option>
+                                {availableMonths.map(m => (
+                                    <option key={m} value={m}>{new Date(`${m}-02`).toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}</option>
+                                ))}
+                            </select>
+                            <button onClick={handleRecalculatePeriod} disabled={!selectedMonth || isRecalculatingPeriod} className="bg-amber-500 text-black px-4 py-2 rounded-lg font-semibold hover:bg-amber-400 disabled:bg-zinc-700 disabled:text-white whitespace-nowrap">
+                                {isRecalculatingPeriod ? 'Memproses...' : 'Update & Rekalkulasi Periode'}
+                            </button>
+                        </div>
                         <p className="text-xs text-gray-text sm:text-right">Gunakan untuk menambah riwayat yang hilang atau mengulang perhitungan keseluruhan.</p>
                     </div>
                 </div>

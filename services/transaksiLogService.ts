@@ -51,8 +51,8 @@ export const batchCreateUploadLogs = async (
             'transaksi_penambahan_pinjaman_berjangka', 'transaksi_penambahan_pinjaman_khusus', 'transaksi_penambahan_pinjaman_niaga'
         ];
 
-        // Copy base fields
-        normalizedTx.no_anggota = String(tx.no_anggota || '').trim();
+        // Copy base fields and normalize member ID to uppercase for consistency
+        normalizedTx.no_anggota = String(tx.no_anggota || '').trim().toUpperCase();
         normalizedTx.nama_angota = String(tx.nama_angota || (tx as any).nama_anggota || '').trim();
 
         // Ensure periode and tanggal_transaksi exist

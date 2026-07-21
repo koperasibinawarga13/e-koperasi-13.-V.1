@@ -249,7 +249,7 @@ const AdminUpload: React.FC = () => {
             const keuanganList: Keuangan[] = json.map(row => {
                 const rawData = {
                     no: parseNumber(row.no),
-                    no_anggota: String(row.no_anggota || '').trim(),
+                    no_anggota: String(row.no_anggota || '').trim().toUpperCase(),
                     nama_angota: String(row.nama_angota || '').trim(),
                     awal_simpanan_pokok: parseNumber(row.awal_simpanan_pokok),
                     awal_simpanan_wajib: parseNumber(row.awal_simpanan_wajib),
@@ -327,8 +327,8 @@ const AdminUpload: React.FC = () => {
             }
             const uploadMonth = `${match[1]}-${match[2]}`;
 
-            const transaksiList: TransaksiBulanan[] = json.map(row => ({
-                 no_anggota: String(row.no_anggota || '').trim(),
+              const transaksiList: TransaksiBulanan[] = json.map(row => ({
+                  no_anggota: String(row.no_anggota || '').trim().toUpperCase(),
                  nama_angota: String(row.nama_angota || '').trim(),
                  transaksi_simpanan_pokok: parseNumber(row.transaksi_simpanan_pokok),
                  transaksi_simpanan_wajib: parseNumber(row.transaksi_simpanan_wajib),
@@ -424,7 +424,9 @@ const AdminUpload: React.FC = () => {
     const handleRebuildHistory = async () => {
         setIsRebuilding(true);
         try {
+            // Rebuild upload history index and then fully recompute financial data
             await rebuildUploadHistory();
+            // Note: do not automatically recalculate all here to avoid long blocking operation
         } catch (error) {
             console.error("Failed to rebuild history:", error);
         }
@@ -439,6 +441,8 @@ const AdminUpload: React.FC = () => {
             setIsRebuilding(false);
         }
     };
+
+    
 
     const handleDownloadReport = async () => {
         setIsDownloading(true);
@@ -623,16 +627,17 @@ const AdminUpload: React.FC = () => {
                                                         </div>
                                                     </div>
                                                     <div className="flex justify-end">
-                                                        <button
-                                                            onClick={() => handleDeleteSessionClick(monthHistory.month, session.id)}
-                                                            disabled={isDeleting === session.id}
-                                                            className="flex items-center gap-2 text-sm text-red-500 hover:text-red-400 font-semibold disabled:text-zinc-600 disabled:cursor-wait"
-                                                        >
-                                                            {isDeleting === session.id ? 'Menghapus...' : <><TrashIcon className="w-4 h-4" /> Hapus Upload</>}
-                                                        </button>
+                                                                <button
+                                                                    onClick={() => handleDeleteSessionClick(monthHistory.month, session.id)}
+                                                                    disabled={isDeleting === session.id}
+                                                                    className="flex items-center gap-2 text-sm text-red-500 hover:text-red-400 font-semibold disabled:text-zinc-600 disabled:cursor-wait"
+                                                                >
+                                                                    {isDeleting === session.id ? 'Menghapus...' : <><TrashIcon className="w-4 h-4" /> Hapus Upload</>}
+                                                                </button>
                                                     </div>
                                                 </div>
                                             ))}
+                                            
                                             <div className="flex justify-end pt-2">
                                                 <button
                                                     onClick={() => handleDeleteMonthClick(monthHistory.month)}
