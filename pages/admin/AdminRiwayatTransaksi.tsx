@@ -150,8 +150,22 @@ const AdminRiwayatTransaksi: React.FC = () => {
         setSyncMessage('');
         try {
             await rebuildUploadHistory();
-            await rebuildFinancialDataFromMonth(selectedMonth);
-            setSyncMessage(`Rekalkulasi periode ${selectedMonth} selesai.`);
+
+            if (selectedMonth === 'ALL') {
+                if (!availableMonths || availableMonths.length === 0) {
+                    setSyncMessage('Tidak ada periode tersedia untuk direkalkulasi.');
+                    return;
+                }
+                // Choose the earliest available month (YYYY-MM strings sort lexicographically)
+                const monthsSorted = [...availableMonths].sort();
+                const earliest = monthsSorted[0];
+                await rebuildFinancialDataFromMonth(earliest);
+                setSyncMessage('Rekalkulasi untuk semua periode selesai.');
+            } else {
+                await rebuildFinancialDataFromMonth(selectedMonth);
+                setSyncMessage(`Rekalkulasi periode ${selectedMonth} selesai.`);
+            }
+
             if (searchedMember) {
                 const dummyEvent = { preventDefault: () => {} } as React.FormEvent;
                 handleSearch(dummyEvent);
@@ -211,6 +225,7 @@ const AdminRiwayatTransaksi: React.FC = () => {
                                 className="bg-zinc-800 rounded-lg px-3 py-2 text-dark focus:ring-1 focus:ring-primary"
                             >
                                 <option value="">Pilih Periode</option>
+                                <option value="ALL">Semua Periode</option>
                                 {availableMonths.map(m => (
                                     <option key={m} value={m}>{new Date(`${m}-02`).toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}</option>
                                 ))}
